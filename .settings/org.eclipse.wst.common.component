@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="t2c">
+        <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/test"/>
+        <dependent-module archiveName="tfy_core.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/tfy_core/tfy_core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="t2c"/>
+        <property name="java-output-path" value="/t2c/build/classes"/>
+    </wb-module>
+</project-modules>
