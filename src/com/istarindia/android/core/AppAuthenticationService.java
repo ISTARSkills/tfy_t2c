@@ -43,5 +43,4 @@ public class AppAuthenticationService {
 
 		return authenticationToken;
 	}
-
 }
