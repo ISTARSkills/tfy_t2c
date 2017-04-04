@@ -10,6 +10,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.istarindia.android.utility.AppPOJOUtility;
+import com.istarindia.apps.services.BatchStudentsServices;
+import com.viksitpro.core.dao.entities.BatchStudents;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.pojo.recruiter.StudentPOJO;
@@ -24,9 +26,9 @@ public class AppIstarUserService {
 				
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.createIstarUser(email, password, mobile);
-		
+
 		if(istarUser==null){
-			//User already exists
+			//User Email or Mobile already registered
 			return Response.status(Response.Status.CONFLICT).build(); 
 		}else{			
 			return Response.status(Response.Status.CREATED).build();
@@ -52,5 +54,34 @@ public class AppIstarUserService {
 			
 			return Response.ok(studentPOJO).build(); 
 		}
+	}
+	
+	@POST
+	@Path("reset/password")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response resetPassword(@FormParam("mobile") Long mobile, @FormParam("password") String password){
+		System.out.println("Resetting password");
+		IstarUserServices istarUserServices = new IstarUserServices();
+		IstarUser istarUser = istarUserServices.getIstarUserByMobile(mobile);
+		
+		if(istarUser==null){
+			return Response.status(404).build(); 
+		}else{
+			istarUser = istarUserServices.updateIstarUser(istarUser.getId(), istarUser.getEmail(), password, istarUser.getMobile());
+			return Response.status(Response.Status.CREATED).build();
+		}
+	}
+	
+	@POST
+	@Path("{userId}/batchCode")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response assignBatchCode(@PathParam("istarUserId") int istarUserId, @FormParam("batchCode") String batchCode){
+
+		//check if student batch already exists
+		
+		BatchStudentsServices batchStudentServices = new BatchStudentsServices();
+		BatchStudents batchStudents = batchStudentServices.createBatchStudents(istarUserId, batchCode);
+				
+		return Response.status(Response.Status.CREATED).build();
 	}
 }
