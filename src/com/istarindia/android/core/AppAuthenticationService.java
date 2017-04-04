@@ -15,7 +15,7 @@ import com.viksitpro.core.dao.utils.user.IstarUserServices;
 public class AppAuthenticationService {
 
 	@POST
-	@Path("issueToken")
+	@Path("login")
 	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 	public Response loginUser(@FormParam("email") String email, @FormParam("password") String password) {
 
@@ -33,10 +33,30 @@ public class AppAuthenticationService {
 			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
 	}
+	
+	@POST
+	@Path("login/social")
+	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+	public Response loginUserWithSocialMedia(@FormParam("email") String email, @FormParam("socialMedia") String socialMedia) {
+
+		IstarUserServices istarUserServices = new IstarUserServices();
+		IstarUser istarUser = istarUserServices.getIstarUserByEmail(email);
+
+		try {
+			if (istarUser == null) {
+				istarUser = istarUserServices.createIstarUser(email, "test123", null);
+			}
+
+			String token = assignToken(istarUser);
+			return Response.ok(token).build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
+	}
 
 	private String assignToken(IstarUser istarUser) {
 
-		String authenticationToken = AppUtility.getRandomString(10);
+		String authenticationToken = AppUtility.getRandomString(20);
 
 		IstarUserServices istarUserServices = new IstarUserServices();
 		istarUser = istarUserServices.updateAuthenticationTokenForIstarUser(istarUser, authenticationToken);
