@@ -44,21 +44,4 @@ public class AppAuthenticationService {
 		return authenticationToken;
 	}
 
-	private boolean validateToken(int istarUserId, String authenticationToken) throws Exception {
-
-		boolean isValid = false;
-		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
-
-		if (istarUser == null) {
-			throw new Exception();
-		}
-
-		if (istarUser.getAuthToken().equals(authenticationToken)) {
-			isValid = true;
-		}
-
-		return isValid;
-	}
-
 }
