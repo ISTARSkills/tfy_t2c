@@ -1,4 +1,4 @@
-package com.istarindia.android.core;
+package com.istarindia.android.rest;
 
 import java.io.IOException;
 

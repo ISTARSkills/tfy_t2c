@@ -1,4 +1,4 @@
-package com.istarindia.android.core;
+package com.istarindia.android.rest;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;

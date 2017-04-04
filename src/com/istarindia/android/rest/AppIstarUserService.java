@@ -1,4 +1,4 @@
-package com.istarindia.android.core;
+package com.istarindia.android.rest;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -49,9 +49,7 @@ public class AppIstarUserService {
 		}else{
 			AppPOJOUtility androidPOJOUtility = new AppPOJOUtility();
 			StudentPOJO studentPOJO = androidPOJOUtility.getStudentPOJO(istarUser);
-
-			//GenericEntity<StudentPOJO> entity = new GenericEntity<StudentPOJO>(studentPOJO){};
-			
+			//GenericEntity<StudentPOJO> entity = new GenericEntity<StudentPOJO>(studentPOJO){};			
 			return Response.ok(studentPOJO).build(); 
 		}
 	}
