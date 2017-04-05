@@ -21,18 +21,18 @@ public class BatchGroupServices {
 		}
 		return batchGroup;
 	}
-	
-	public BatchGroup getBatchGroupByBatchCode(String batchCode){
+
+	public BatchGroup getBatchGroupByBatchCode(String batchCode) {
 		BatchGroup batchGroup = null;
 		BatchGroupDAO batchGroupDAO = new BatchGroupDAO();
-			List<BatchGroup> allBatchGroup = batchGroupDAO.findByBatchCode(batchCode);
-			
-			if(allBatchGroup.size() > 0){
-				batchGroup = allBatchGroup.get(0);
-			}			
+		List<BatchGroup> allBatchGroup = batchGroupDAO.findByBatchCode(batchCode);
+
+		if (allBatchGroup.size() > 0) {
+			batchGroup = allBatchGroup.get(0);
+		}
 		return batchGroup;
 	}
-	
+
 	public BatchGroup saveBatchGroupToDAO(BatchGroup batchGroup) {
 
 		BatchGroupDAO batchGroupDAO = new BatchGroupDAO();

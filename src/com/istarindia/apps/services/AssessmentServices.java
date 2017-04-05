@@ -5,12 +5,12 @@ import com.viksitpro.core.dao.entities.AssessmentDAO;
 
 public class AssessmentServices {
 
-	public Assessment getAssessment(int assessmentId){		
-		Assessment assessment;		
+	public Assessment getAssessment(int assessmentId) {
+		Assessment assessment;
 		AssessmentDAO assessmentDAO = new AssessmentDAO();
-		try{
+		try {
 			assessment = assessmentDAO.findById(assessmentId);
-		}catch(IllegalArgumentException e){
+		} catch (IllegalArgumentException e) {
 			assessment = null;
 		}
 		return assessment;
