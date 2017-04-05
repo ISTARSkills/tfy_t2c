@@ -11,7 +11,6 @@ import javax.ws.rs.core.Response;
 
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.apps.services.BatchStudentsServices;
-import com.viksitpro.core.dao.entities.BatchStudents;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.pojo.recruiter.StudentPOJO;
@@ -80,7 +79,7 @@ public class AppIstarUserService {
 
 		// check if student batch already exists
 		BatchStudentsServices batchStudentServices = new BatchStudentsServices();
-		BatchStudents batchStudents = batchStudentServices.createBatchStudents(istarUserId, batchCode);
+		batchStudentServices.createBatchStudents(istarUserId, batchCode);
 
 		return Response.status(Response.Status.CREATED).build();
 	}
