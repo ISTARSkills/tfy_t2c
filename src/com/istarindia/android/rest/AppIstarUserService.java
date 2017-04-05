@@ -21,7 +21,7 @@ public class AppIstarUserService {
 
 	@POST
 	@Path("create")
-	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response createUser(@FormParam("email") String email, @FormParam("password") String password, @FormParam("mobile") Long mobile){
 				
 		IstarUserServices istarUserServices = new IstarUserServices();

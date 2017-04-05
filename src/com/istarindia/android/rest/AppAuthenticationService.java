@@ -37,17 +37,17 @@ public class AppAuthenticationService {
 	@POST
 	@Path("login/social")
 	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-	public Response loginUserWithSocialMedia(@FormParam("email") String email, @FormParam("socialMedia") String socialMedia) {
+	public Response loginUserWithSocialMedia(@FormParam("email") String email, @FormParam("mobile") Long mobile, 
+			@FormParam("token") String token, @FormParam("socialMedia") String socialMedia) {
 
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.getIstarUserByEmail(email);
 
 		try {
 			if (istarUser == null) {
-				istarUser = istarUserServices.createIstarUser(email, "test123", null);
+				istarUser = istarUserServices.createIstarUser(email, "test123", mobile, token, socialMedia);
 			}
 
-			String token = assignToken(istarUser);
 			return Response.ok(token).build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.UNAUTHORIZED).build();
