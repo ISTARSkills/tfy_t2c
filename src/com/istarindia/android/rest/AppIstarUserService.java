@@ -22,64 +22,66 @@ public class AppIstarUserService {
 	@POST
 	@Path("create")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createUser(@FormParam("email") String email, @FormParam("password") String password, @FormParam("mobile") Long mobile){
-				
+	public Response createUser(@FormParam("email") String email, @FormParam("password") String password,
+			@FormParam("mobile") Long mobile) {
+
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.createIstarUser(email, password, mobile);
 
-		if(istarUser==null){
-			//User Email or Mobile already registered
-			return Response.status(Response.Status.CONFLICT).build(); 
-		}else{			
+		if (istarUser == null) {
+			// User Email or Mobile already registered
+			return Response.status(Response.Status.CONFLICT).build();
+		} else {
 			return Response.status(Response.Status.CREATED).build();
 		}
 	}
-	
+
 	@GET
 	@Path("{userId}/profile")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUserProfile(@PathParam("userId") int userId){
+	public Response getUserProfile(@PathParam("userId") int userId) {
 		System.out.println("Getting user profile" + userId);
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.getIstarUser(userId);
-		
-		if(istarUser==null){
-			//User does not exists
-			return Response.status(404).build(); 
-		}else{
+
+		if (istarUser == null) {
+			// User does not exists
+			return Response.status(404).build();
+		} else {
 			AppPOJOUtility androidPOJOUtility = new AppPOJOUtility();
 			StudentPOJO studentPOJO = androidPOJOUtility.getStudentPOJO(istarUser);
-			//GenericEntity<StudentPOJO> entity = new GenericEntity<StudentPOJO>(studentPOJO){};			
-			return Response.ok(studentPOJO).build(); 
+
+			return Response.ok(studentPOJO).build();
 		}
 	}
-	
+
 	@POST
 	@Path("reset/password")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response resetPassword(@FormParam("mobile") Long mobile, @FormParam("password") String password){
+	public Response resetPassword(@FormParam("mobile") Long mobile, @FormParam("password") String password) {
 		System.out.println("Resetting password");
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.getIstarUserByMobile(mobile);
-		
-		if(istarUser==null){
-			return Response.status(404).build(); 
-		}else{
-			istarUser = istarUserServices.updateIstarUser(istarUser.getId(), istarUser.getEmail(), password, istarUser.getMobile());
+
+		if (istarUser == null) {
+			return Response.status(404).build();
+		} else {
+			istarUser = istarUserServices.updateIstarUser(istarUser.getId(), istarUser.getEmail(), password,
+					istarUser.getMobile());
 			return Response.status(Response.Status.CREATED).build();
 		}
 	}
-	
+
 	@POST
 	@Path("{userId}/batchCode")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response assignBatchCode(@PathParam("istarUserId") int istarUserId, @FormParam("batchCode") String batchCode){
+	public Response assignBatchCode(@PathParam("istarUserId") int istarUserId,
+			@FormParam("batchCode") String batchCode) {
 
-		//check if student batch already exists
-		
+		// check if student batch already exists
 		BatchStudentsServices batchStudentServices = new BatchStudentsServices();
 		BatchStudents batchStudents = batchStudentServices.createBatchStudents(istarUserId, batchCode);
-				
+
 		return Response.status(Response.Status.CREATED).build();
 	}
 }

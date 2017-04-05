@@ -33,11 +33,11 @@ public class AppAuthenticationService {
 			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
 	}
-	
+
 	@POST
 	@Path("login/social")
 	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-	public Response loginUserWithSocialMedia(@FormParam("email") String email, @FormParam("mobile") Long mobile, 
+	public Response loginUserWithSocialMedia(@FormParam("email") String email, @FormParam("mobile") Long mobile,
 			@FormParam("token") String token, @FormParam("socialMedia") String socialMedia) {
 
 		IstarUserServices istarUserServices = new IstarUserServices();
