@@ -8,6 +8,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.istarindia.android.pojo.StudentProfile;
+import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.android.utility.AppUtility;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
@@ -29,8 +31,12 @@ public class AppAuthenticationService {
 				throw new Exception();
 			}
 
-			String token = assignToken(istarUser);
-			return Response.ok(token).build();
+			istarUser = assignToken(istarUser);
+
+			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
+
+			return Response.ok(studentProfile).build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
@@ -43,7 +49,7 @@ public class AppAuthenticationService {
 			@FormParam("token") String token, @FormParam("socialMedia") String socialMedia) {
 
 		System.out.println("Logged In from Social Media--> Mobile Number is:" + mobile);
-		
+
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.getIstarUserByEmail(email);
 
@@ -51,34 +57,38 @@ public class AppAuthenticationService {
 			if (istarUser == null) {
 				istarUser = istarUserServices.createIstarUser(email, "test123", mobile, token, socialMedia);
 			}
-			return Response.ok(token).build();
+
+			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
+
+			return Response.ok(studentProfile).build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
 	}
-	
+
 	@POST
 	@Path("test")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response test(IstarUserPOJO istarUserPOJO){
-		
+	public Response test(IstarUserPOJO istarUserPOJO) {
+
 		System.out.println("Accepting JSON method");
-		
+
 		System.out.println(istarUserPOJO.getEmail());
 		System.out.println(istarUserPOJO.getAuthenticationToken());
-		
+
 		System.out.println("Returning JSON");
 		return Response.ok(istarUserPOJO).build();
 	}
 
-	private String assignToken(IstarUser istarUser) {
+	private IstarUser assignToken(IstarUser istarUser) {
 
 		String authenticationToken = AppUtility.getRandomString(20);
 
 		IstarUserServices istarUserServices = new IstarUserServices();
 		istarUser = istarUserServices.updateAuthenticationTokenForIstarUser(istarUser, authenticationToken);
 
-		return authenticationToken;
+		return istarUser;
 	}
 }

@@ -1,14 +1,13 @@
 package com.istarindia.android.utility;
 
-
+import com.istarindia.android.pojo.StudentProfile;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.pojo.recruiter.IstarUserPOJO;
-import com.viksitpro.core.pojo.recruiter.StudentPOJO;
 
 public class AppPOJOUtility {
 
-	public IstarUserPOJO getIstarUserPOJO(IstarUser istarUser){
-		
+	public IstarUserPOJO getIstarUserPOJO(IstarUser istarUser) {
+
 		IstarUserPOJO istarUserPOJO = new IstarUserPOJO();
 
 		istarUserPOJO.setIstarUserId(istarUser.getId());
@@ -22,38 +21,47 @@ public class AppPOJOUtility {
 		if (istarUser.getUserProfile() != null) {
 			istarUserPOJO.setName(istarUser.getUserProfile().getFirstName());
 		}
-		
+
 		return istarUserPOJO;
 	}
-	
-	public StudentPOJO getStudentPOJO(IstarUser student) {
 
-		StudentPOJO studentPOJO = new StudentPOJO();
+	public StudentProfile getStudentProfile(IstarUser student) {
 
-		studentPOJO.setIstarUser(student.getId());
+		StudentProfile studentProfile = new StudentProfile();
+
+		studentProfile.setId(student.getId());
+		studentProfile.setMobile(student.getMobile());
+		studentProfile.setEmail(student.getEmail());
+		studentProfile.setAuthenticationToken(student.getAuthToken());
+		studentProfile.setLoginType(student.getLoginType());
 
 		if (student.getUserProfile() != null) {
-			studentPOJO.setFirstName(student.getUserProfile().getFirstName());
-			studentPOJO.setLastName(student.getUserProfile().getLastName());
-			studentPOJO.setGender(student.getUserProfile().getGender());
-			studentPOJO.setLocation(student.getUserProfile().getAddress().getPincode().getCity());
-			/*studentPOJO.setProfileImage(student.getUserProfile().getProfileImage());*/
-			studentPOJO.setProfileImage("/root/recruiter/pictures/student.png");
+			studentProfile.setFirstName(student.getUserProfile().getFirstName());
+			studentProfile.setLastName(student.getUserProfile().getLastName());
+			studentProfile.setGender(student.getUserProfile().getGender());
+			studentProfile.setDateOfBirth(student.getUserProfile().getDob());
+			studentProfile.setLocation(student.getUserProfile().getAddress().getPincode().getCity());
+			/*
+			 * studentPOJO.setProfileImage(student.getUserProfile().
+			 * getProfileImage());
+			 */
+			studentProfile.setProfileImage("/root/recruiter/pictures/student.png");
 		}
 
 		if (student.getProfessionalProfile() != null) {
-			studentPOJO.setUnderGraduationDegree(student.getProfessionalProfile().getUnderGraduateDegreeName());
-			studentPOJO.setPostGraduationDegree(student.getProfessionalProfile().getPgDegreeName());
-			studentPOJO.setUnderGraduationCollege(
-					student.getProfessionalProfile().getUnderGraduationCollege());
-			studentPOJO.setPostGraduationCollege(
-					student.getProfessionalProfile().getPostGraduationCollege());
-			studentPOJO.setUnderGraduationSpecializationName(
+			studentProfile.setUnderGraduationDegree(student.getProfessionalProfile().getUnderGraduateDegreeName());
+			studentProfile.setPostGraduationDegree(student.getProfessionalProfile().getPgDegreeName());
+			studentProfile.setUnderGraduationCollege(student.getProfessionalProfile().getUnderGraduationCollege());
+			studentProfile.setPostGraduationCollege(student.getProfessionalProfile().getPostGraduationCollege());
+			studentProfile.setUnderGraduationSpecializationName(
 					student.getProfessionalProfile().getUnderGraduationSpecializationName());
-			studentPOJO.setPostGraduationSpecializationName(
+			studentProfile.setPostGraduationSpecializationName(
 					student.getProfessionalProfile().getPostGraduationSpecializationName());
-			studentPOJO.setResumeURL(student.getProfessionalProfile().getResumeUrl());
+			studentProfile.setResumeURL(student.getProfessionalProfile().getResumeUrl());
+			studentProfile.setCoins(250);
+			studentProfile.setExperiencePoints(3450);
+			studentProfile.setBatchRank(2);
 		}
-		return studentPOJO;
+		return studentProfile;
 	}
 }

@@ -9,11 +9,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.apps.services.BatchStudentsServices;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
-import com.viksitpro.core.pojo.recruiter.StudentPOJO;
 
 @Path("user")
 public class AppIstarUserService {
@@ -48,9 +48,9 @@ public class AppIstarUserService {
 			return Response.status(404).build();
 		} else {
 			AppPOJOUtility androidPOJOUtility = new AppPOJOUtility();
-			StudentPOJO studentPOJO = androidPOJOUtility.getStudentPOJO(istarUser);
+			StudentProfile studentProfile = androidPOJOUtility.getStudentProfile(istarUser);
 
-			return Response.ok(studentPOJO).build();
+			return Response.ok(studentProfile).build();
 		}
 	}
 

@@ -13,9 +13,11 @@ import javax.ws.rs.core.Response;
 
 import com.istarindia.android.pojo.DashboardCard;
 import com.istarindia.apps.services.AssessmentServices;
+import com.istarindia.apps.services.JobServices;
 import com.istarindia.apps.services.PresentationServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.entities.Job;
 import com.viksitpro.core.dao.entities.Presentation;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
@@ -36,21 +38,24 @@ public class AppDashboardService {
 		List<DashboardCard> allDashboardCard = new ArrayList<DashboardCard>();
 
 		for (Task task : allTaskOfUser) {
-			DashboardCard dashboardCard = null;
-			String itemType = task.getItemType();
 
-			switch (itemType) {
-			case TaskCategory.ASSESSMENT:
-				dashboardCard = getDashboardCardForAssessment(task);
-				break;
-			case TaskCategory.LEARN:
-				dashboardCard = getDashboardCardForPresentation(task);
-				break;
-			}
+				DashboardCard dashboardCard = null;
+				String itemType = task.getItemType();
 
-			if (dashboardCard != null) {
-				allDashboardCard.add(dashboardCard);
-			}
+				switch (itemType) {
+				case TaskCategory.ASSESSMENT:
+					dashboardCard = getDashboardCardForAssessment(task);
+					break;
+				case TaskCategory.LEARN:
+					dashboardCard = getDashboardCardForPresentation(task);
+					break;
+				case TaskCategory.JOB:
+					dashboardCard = getDashboardCardForJob(task);
+				}
+
+				if (dashboardCard != null) {
+					allDashboardCard.add(dashboardCard);
+				}
 		}
 		System.out.println("Dashboard cards returned");
 		return Response.ok(allDashboardCard).build();
@@ -72,16 +77,29 @@ public class AppDashboardService {
 		}
 		return dashboardCard;
 	}
-	
-	private DashboardCard getDashboardCardForPresentation(Task task){
-		
+
+	private DashboardCard getDashboardCardForPresentation(Task task) {
+
 		int itemId = task.getItemId();
 		PresentationServices presentationServices = new PresentationServices();
 		Presentation presentation = presentationServices.getPresentation(itemId);
+
+		DashboardCard dashboardCard = null;
+		if (presentation != null) {
+			// constructor for presentation
+		}
+		return dashboardCard;
+	}
+	
+	private DashboardCard getDashboardCardForJob(Task task){
+		
+		int itemId = task.getItemId();
+		JobServices jobServices = new JobServices();
+		Job job = jobServices.getJob(itemId);
 		
 		DashboardCard dashboardCard = null;
-		if(presentation!=null){
-			//constructor for presentation
+		if(job!=null){
+			dashboardCard = new DashboardCard(task.getId(), job.getTitle(), task.getState(), job.getDescription(), job.getOrganization().getImage(), task.getItemType(), job.getId());
 		}
 		return dashboardCard;
 	}
