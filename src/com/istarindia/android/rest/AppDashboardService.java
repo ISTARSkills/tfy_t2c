@@ -13,8 +13,10 @@ import javax.ws.rs.core.Response;
 
 import com.istarindia.android.pojo.DashboardCard;
 import com.istarindia.apps.services.AssessmentServices;
+import com.istarindia.apps.services.PresentationServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.entities.Presentation;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.utilities.TaskCategory;
@@ -41,6 +43,9 @@ public class AppDashboardService {
 			case TaskCategory.ASSESSMENT:
 				dashboardCard = getDashboardCardForAssessment(task);
 				break;
+			case TaskCategory.LEARN:
+				dashboardCard = getDashboardCardForPresentation(task);
+				break;
 			}
 
 			if (dashboardCard != null) {
@@ -64,6 +69,19 @@ public class AppDashboardService {
 					assessment.getNumberOfQuestions(), assessment.getAssessmentdurationminutes(), 100, 50,
 					task.getItemType(), task.getItemId());
 
+		}
+		return dashboardCard;
+	}
+	
+	private DashboardCard getDashboardCardForPresentation(Task task){
+		
+		int itemId = task.getItemId();
+		PresentationServices presentationServices = new PresentationServices();
+		Presentation presentation = presentationServices.getPresentation(itemId);
+		
+		DashboardCard dashboardCard = null;
+		if(presentation!=null){
+			//constructor for presentation
 		}
 		return dashboardCard;
 	}
