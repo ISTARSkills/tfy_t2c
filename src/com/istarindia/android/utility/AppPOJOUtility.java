@@ -1,7 +1,17 @@
 package com.istarindia.android.utility;
 
+import java.util.ArrayList;
+
+import com.istarindia.android.pojo.CoursePOJO;
+import com.istarindia.android.pojo.LessonPOJO;
+import com.istarindia.android.pojo.ModulePOJO;
 import com.istarindia.android.pojo.StudentProfile;
+import com.viksitpro.core.dao.entities.Cmsession;
+import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.entities.Lesson;
+import com.viksitpro.core.dao.entities.Module;
+import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.pojo.recruiter.IstarUserPOJO;
 
 public class AppPOJOUtility {
@@ -27,7 +37,7 @@ public class AppPOJOUtility {
 	}
 
 	public StudentProfile getStudentProfile(IstarUser student) {
-System.out.println("POJO service");
+		System.out.println("POJO service");
 		StudentProfile studentProfile = new StudentProfile();
 
 		studentProfile.setId(student.getId());
@@ -43,18 +53,18 @@ System.out.println("POJO service");
 			studentProfile.setLastName(student.getUserProfile().getLastName());
 			studentProfile.setGender(student.getUserProfile().getGender());
 			studentProfile.setDateOfBirth(student.getUserProfile().getDob());
-			
-			if(student.getUserProfile().getAddress()!=null){
-			studentProfile.setLocation(student.getUserProfile().getAddress().getPincode().getCity());
+
+			if (student.getUserProfile().getAddress() != null) {
+				studentProfile.setLocation(student.getUserProfile().getAddress().getPincode().getCity());
 			}
 			/*
 			 * studentPOJO.setProfileImage(student.getUserProfile().
 			 * getProfileImage());
 			 */
-			if(student.getUserProfile().getProfileImage()==null){
-			studentProfile.setProfileImage("/root/recruiter/pictures/student.png");
-			}else{
-			studentProfile.setProfileImage(student.getUserProfile().getProfileImage());
+			if (student.getUserProfile().getProfileImage() == null) {
+				studentProfile.setProfileImage("/root/recruiter/pictures/student.png");
+			} else {
+				studentProfile.setProfileImage(student.getUserProfile().getProfileImage());
 			}
 		}
 
@@ -73,5 +83,84 @@ System.out.println("POJO service");
 			studentProfile.setBatchRank(2);
 		}
 		return studentProfile;
+	}
+
+	public CoursePOJO getCoursePOJO(StudentPlaylist studentPlaylist) {
+
+		CoursePOJO coursePOJO = new CoursePOJO();
+
+		Course course = studentPlaylist.getCourse();
+
+		if (course != null) {
+			coursePOJO.setId(course.getId());
+			coursePOJO.setName(course.getCourseName());
+			coursePOJO.setDescription(course.getCourseDescription());
+			coursePOJO.setImageURL(course.getImage_url());
+			coursePOJO.setCategory(course.getCategory());
+
+			ArrayList<ModulePOJO> modules = new ArrayList<ModulePOJO>();
+
+			for (Module module : course.getModules()) {
+				ModulePOJO modulePOJO = new ModulePOJO();
+
+				modulePOJO.setId(module.getId());
+				modulePOJO.setName(module.getModuleName());
+				modulePOJO.setDescription(module.getModule_description());
+				modulePOJO.setImageURL(module.getImage_url());
+				modulePOJO.setOrderId(module.getOrderId());
+
+				ArrayList<LessonPOJO> lessons = new ArrayList<LessonPOJO>();
+
+				for (Cmsession cmsession : module.getCmsessions()) {
+					for (Lesson lesson : cmsession.getLessons()) {
+						LessonPOJO lessonPOJO = new LessonPOJO();
+
+						lessonPOJO.setId(lesson.getId());
+						lessonPOJO.setTitle(lesson.getTitle());
+						lessonPOJO.setDescription(lesson.getDescription());
+						lessonPOJO.setOrderId(lesson.getOrderId());
+						lessonPOJO.setType(lesson.getType());
+						lessonPOJO.setDuration(lesson.getDuration());
+						lessonPOJO.setSubject(lesson.getSubject());
+						lessonPOJO.setStatus(studentPlaylist.getStatus());
+						lessonPOJO.setPlaylistId(studentPlaylist.getId());
+
+						lessons.add(lessonPOJO);
+					}
+				}
+				modulePOJO.setLessons(lessons);
+				modules.add(modulePOJO);
+			}
+			coursePOJO.setModules(modules);
+		}
+		return coursePOJO;
+	}
+
+	public ModulePOJO getModulePOJO(Module module) {
+
+		ModulePOJO modulePOJO = new ModulePOJO();
+
+		modulePOJO.setId(module.getId());
+		modulePOJO.setName(module.getModuleName());
+		modulePOJO.setDescription(module.getModule_description());
+		modulePOJO.setImageURL(module.getImage_url());
+		modulePOJO.setOrderId(module.getOrderId());
+
+		return modulePOJO;
+	}
+
+	public LessonPOJO getLessonPOJO(Lesson lesson) {
+
+		LessonPOJO lessonPOJO = new LessonPOJO();
+
+		lessonPOJO.setId(lesson.getId());
+		lessonPOJO.setTitle(lesson.getTitle());
+		lessonPOJO.setDescription(lesson.getDescription());
+		lessonPOJO.setOrderId(lesson.getOrderId());
+		lessonPOJO.setType(lesson.getType());
+		lessonPOJO.setDuration(lesson.getDuration());
+		lessonPOJO.setSubject(lesson.getSubject());
+
+		return lessonPOJO;
 	}
 }

@@ -184,7 +184,7 @@ public class AppIstarUserService {
 	public Response isVerified(@PathParam("userId") int userId, @PathParam("isVerified") boolean isVerified) {
 
 		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUser = istarUserServices.updateIsVerified(userId, isVerified);
+		istarUserServices.updateIsVerified(userId, isVerified);
 		
 		return Response.status(Response.Status.CREATED).build();
 	}

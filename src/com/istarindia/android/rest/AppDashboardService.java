@@ -12,9 +12,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.istarindia.android.pojo.DashboardCard;
-import com.istarindia.apps.services.AssessmentServices;
+import com.istarindia.apps.services.ContentServiceUtility;
 import com.istarindia.apps.services.JobServices;
-import com.istarindia.apps.services.PresentationServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Job;
@@ -64,8 +63,8 @@ public class AppDashboardService {
 	private DashboardCard getDashboardCardForAssessment(Task task) {
 
 		int itemId = task.getItemId();
-		AssessmentServices assessmentServices = new AssessmentServices();
-		Assessment assessment = assessmentServices.getAssessment(itemId);
+		ContentServiceUtility contentServiceUtility = new ContentServiceUtility();
+		Assessment assessment = contentServiceUtility.getAssessment(itemId);
 
 		DashboardCard dashboardCard = null;
 		if (assessment != null) {
@@ -81,8 +80,8 @@ public class AppDashboardService {
 	private DashboardCard getDashboardCardForPresentation(Task task) {
 
 		int itemId = task.getItemId();
-		PresentationServices presentationServices = new PresentationServices();
-		Presentation presentation = presentationServices.getPresentation(itemId);
+		ContentServiceUtility contentServiceUtility = new ContentServiceUtility();
+		Presentation presentation = contentServiceUtility.getPresentation(itemId);
 
 		DashboardCard dashboardCard = null;
 		if (presentation != null) {
