@@ -1,5 +1,7 @@
 package com.istarindia.android.rest;
 
+import java.util.HashSet;
+
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -18,7 +20,11 @@ import com.istarindia.android.utility.AppUtility;
 import com.istarindia.apps.services.AppServices;
 import com.istarindia.apps.services.BatchStudentsServices;
 import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.entities.Role;
+import com.viksitpro.core.dao.entities.UserRole;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
+import com.viksitpro.core.dao.utils.user.RoleServices;
+import com.viksitpro.core.dao.utils.user.UserRoleServices;
 import com.viksitpro.core.pojo.recruiter.IstarUserPOJO;
 
 @Path("user")
@@ -34,12 +40,21 @@ public class AppIstarUserService {
 		String authenticationToken = AppUtility.getRandomString(20);
 		IstarUser istarUser = istarUserServices.createIstarUser(email, password, mobile, authenticationToken);
 
-		// assign Role and map to UserRole Mapping
-
 		if (istarUser == null) {
 			// User Email or Mobile already registered
 			return Response.status(Response.Status.CONFLICT).build();
-		} else {
+		} else {			
+			RoleServices roleServices = new RoleServices();
+			Role role = roleServices.getRoleByName("STUDENT");
+			
+			UserRoleServices userRoleServices = new UserRoleServices();
+			UserRole userRole = userRoleServices.createUserRole(istarUser, role, 1);
+
+			HashSet<UserRole> allUserRole = new HashSet<UserRole>();
+			allUserRole.add(userRole);
+			
+			istarUser.setUserRoles(allUserRole);
+			
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 			IstarUserPOJO istarUserPOJO = appPOJOUtility.getIstarUserPOJO(istarUser);
 
