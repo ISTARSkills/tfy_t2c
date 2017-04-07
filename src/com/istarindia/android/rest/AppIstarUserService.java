@@ -3,6 +3,7 @@ package com.istarindia.android.rest;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -11,6 +12,7 @@ import javax.ws.rs.core.Response;
 
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppPOJOUtility;
+import com.istarindia.apps.services.AppServices;
 import com.istarindia.apps.services.BatchStudentsServices;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
@@ -54,7 +56,7 @@ public class AppIstarUserService {
 		}
 	}
 
-	@POST
+	@PUT
 	@Path("reset/password")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response resetPassword(@FormParam("mobile") Long mobile, @FormParam("password") String password) {
@@ -67,6 +69,49 @@ public class AppIstarUserService {
 		} else {
 			istarUser = istarUserServices.updateIstarUser(istarUser.getId(), istarUser.getEmail(), password,
 					istarUser.getMobile());
+			return Response.status(Response.Status.CREATED).build();
+		}
+	}
+
+	@GET
+	@Path("{userId}/mobile")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response verifyMobileNumber(@PathParam("userId") int userId, @FormParam("mobile") Long mobile) {
+
+		IstarUserServices istarUserServices = new IstarUserServices();
+		IstarUser istarUser = istarUserServices.getIstarUser(userId);
+
+		IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobile);
+
+		if (istarUser == null || mobileIstarUser != null) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		} else {
+
+			Integer otp = null;
+			istarUserServices.updateMobile(istarUser.getId(), mobile);
+
+			try {
+				AppServices appServices = new AppServices();
+				otp = appServices.sendOTP(mobile.toString());
+			} catch (Exception e) {
+				return Response.status(Response.Status.BAD_GATEWAY).build();
+			}
+			return Response.ok(otp).build();
+		}
+	}
+
+	@PUT
+	@Path("{userId}/mobile")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateMobileNumber(@PathParam("userId") int userId, @FormParam("mobile") Long mobile) {
+
+		IstarUserServices istarUserServices = new IstarUserServices();
+		IstarUser istarUser = istarUserServices.getIstarUser(userId);
+
+		if (istarUser == null) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		} else {
+			istarUserServices.updateMobile(istarUser.getId(), mobile);
 			return Response.status(Response.Status.CREATED).build();
 		}
 	}

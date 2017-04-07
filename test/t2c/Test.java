@@ -1,34 +1,58 @@
 package t2c;
 
-/*import java.util.Random;
+import java.io.IOException;
 
-import javax.ws.rs.core.Response;
-
+import com.istarindia.android.utility.AppUtility;
+import com.istarindia.apps.services.AppServices;
 import com.viksitpro.core.dao.entities.IstarUser;
-import com.viksitpro.core.dao.utils.task.TaskServices;
+import com.viksitpro.core.dao.entities.UserProfile;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
-import com.viksitpro.core.utilities.TaskCategory;*/
 
 public class Test {
 
 	public static void main(String[] args) {
 	
-/*		TaskServices taskServices = new TaskServices();
+		try {
+			new AppServices().sendOTP("9591940080");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		
-		Object[][] allCategory = {{TaskCategory.CONTENT, 1}, {TaskCategory.LEARN, 2}, {TaskCategory.TODO, }, 
-				{TaskCategory.ASSESSMENT, 5}, {TaskCategory.FEEDBACK, 5}};
-		
-		*/
-/*		taskServices.createTask(name, description, "INCOMPLETE", null, 
-				allCategory[new Random().nextInt(allCategory.length-1)], 
-				"asdfsgd", itemId, istarUserByOwnerId, null, 
-				taskTypeId, parentTaskId, projectId, teamId, priority, 
-				followupDurationInDays, durationInHours, isActive, 
-				isRepeatative, isTimedTask, startDate, 
-				endDate, followupDate);
-		
-		*/
 	}
+	
+	public static void istarUserTest(){
+		
+		String email = "aeewwbc_11112311@istar.com";
+		String socialMedia = "GOOGLE";
+		String name = "TEST ISTAR";
+		String profileImage = "student.png";		
+		
+		IstarUserServices istarUserServices = new IstarUserServices();
+		IstarUser istarUser = istarUserServices.getIstarUserByEmail(email);
+		
+		if (istarUser == null) {
+
+			istarUser = istarUserServices.createIstarUser(email, "test123", null, null, socialMedia);
+			UserProfile userProfile = istarUserServices.createUserProfile(istarUser.getId(), null, name, null, null,
+					null, profileImage, null);
+
+			istarUser = userProfile.getIstarUser();
+
+			if (istarUser.getUserProfile() == null) {
+				System.out.println("User profile is null");
+			} else {
+				System.out.println("User profile is NOT null");
+			}
+		
+		} else{
+			System.out.println("User exists");
+			System.out.println("UserProfile ID is "+ istarUser.getUserProfile().getId());
+		}
+		
+		System.exit(0);
+	}
+	
+	
 
 }

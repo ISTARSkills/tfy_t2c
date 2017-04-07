@@ -85,7 +85,7 @@ public class AppAuthenticationService {
 	}
 
 	@POST
-	@Path("test")
+	@Path("user")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response test(IstarUserPOJO istarUserPOJO) {
