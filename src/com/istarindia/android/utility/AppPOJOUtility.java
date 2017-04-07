@@ -13,6 +13,7 @@ public class AppPOJOUtility {
 		istarUserPOJO.setIstarUserId(istarUser.getId());
 		istarUserPOJO.setAuthenticationToken(istarUser.getAuthToken());
 		istarUserPOJO.setEmail(istarUser.getEmail());
+		istarUserPOJO.setIsVerified(istarUser.getIsVerified());
 
 		if (istarUser.getUserRoles().iterator().hasNext()) {
 			istarUserPOJO.setRole(istarUser.getUserRoles().iterator().next().getRole().getRoleName());
@@ -33,6 +34,7 @@ System.out.println("POJO service");
 		studentProfile.setMobile(student.getMobile());
 		studentProfile.setEmail(student.getEmail());
 		studentProfile.setAuthenticationToken(student.getAuthToken());
+		studentProfile.setIsVerified(student.getIsVerified());
 		studentProfile.setLoginType(student.getLoginType());
 
 		if (student.getUserProfile() != null) {

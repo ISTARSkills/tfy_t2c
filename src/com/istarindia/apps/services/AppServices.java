@@ -8,8 +8,20 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import com.istarindia.android.utility.AppUtility;
+import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
 public class AppServices {
+	
+	public IstarUser assignToken(IstarUser istarUser) {
+		System.out.println("Assigning Token");
+		String authenticationToken = AppUtility.getRandomString(20);
+
+		IstarUserServices istarUserServices = new IstarUserServices();
+		istarUser = istarUserServices.updateAuthenticationTokenForIstarUser(istarUser, authenticationToken);
+
+		return istarUser;
+	}
 
 	public Integer sendOTP(String mobile) throws IOException{
 		

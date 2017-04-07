@@ -11,6 +11,7 @@ public class StudentProfile {
 	private Integer id;
 	private String authenticationToken;
 	private String loginType;
+	private Boolean isVerified;
 	private String email;
 	private String firstName;
 	private String lastName;
@@ -55,6 +56,15 @@ public class StudentProfile {
 
 	public void setLoginType(String loginType) {
 		this.loginType = loginType;
+	}
+	
+	@XmlAttribute(name = "isVerified", required = false)	
+	public Boolean getIsVerified() {
+		return isVerified;
+	}
+
+	public void setIsVerified(Boolean isVerified) {
+		this.isVerified = isVerified;
 	}
 
 	@XmlAttribute(name = "email", required = false)

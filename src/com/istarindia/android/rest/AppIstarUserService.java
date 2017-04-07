@@ -11,12 +11,15 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.gson.Gson;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppPOJOUtility;
+import com.istarindia.android.utility.AppUtility;
 import com.istarindia.apps.services.AppServices;
 import com.istarindia.apps.services.BatchStudentsServices;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
+import com.viksitpro.core.pojo.recruiter.IstarUserPOJO;
 
 @Path("user")
 public class AppIstarUserService {
@@ -28,13 +31,22 @@ public class AppIstarUserService {
 			@FormParam("mobile") Long mobile) {
 
 		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUser = istarUserServices.createIstarUser(email, password, mobile);
+		String authenticationToken = AppUtility.getRandomString(20);
+		IstarUser istarUser = istarUserServices.createIstarUser(email, password, mobile, authenticationToken);
+
+		// assign Role and map to UserRole Mapping
 
 		if (istarUser == null) {
 			// User Email or Mobile already registered
 			return Response.status(Response.Status.CONFLICT).build();
 		} else {
-			return Response.status(Response.Status.CREATED).build();
+			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+			IstarUserPOJO istarUserPOJO = appPOJOUtility.getIstarUserPOJO(istarUser);
+
+			Gson gson = new Gson();
+			String result = gson.toJson(istarUserPOJO);
+
+			return Response.ok(result).build();
 		}
 	}
 
@@ -50,10 +62,13 @@ public class AppIstarUserService {
 			// User does not exists
 			return Response.status(404).build();
 		} else {
-			AppPOJOUtility androidPOJOUtility = new AppPOJOUtility();
-			StudentProfile studentProfile = androidPOJOUtility.getStudentProfile(istarUser);
+			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
-			return Response.ok(studentProfile).build();
+			Gson gson = new Gson();
+			String result = gson.toJson(studentProfile);
+
+			return Response.ok(result).build();
 		}
 	}
 
@@ -84,12 +99,10 @@ public class AppIstarUserService {
 
 		IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobile);
 
-		if (istarUser == null && mobileIstarUser != null) {
+		if (istarUser == null && mobileIstarUser == null) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		} else {
-
 			Integer otp = null;
-			istarUserServices.updateMobile(istarUser.getId(), mobile);
 
 			try {
 				AppServices appServices = new AppServices();
@@ -105,25 +118,43 @@ public class AppIstarUserService {
 	@PUT
 	@Path("{userId}/mobile")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateMobileNumber(@PathParam("userId") int userId, @FormParam("mobile") Long mobile) {
-		System.out.println("Request to update mobile number->" + mobile);
+	public Response updateAndVerifyMobileNumber(@PathParam("userId") int userId, @FormParam("mobile") Long mobile) {
+
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
-		if (istarUser == null) {
+		IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobile);
+
+		if (istarUser == null && mobileIstarUser != null) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		} else {
-			System.out.println("Updating mobile number");
-			istarUser = istarUserServices.updateMobile(istarUser.getId(), mobile);
-			
-			System.out.println("Updated mobile number is :" + istarUser.getMobile());
-			
-			return Response.status(Response.Status.CREATED).build();
+			Integer otp = null;
+			istarUserServices.updateMobile(istarUser.getId(), mobile);
+
+			try {
+				AppServices appServices = new AppServices();
+				otp = appServices.sendOTP(mobile.toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+				return Response.status(Response.Status.BAD_GATEWAY).build();
+			}
+			return Response.ok(otp).build();
 		}
 	}
 
+	@PUT
+	@Path("{userId}/verify/{isVerified}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response isVerified(@PathParam("userId") int userId, @PathParam("isVerified") boolean isVerified) {
+
+		IstarUserServices istarUserServices = new IstarUserServices();
+		IstarUser istarUser = istarUserServices.updateIsVerified(userId, isVerified);
+		
+		return Response.status(Response.Status.CREATED).build();
+	}
+
 	@POST
-	@Path("{userId}/batchCode")
+	@Path("{userId}/batch")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response assignBatchCode(@PathParam("istarUserId") int istarUserId,
 			@FormParam("batchCode") String batchCode) {
@@ -134,4 +165,47 @@ public class AppIstarUserService {
 
 		return Response.status(Response.Status.CREATED).build();
 	}
+
+	/*
+	 * @GET
+	 * 
+	 * @Path("mobile/verify")
+	 * 
+	 * @Produces(MediaType.APPLICATION_JSON) public Response
+	 * verifyMobileNumber(@QueryParam("mobile") Long mobile) { Integer otp =
+	 * null;
+	 * 
+	 * IstarUserServices istarUserServices = new IstarUserServices(); IstarUser
+	 * istarUser = istarUserServices.getIstarUserByMobile(mobile);
+	 * 
+	 * try { AppServices appServices = new AppServices(); otp =
+	 * appServices.sendOTP(mobile.toString()); } catch (Exception e) {
+	 * e.printStackTrace(); return
+	 * Response.status(Response.Status.BAD_GATEWAY).build(); }
+	 * 
+	 * Gson gson = new Gson(); String result = gson.toJson(otp);
+	 * 
+	 * return Response.ok(result).build(); }
+	 */
+
+	/*
+	 * @PUT
+	 * 
+	 * @Path("{userId}/mobile")
+	 * 
+	 * @Produces(MediaType.APPLICATION_JSON) public Response
+	 * updateMobileNumber(@PathParam("userId") int userId, @FormParam("mobile")
+	 * Long mobile) { System.out.println("Request to update mobile number->" +
+	 * mobile); IstarUserServices istarUserServices = new IstarUserServices();
+	 * IstarUser istarUser = istarUserServices.getIstarUser(userId);
+	 * 
+	 * if (istarUser == null) { return
+	 * Response.status(Response.Status.BAD_REQUEST).build(); } else {
+	 * System.out.println("Updating mobile number"); istarUser =
+	 * istarUserServices.updateMobile(istarUser.getId(), mobile);
+	 * 
+	 * System.out.println("Updated mobile number is :" + istarUser.getMobile());
+	 * 
+	 * return Response.status(Response.Status.CREATED).build(); } }
+	 */
 }

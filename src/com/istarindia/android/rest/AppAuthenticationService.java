@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppPOJOUtility;
-import com.istarindia.android.utility.AppUtility;
+import com.istarindia.apps.services.AppServices;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.UserProfile;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
@@ -33,14 +33,18 @@ public class AppAuthenticationService {
 				System.out.println("user is null or password does not match");
 				throw new Exception();
 			}
-
-			istarUser = assignToken(istarUser);
+			AppServices appServices = new AppServices();
+			istarUser = appServices.assignToken(istarUser);
 
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 			System.out.println("Returing system profile");
-			return Response.ok(studentProfile).build();
+
+			Gson gson = new Gson();
+			String result = gson.toJson(studentProfile);
+
+			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -68,7 +72,8 @@ public class AppAuthenticationService {
 				istarUser.setUserProfile(userProfile);
 			}
 
-			istarUser = assignToken(istarUser);
+			AppServices appServices = new AppServices();
+			istarUser = appServices.assignToken(istarUser);
 
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
@@ -97,15 +102,5 @@ public class AppAuthenticationService {
 
 		System.out.println("Returning JSON");
 		return Response.ok(istarUserPOJO).build();
-	}
-
-	private IstarUser assignToken(IstarUser istarUser) {
-		System.out.println("Assigning Token");
-		String authenticationToken = AppUtility.getRandomString(20);
-
-		IstarUserServices istarUserServices = new IstarUserServices();
-		istarUser = istarUserServices.updateAuthenticationTokenForIstarUser(istarUser, authenticationToken);
-
-		return istarUser;
 	}
 }
