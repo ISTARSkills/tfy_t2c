@@ -36,7 +36,7 @@ public class AppIstarUserService {
 	}
 
 	@GET
-	@Path("{userId}/profile")
+	@Path("{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserProfile(@PathParam("userId") int userId) {
 		System.out.println("Getting user profile" + userId);

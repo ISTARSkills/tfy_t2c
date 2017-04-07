@@ -26,7 +26,7 @@ public class AppPOJOUtility {
 	}
 
 	public StudentProfile getStudentProfile(IstarUser student) {
-
+System.out.println("POJO service");
 		StudentProfile studentProfile = new StudentProfile();
 
 		studentProfile.setId(student.getId());
@@ -36,16 +36,24 @@ public class AppPOJOUtility {
 		studentProfile.setLoginType(student.getLoginType());
 
 		if (student.getUserProfile() != null) {
+			System.out.println("FIRST NAME POJO is->" + student.getUserProfile().getFirstName());
 			studentProfile.setFirstName(student.getUserProfile().getFirstName());
 			studentProfile.setLastName(student.getUserProfile().getLastName());
 			studentProfile.setGender(student.getUserProfile().getGender());
 			studentProfile.setDateOfBirth(student.getUserProfile().getDob());
+			
+			if(student.getUserProfile().getAddress()!=null){
 			studentProfile.setLocation(student.getUserProfile().getAddress().getPincode().getCity());
+			}
 			/*
 			 * studentPOJO.setProfileImage(student.getUserProfile().
 			 * getProfileImage());
 			 */
+			if(student.getUserProfile().getProfileImage()==null){
 			studentProfile.setProfileImage("/root/recruiter/pictures/student.png");
+			}else{
+			studentProfile.setProfileImage(student.getUserProfile().getProfileImage());
+			}
 		}
 
 		if (student.getProfessionalProfile() != null) {
