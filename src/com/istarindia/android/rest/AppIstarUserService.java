@@ -88,12 +88,12 @@ public class AppIstarUserService {
 	}
 
 	@PUT
-	@Path("reset/password")
+	@Path("password/reset")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response resetPassword(@FormParam("mobile") Long mobile, @FormParam("password") String password) {
+	public Response resetPassword(@FormParam("userId") int userId, @FormParam("password") String password) {
 		System.out.println("Resetting password");
 		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUser = istarUserServices.getIstarUserByMobile(mobile);
+		IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
 		if (istarUser == null) {
 			return Response.status(404).build();
@@ -101,6 +101,27 @@ public class AppIstarUserService {
 			istarUser = istarUserServices.updateIstarUser(istarUser.getId(), istarUser.getEmail(), password,
 					istarUser.getMobile());
 			return Response.status(Response.Status.CREATED).build();
+		}
+	}
+	
+	@GET
+	@Path("password/forgot")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response forgotPassword(@QueryParam("mobile") Long mobile){
+		
+		IstarUserServices istarUserServices = new IstarUserServices();
+		IstarUser istarUser = istarUserServices.getIstarUserByMobile(mobile);
+		
+		if (istarUser == null) {
+			return Response.status(404).build();
+		} else {
+			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+			IstarUserPOJO istarUserPOJO = appPOJOUtility.getIstarUserPOJO(istarUser);
+
+			Gson gson = new Gson();
+			String result = gson.toJson(istarUserPOJO);
+
+			return Response.ok(result).build();
 		}
 	}
 
