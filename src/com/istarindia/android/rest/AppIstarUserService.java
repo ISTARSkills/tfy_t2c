@@ -7,6 +7,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -76,14 +77,14 @@ public class AppIstarUserService {
 	@GET
 	@Path("{userId}/mobile")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response verifyMobileNumber(@PathParam("userId") int userId, @FormParam("mobile") Long mobile) {
+	public Response verifyMobileNumber(@PathParam("userId") int userId, @QueryParam("mobile") Long mobile) {
 
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
 		IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobile);
 
-		if (istarUser == null || mobileIstarUser != null) {
+		if (istarUser == null && mobileIstarUser != null) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		} else {
 
@@ -94,6 +95,7 @@ public class AppIstarUserService {
 				AppServices appServices = new AppServices();
 				otp = appServices.sendOTP(mobile.toString());
 			} catch (Exception e) {
+				e.printStackTrace();
 				return Response.status(Response.Status.BAD_GATEWAY).build();
 			}
 			return Response.ok(otp).build();
@@ -104,14 +106,18 @@ public class AppIstarUserService {
 	@Path("{userId}/mobile")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateMobileNumber(@PathParam("userId") int userId, @FormParam("mobile") Long mobile) {
-
+		System.out.println("Request to update mobile number->" + mobile);
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
 		if (istarUser == null) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		} else {
-			istarUserServices.updateMobile(istarUser.getId(), mobile);
+			System.out.println("Updating mobile number");
+			istarUser = istarUserServices.updateMobile(istarUser.getId(), mobile);
+			
+			System.out.println("Updated mobile number is :" + istarUser.getMobile());
+			
 			return Response.status(Response.Status.CREATED).build();
 		}
 	}
