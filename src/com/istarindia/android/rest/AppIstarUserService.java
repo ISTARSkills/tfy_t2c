@@ -56,10 +56,10 @@ public class AppIstarUserService {
 			istarUser.setUserRoles(allUserRole);
 			
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-			IstarUserPOJO istarUserPOJO = appPOJOUtility.getIstarUserPOJO(istarUser);
+			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
 			Gson gson = new Gson();
-			String result = gson.toJson(istarUserPOJO);
+			String result = gson.toJson(studentProfile);
 
 			return Response.ok(result).build();
 		}

@@ -78,10 +78,10 @@ public class AppPOJOUtility {
 			studentProfile.setPostGraduationSpecializationName(
 					student.getProfessionalProfile().getPostGraduationSpecializationName());
 			studentProfile.setResumeURL(student.getProfessionalProfile().getResumeUrl());
-			studentProfile.setCoins(250);
-			studentProfile.setExperiencePoints(3450);
-			studentProfile.setBatchRank(2);
 		}
+		studentProfile.setCoins(250);
+		studentProfile.setExperiencePoints(3450);
+		studentProfile.setBatchRank(2);
 		return studentProfile;
 	}
 

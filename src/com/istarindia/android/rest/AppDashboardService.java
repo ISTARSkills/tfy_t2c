@@ -45,7 +45,7 @@ public class AppDashboardService {
 				case TaskCategory.ASSESSMENT:
 					dashboardCard = getDashboardCardForAssessment(task);
 					break;
-				case TaskCategory.LEARN:
+				case TaskCategory.PRESENTATION:
 					dashboardCard = getDashboardCardForPresentation(task);
 					break;
 				case TaskCategory.JOB:
@@ -78,14 +78,14 @@ public class AppDashboardService {
 	}
 
 	private DashboardCard getDashboardCardForPresentation(Task task) {
-
+System.out.println("getting presentation cards");
 		int itemId = task.getItemId();
 		ContentServiceUtility contentServiceUtility = new ContentServiceUtility();
 		Presentation presentation = contentServiceUtility.getPresentation(itemId);
 
 		DashboardCard dashboardCard = null;
 		if (presentation != null) {
-			// constructor for presentation
+			dashboardCard = new DashboardCard(task.getId(), presentation.getName(), task.getState(), presentation.getDescription(), "/root/talentify/presentation.jpeg", task.getItemType(), presentation.getId());
 		}
 		return dashboardCard;
 	}
