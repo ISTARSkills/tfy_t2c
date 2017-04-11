@@ -13,10 +13,10 @@ import javax.ws.rs.ext.Provider;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
-@AppSecured
+@RESTSecured
 @Provider
 @Priority(Priorities.AUTHENTICATION)
-public class AppAuthenticationFilter implements ContainerRequestFilter{
+public class RESTAuthenticationFilter implements ContainerRequestFilter{
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {		

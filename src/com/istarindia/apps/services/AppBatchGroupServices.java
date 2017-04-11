@@ -9,7 +9,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-public class BatchGroupServices {
+public class AppBatchGroupServices {
 
 	public BatchGroup getBatchGroup(Integer batchGroupId) {
 		BatchGroup batchGroup;

@@ -23,8 +23,8 @@ import com.viksitpro.core.dao.utils.user.RoleServices;
 import com.viksitpro.core.dao.utils.user.UserRoleServices;
 import com.viksitpro.core.pojo.recruiter.IstarUserPOJO;
 
-@Path("AuthenticateUser")
-public class AppAuthenticationService {
+@Path("auth")
+public class RESTAuthenticationService {
 
 	@POST
 	@Path("login")

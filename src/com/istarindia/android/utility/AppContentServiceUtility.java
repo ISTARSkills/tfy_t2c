@@ -1,4 +1,4 @@
-package com.istarindia.apps.services;
+package com.istarindia.android.utility;
 
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.AssessmentDAO;
@@ -11,7 +11,7 @@ import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Module;
 import com.viksitpro.core.dao.entities.ModuleDAO;
 
-public class ContentServiceUtility {
+public class AppContentServiceUtility {
 
 	public Course getCourse(int courseId) {
 		Course course;

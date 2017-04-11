@@ -17,8 +17,8 @@ import com.google.gson.Gson;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.android.utility.AppUtility;
+import com.istarindia.apps.services.AppBatchStudentsServices;
 import com.istarindia.apps.services.AppServices;
-import com.istarindia.apps.services.BatchStudentsServices;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Role;
 import com.viksitpro.core.dao.entities.UserRole;
@@ -28,7 +28,7 @@ import com.viksitpro.core.dao.utils.user.UserRoleServices;
 import com.viksitpro.core.pojo.recruiter.IstarUserPOJO;
 
 @Path("user")
-public class AppIstarUserService {
+public class RESTIstarUserService {
 
 	@POST
 	@Path("create")
@@ -192,11 +192,11 @@ public class AppIstarUserService {
 	@POST
 	@Path("{userId}/batch")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response assignBatchCode(@PathParam("istarUserId") int istarUserId,
+	public Response assignBatchCode(@PathParam("userId") int istarUserId,
 			@FormParam("batchCode") String batchCode) {
 
 		// check if student batch already exists
-		BatchStudentsServices batchStudentServices = new BatchStudentsServices();
+		AppBatchStudentsServices batchStudentServices = new AppBatchStudentsServices();
 		batchStudentServices.createBatchStudents(istarUserId, batchCode);
 
 		return Response.status(Response.Status.CREATED).build();

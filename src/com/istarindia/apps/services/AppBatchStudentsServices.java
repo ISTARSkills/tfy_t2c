@@ -10,14 +10,14 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-public class BatchStudentsServices {
+public class AppBatchStudentsServices {
 
 	public BatchStudents createBatchStudents(int istarUserId, int batchGroupId){
 		
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
 		
-		BatchGroupServices batchGroupServices = new BatchGroupServices();
+		AppBatchGroupServices batchGroupServices = new AppBatchGroupServices();
 		BatchGroup batchGroup = batchGroupServices.getBatchGroup(batchGroupId);
 				
 		BatchStudents batchStudents = new BatchStudents();
@@ -35,7 +35,7 @@ public class BatchStudentsServices {
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
 		
-		BatchGroupServices batchGroupServices = new BatchGroupServices();
+		AppBatchGroupServices batchGroupServices = new AppBatchGroupServices();
 		BatchGroup batchGroup = batchGroupServices.getBatchGroupByBatchCode(batchCode);
 				
 		BatchStudents batchStudents = new BatchStudents();

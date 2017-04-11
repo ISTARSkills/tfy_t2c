@@ -11,6 +11,7 @@ import com.sun.xml.internal.txw2.annotation.XmlCDATA;
 public class QuestionPOJO {
 	
 	private Integer id;
+	private Integer orderId;
 	private String text;
 	private String type;
 	private Integer difficultyLevel;
@@ -19,7 +20,7 @@ public class QuestionPOJO {
 	private String comprehensivePassageText;
 	private Integer points;
 	private List<OptionPOJO> options;
-	private List<Integer> correctOptions;
+	private List<Integer> answers;
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
@@ -27,6 +28,14 @@ public class QuestionPOJO {
 	}
 	public void setId(Integer id) {
 		this.id = id;
+	}
+	
+	@XmlAttribute(name = "orderId", required = false)	
+	public Integer getOrderId() {
+		return orderId;
+	}
+	public void setOrderId(Integer orderId) {
+		this.orderId = orderId;
 	}
 	
 	@XmlCDATA
@@ -93,12 +102,12 @@ public class QuestionPOJO {
 		this.options = options;
 	}
 	
-	@XmlAttribute(name = "correctOptionId", required = false)
-	public List<Integer> getCorrectOptions() {
-		return correctOptions;
+	@XmlAttribute(name = "answers", required = false)
+	public List<Integer> getAnswers() {
+		return answers;
 	}
-	public void setCorrectOptions(List<Integer> correctOptions) {
-		this.correctOptions = correctOptions;
+	public void setAnswers(List<Integer> answers) {
+		this.answers = answers;
 	}
 }
 

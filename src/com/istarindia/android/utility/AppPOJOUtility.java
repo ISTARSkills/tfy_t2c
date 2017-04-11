@@ -1,16 +1,25 @@
 package com.istarindia.android.utility;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
+import com.istarindia.android.pojo.AssessmentPOJO;
 import com.istarindia.android.pojo.CoursePOJO;
 import com.istarindia.android.pojo.LessonPOJO;
 import com.istarindia.android.pojo.ModulePOJO;
+import com.istarindia.android.pojo.OptionPOJO;
+import com.istarindia.android.pojo.QuestionPOJO;
 import com.istarindia.android.pojo.StudentProfile;
+import com.viksitpro.core.dao.entities.Assessment;
+import com.viksitpro.core.dao.entities.AssessmentOption;
+import com.viksitpro.core.dao.entities.AssessmentQuestion;
 import com.viksitpro.core.dao.entities.Cmsession;
 import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Module;
+import com.viksitpro.core.dao.entities.Question;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.pojo.recruiter.IstarUserPOJO;
 
@@ -162,5 +171,70 @@ public class AppPOJOUtility {
 		lessonPOJO.setSubject(lesson.getSubject());
 
 		return lessonPOJO;
+	}
+	
+	public AssessmentPOJO getAssessmentPOJO(Assessment assessment){
+		
+		AssessmentPOJO assessmentPOJO = new AssessmentPOJO();
+		
+		assessmentPOJO.setId(assessment.getId());
+		assessmentPOJO.setType(assessment.getAssessmentType());
+		assessmentPOJO.setName(assessment.getAssessmenttitle());
+		assessmentPOJO.setCategory(assessment.getCategory());
+		assessmentPOJO.setDurationInMinutes(assessment.getAssessmentdurationminutes());
+		
+		Set<AssessmentQuestion> assessmentQuestions = assessment.getAssessmentQuestions();
+		ArrayList<QuestionPOJO> questions = new ArrayList<QuestionPOJO>();
+		
+		for(AssessmentQuestion assessmentQuestion: assessmentQuestions){
+			questions.add(getQuestionPOJO(assessmentQuestion));
+		}
+		assessmentPOJO.setQuestions(questions);
+		
+		return assessmentPOJO;
+	}
+	
+	public QuestionPOJO getQuestionPOJO(AssessmentQuestion assessmentQuestion){
+		QuestionPOJO questionPOJO = new QuestionPOJO();
+		
+		Question question = assessmentQuestion.getQuestion();
+		
+		int orderId = assessmentQuestion.getOrderId();
+		
+		questionPOJO.setId(question.getId());
+		questionPOJO.setOrderId(orderId);
+		questionPOJO.setText(question.getQuestionText());
+		questionPOJO.setType(question.getQuestionType());
+		questionPOJO.setDifficultyLevel(question.getDifficultyLevel());
+		questionPOJO.setExplanation(question.getExplanation());
+		questionPOJO.setComprehensivePassageText(question.getComprehensivePassageText());
+		questionPOJO.setPoints(question.getPoints());
+		questionPOJO.setDurationInSec(question.getDurationInSec());
+		
+		Set<AssessmentOption> allAssessmentOption = question.getAssessmentOptions();
+		
+		List<OptionPOJO> options = new ArrayList<OptionPOJO>();
+		List<Integer> answers = new ArrayList<Integer>();
+		
+		for( AssessmentOption assessmentOption: allAssessmentOption){
+			options.add(getOptionPOJO(assessmentOption));
+			if(assessmentOption.getMarkingScheme()==1){
+				answers.add(assessmentOption.getId());
+			}		
+		}		
+		questionPOJO.setOptions(options);
+		questionPOJO.setAnswers(answers);
+		
+		return questionPOJO;
+	}
+	
+	public OptionPOJO getOptionPOJO(AssessmentOption assessmentOption){
+		
+		OptionPOJO optionPOJO= new OptionPOJO();
+		
+		optionPOJO.setId(assessmentOption.getId());
+		optionPOJO.setText(assessmentOption.getText());
+		
+		return optionPOJO;
 	}
 }

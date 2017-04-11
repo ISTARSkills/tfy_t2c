@@ -10,6 +10,6 @@ import javax.ws.rs.NameBinding;
 @NameBinding
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AppSecured {
+public @interface RESTSecured {
 
 }
