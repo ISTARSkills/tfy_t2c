@@ -17,7 +17,7 @@ import com.istarindia.apps.services.JobServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Job;
-import com.viksitpro.core.dao.entities.Presentation;
+import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.utilities.TaskCategory;
@@ -45,8 +45,8 @@ public class AppDashboardService {
 				case TaskCategory.ASSESSMENT:
 					dashboardCard = getDashboardCardForAssessment(task);
 					break;
-				case TaskCategory.PRESENTATION:
-					dashboardCard = getDashboardCardForPresentation(task);
+				case TaskCategory.LESSON:
+					dashboardCard = getDashboardCardForLesson(task);
 					break;
 				case TaskCategory.JOB:
 					dashboardCard = getDashboardCardForJob(task);
@@ -77,15 +77,15 @@ public class AppDashboardService {
 		return dashboardCard;
 	}
 
-	private DashboardCard getDashboardCardForPresentation(Task task) {
-System.out.println("getting presentation cards");
+	private DashboardCard getDashboardCardForLesson(Task task) {
+
 		int itemId = task.getItemId();
 		ContentServiceUtility contentServiceUtility = new ContentServiceUtility();
-		Presentation presentation = contentServiceUtility.getPresentation(itemId);
+		Lesson lesson = contentServiceUtility.getLesson(itemId);
 
 		DashboardCard dashboardCard = null;
-		if (presentation != null) {
-			dashboardCard = new DashboardCard(task.getId(), presentation.getName(), task.getState(), presentation.getDescription(), "/root/talentify/presentation.jpeg", task.getItemType(), presentation.getId());
+		if (lesson != null) {
+			dashboardCard = new DashboardCard(task.getId(), lesson.getTitle(), task.getState(), lesson.getDescription(), "/root/talentify/presentation.jpeg", task.getItemType(), lesson.getId());
 		}
 		return dashboardCard;
 	}

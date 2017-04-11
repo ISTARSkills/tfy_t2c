@@ -10,8 +10,6 @@ import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Module;
 import com.viksitpro.core.dao.entities.ModuleDAO;
-import com.viksitpro.core.dao.entities.Presentation;
-import com.viksitpro.core.dao.entities.PresentationDAO;
 
 public class ContentServiceUtility {
 
@@ -68,16 +66,5 @@ public class ContentServiceUtility {
 			assessment = null;
 		}
 		return assessment;
-	}
-	
-	public Presentation getPresentation(int assessmentId) {
-		Presentation presentation;
-		PresentationDAO presentationDAO = new PresentationDAO();
-		try {
-			presentation = presentationDAO.findById(assessmentId);
-		} catch (IllegalArgumentException e) {
-			presentation = null;
-		}
-		return presentation;
 	}
 }
