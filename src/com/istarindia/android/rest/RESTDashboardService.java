@@ -10,6 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.gson.Gson;
 import com.istarindia.android.pojo.DashboardCard;
 import com.istarindia.android.utility.AppDashboardUtility;
 import com.viksitpro.core.dao.entities.IstarUser;
@@ -62,7 +63,11 @@ public class RESTDashboardService {
 					}
 				}
 			}
-			return Response.ok(allDashboardCard).build();
+			
+			Gson gson = new Gson();
+			String result = gson.toJson(allDashboardCard);
+			
+			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
