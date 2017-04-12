@@ -2,7 +2,6 @@ package com.istarindia.android.rest;
 
 import java.util.HashSet;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -21,7 +20,6 @@ import com.viksitpro.core.dao.entities.UserRole;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.dao.utils.user.RoleServices;
 import com.viksitpro.core.dao.utils.user.UserRoleServices;
-import com.viksitpro.core.pojo.recruiter.IstarUserPOJO;
 
 @Path("auth")
 public class RESTAuthenticationService {
