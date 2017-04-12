@@ -34,6 +34,7 @@ public class RESTAuthenticationFilter implements ContainerRequestFilter{
 		validateToken(4013, authenticationToken);
 		
 		}catch(Exception e){
+			e.printStackTrace();
 			requestContext.abortWith(
 	                Response.status(Response.Status.UNAUTHORIZED).build());
 		}
