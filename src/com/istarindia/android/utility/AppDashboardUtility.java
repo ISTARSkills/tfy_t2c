@@ -38,7 +38,7 @@ public class AppDashboardUtility {
 		DashboardCard dashboardCard = null;
 		if (lesson != null) {
 			dashboardCard = new DashboardCard(task.getId(), lesson.getTitle(), task.getState(), lesson.getDescription(),
-					"/root/talentify/presentation.jpeg", task.getItemType(), lesson.getId());
+					"/root/talentify/presentation.jpeg", null, task.getItemType(), lesson.getId());
 		}
 		return dashboardCard;
 	}

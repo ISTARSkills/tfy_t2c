@@ -74,16 +74,16 @@ public class RESTAuthenticationService {
 				istarUser = istarUserServices.createIstarUser(email, "test123", null, null, socialMedia);
 				UserProfile userProfile = istarUserServices.createUserProfile(istarUser.getId(), null, name, null, null,
 						null, profileImage, null);
-				
+
 				RoleServices roleServices = new RoleServices();
 				Role role = roleServices.getRoleByName("STUDENT");
-				
+
 				UserRoleServices userRoleServices = new UserRoleServices();
 				UserRole userRole = userRoleServices.createUserRole(istarUser, role, 1);
 
 				HashSet<UserRole> allUserRole = new HashSet<UserRole>();
 				allUserRole.add(userRole);
-				
+
 				istarUser.setUserRoles(allUserRole);
 				istarUser.setUserProfile(userProfile);
 			}
@@ -103,20 +103,5 @@ public class RESTAuthenticationService {
 			e.printStackTrace();
 			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
-	}
-
-	@POST
-	@Path("user")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response test(IstarUserPOJO istarUserPOJO) {
-
-		System.out.println("Accepting JSON method");
-
-		System.out.println(istarUserPOJO.getEmail());
-		System.out.println(istarUserPOJO.getAuthenticationToken());
-
-		System.out.println("Returning JSON");
-		return Response.ok(istarUserPOJO).build();
 	}
 }

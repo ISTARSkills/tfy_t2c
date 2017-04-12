@@ -41,8 +41,9 @@ public class RESTCourseService {
 			String result = gson.toJson(courses);
 
 			return Response.ok(result).build();
-		} catch (Exception e) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
+		}catch(Exception e){
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 }

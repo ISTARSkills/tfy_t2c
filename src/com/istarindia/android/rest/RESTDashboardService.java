@@ -26,37 +26,42 @@ public class RESTDashboardService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getDashboardCard(@PathParam("userId") int userId) {
 
-		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUser = istarUserServices.getIstarUser(userId);
-		Set<Task> allTaskOfUser = istarUser.getTasksForActor();
+		try {
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+			Set<Task> allTaskOfUser = istarUser.getTasksForActor();
 
-		AppDashboardUtility dashboardUtility = new AppDashboardUtility();
-		List<DashboardCard> allDashboardCard = new ArrayList<DashboardCard>();
+			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
+			List<DashboardCard> allDashboardCard = new ArrayList<DashboardCard>();
 
-		for (Task task : allTaskOfUser) {
-			if (task.getIsActive()) {
-				DashboardCard dashboardCard = null;
-				String itemType = task.getItemType();
+			for (Task task : allTaskOfUser) {
+				if (task.getIsActive()) {
+					DashboardCard dashboardCard = null;
+					String itemType = task.getItemType();
 
-				switch (itemType) {
-				case TaskCategory.ASSESSMENT:
-					dashboardCard = dashboardUtility.getDashboardCardForAssessment(task);
-					break;
-				case TaskCategory.LESSON:
-					dashboardCard = dashboardUtility.getDashboardCardForLesson(task);
-					break;
-				case TaskCategory.JOB:
-					dashboardCard = dashboardUtility.getDashboardCardForJob(task);
-				case TaskCategory.VIDEO:
-					dashboardCard = dashboardUtility.getDashboardCardForVideo(task);
-					break;
-				}
+					switch (itemType) {
+					case TaskCategory.ASSESSMENT:
+						dashboardCard = dashboardUtility.getDashboardCardForAssessment(task);
+						break;
+					case TaskCategory.LESSON:
+						dashboardCard = dashboardUtility.getDashboardCardForLesson(task);
+						break;
+					case TaskCategory.JOB:
+						dashboardCard = dashboardUtility.getDashboardCardForJob(task);
+					case TaskCategory.VIDEO:
+						dashboardCard = dashboardUtility.getDashboardCardForVideo(task);
+						break;
+					}
 
-				if (dashboardCard != null) {
-					allDashboardCard.add(dashboardCard);
+					if (dashboardCard != null) {
+						allDashboardCard.add(dashboardCard);
+					}
 				}
 			}
+			return Response.ok(allDashboardCard).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
-		return Response.ok(allDashboardCard).build();
 	}
 }

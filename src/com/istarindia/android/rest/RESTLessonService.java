@@ -30,7 +30,8 @@ public class RESTLessonService {
 			studentPlaylistServices.updateStatus(studentPlaylist, status);
 			return Response.status(Response.Status.CREATED).build();
 		} catch (Exception e) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
-	}	
+	}
 }

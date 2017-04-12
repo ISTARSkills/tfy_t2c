@@ -20,11 +20,25 @@ public class DashboardCard implements Serializable {
 	private Integer itemId;
 	private Integer duration;
 	private String imageURL;
+	private String videoURL;
 	private String challengerName;
 	private Integer challengerRank;
 	private Integer challengerExperience;
 
-	// Game, Video, Presentation
+	//Lesson, Video
+	public DashboardCard(Integer id, String header, String title, String description, String imageURL, String videoURL, String itemType,
+			Integer itemId) {
+		this.id = id;
+		this.header = header;
+		this.title = title;
+		this.description = description;
+		this.imageURL = imageURL;
+		this.videoURL = videoURL;
+		this.itemType = itemType;
+		this.itemId = itemId;
+	}
+	
+	//Game, Job
 	public DashboardCard(Integer id, String header, String title, String description, String imageURL, String itemType,
 			Integer itemId) {
 		this.id = id;
@@ -36,7 +50,7 @@ public class DashboardCard implements Serializable {
 		this.itemId = itemId;
 	}
 
-	// Challenge
+	//Challenge
 	public DashboardCard(Integer id, String header, String title, String description, String imageURL,
 			Integer numberOfQuestions, Integer itemExperience, Integer duration, Integer itemCoins, String itemType,
 			Integer itemId, Integer challengerExperience, Integer challengerRank) {
@@ -55,7 +69,7 @@ public class DashboardCard implements Serializable {
 		this.challengerRank = challengerRank;
 	}
 
-	// Assessments
+	//Assessment
 	public DashboardCard(Integer id, String header, String title, String description, String imageURL,
 			Integer numberOfQuestions, Integer duration, Integer itemExperience, Integer itemCoins, String itemType,
 			Integer itemId) {
@@ -169,6 +183,15 @@ public class DashboardCard implements Serializable {
 
 	public void setImageURL(String imageURL) {
 		this.imageURL = imageURL;
+	}
+	
+	@XmlAttribute(name = "videoURL", required = false)
+	public String getVideoURL() {
+		return videoURL;
+	}
+
+	public void setVideoURL(String videoURL) {
+		this.videoURL = videoURL;
 	}
 
 	@XmlAttribute(name = "challengerName", required = false)

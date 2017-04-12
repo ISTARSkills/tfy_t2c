@@ -36,32 +36,37 @@ public class RESTIstarUserService {
 	public Response createUser(@FormParam("email") String email, @FormParam("password") String password,
 			@FormParam("mobile") Long mobile) {
 
-		IstarUserServices istarUserServices = new IstarUserServices();
-		String authenticationToken = AppUtility.getRandomString(20);
-		IstarUser istarUser = istarUserServices.createIstarUser(email, password, mobile, authenticationToken);
+		try {
+			IstarUserServices istarUserServices = new IstarUserServices();
+			String authenticationToken = AppUtility.getRandomString(20);
+			IstarUser istarUser = istarUserServices.createIstarUser(email, password, mobile, authenticationToken);
 
-		if (istarUser == null) {
-			// User Email or Mobile already registered
-			return Response.status(Response.Status.CONFLICT).build();
-		} else {			
-			RoleServices roleServices = new RoleServices();
-			Role role = roleServices.getRoleByName("STUDENT");
-			
-			UserRoleServices userRoleServices = new UserRoleServices();
-			UserRole userRole = userRoleServices.createUserRole(istarUser, role, 1);
+			if (istarUser == null) {
+				// User Email or Mobile already registered
+				return Response.status(Response.Status.CONFLICT).build();
+			} else {
+				RoleServices roleServices = new RoleServices();
+				Role role = roleServices.getRoleByName("STUDENT");
 
-			HashSet<UserRole> allUserRole = new HashSet<UserRole>();
-			allUserRole.add(userRole);
-			
-			istarUser.setUserRoles(allUserRole);
-			
-			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
+				UserRoleServices userRoleServices = new UserRoleServices();
+				UserRole userRole = userRoleServices.createUserRole(istarUser, role, 1);
 
-			Gson gson = new Gson();
-			String result = gson.toJson(studentProfile);
+				HashSet<UserRole> allUserRole = new HashSet<UserRole>();
+				allUserRole.add(userRole);
 
-			return Response.ok(result).build();
+				istarUser.setUserRoles(allUserRole);
+
+				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
+
+				Gson gson = new Gson();
+				String result = gson.toJson(studentProfile);
+
+				return Response.ok(result).build();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 
@@ -69,21 +74,26 @@ public class RESTIstarUserService {
 	@Path("{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserProfile(@PathParam("userId") int userId) {
-		System.out.println("Getting user profile" + userId);
-		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
-		if (istarUser == null) {
-			// User does not exists
-			return Response.status(404).build();
-		} else {
-			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
+		try {
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
-			Gson gson = new Gson();
-			String result = gson.toJson(studentProfile);
+			if (istarUser == null) {
+				// User does not exists
+				return Response.status(404).build();
+			} else {
+				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
-			return Response.ok(result).build();
+				Gson gson = new Gson();
+				String result = gson.toJson(studentProfile);
+
+				return Response.ok(result).build();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 
@@ -91,37 +101,45 @@ public class RESTIstarUserService {
 	@Path("password/reset")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response resetPassword(@FormParam("userId") int userId, @FormParam("password") String password) {
-		System.out.println("Resetting password");
-		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUser = istarUserServices.getIstarUser(userId);
+		try {
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
-		if (istarUser == null) {
-			return Response.status(404).build();
-		} else {
-			istarUser = istarUserServices.updateIstarUser(istarUser.getId(), istarUser.getEmail(), password,
-					istarUser.getMobile());
-			return Response.status(Response.Status.CREATED).build();
+			if (istarUser == null) {
+				return Response.status(404).build();
+			} else {
+				istarUser = istarUserServices.updateIstarUser(istarUser.getId(), istarUser.getEmail(), password,
+						istarUser.getMobile());
+				return Response.status(Response.Status.CREATED).build();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-	
+
 	@GET
 	@Path("password/forgot")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response forgotPassword(@QueryParam("mobile") Long mobile){
-		
-		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUser = istarUserServices.getIstarUserByMobile(mobile);
-		
-		if (istarUser == null) {
-			return Response.status(404).build();
-		} else {
-			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-			IstarUserPOJO istarUserPOJO = appPOJOUtility.getIstarUserPOJO(istarUser);
+	public Response forgotPassword(@QueryParam("mobile") Long mobile) {
+		try {
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUserByMobile(mobile);
 
-			Gson gson = new Gson();
-			String result = gson.toJson(istarUserPOJO);
+			if (istarUser == null) {
+				return Response.status(404).build();
+			} else {
+				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+				IstarUserPOJO istarUserPOJO = appPOJOUtility.getIstarUserPOJO(istarUser);
 
-			return Response.ok(result).build();
+				Gson gson = new Gson();
+				String result = gson.toJson(istarUserPOJO);
+
+				return Response.ok(result).build();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 
@@ -129,25 +147,29 @@ public class RESTIstarUserService {
 	@Path("{userId}/mobile")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response verifyMobileNumber(@PathParam("userId") int userId, @QueryParam("mobile") Long mobile) {
+		try {
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
-		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUser = istarUserServices.getIstarUser(userId);
+			IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobile);
 
-		IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobile);
+			if (istarUser == null && mobileIstarUser == null) {
+				return Response.status(Response.Status.BAD_REQUEST).build();
+			} else {
+				Integer otp = null;
 
-		if (istarUser == null && mobileIstarUser == null) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		} else {
-			Integer otp = null;
-
-			try {
-				AppServices appServices = new AppServices();
-				otp = appServices.sendOTP(mobile.toString());
-			} catch (Exception e) {
-				e.printStackTrace();
-				return Response.status(Response.Status.BAD_GATEWAY).build();
+				try {
+					AppServices appServices = new AppServices();
+					otp = appServices.sendOTP(mobile.toString());
+				} catch (Exception e) {
+					e.printStackTrace();
+					return Response.status(Response.Status.BAD_GATEWAY).build();
+				}
+				return Response.ok(otp).build();
 			}
-			return Response.ok(otp).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 
@@ -155,26 +177,30 @@ public class RESTIstarUserService {
 	@Path("{userId}/mobile")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateAndVerifyMobileNumber(@PathParam("userId") int userId, @FormParam("mobile") Long mobile) {
+		try {
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
-		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUser = istarUserServices.getIstarUser(userId);
+			IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobile);
 
-		IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobile);
+			if (istarUser == null && mobileIstarUser != null) {
+				return Response.status(Response.Status.BAD_REQUEST).build();
+			} else {
+				Integer otp = null;
+				istarUserServices.updateMobile(istarUser.getId(), mobile);
 
-		if (istarUser == null && mobileIstarUser != null) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		} else {
-			Integer otp = null;
-			istarUserServices.updateMobile(istarUser.getId(), mobile);
-
-			try {
-				AppServices appServices = new AppServices();
-				otp = appServices.sendOTP(mobile.toString());
-			} catch (Exception e) {
-				e.printStackTrace();
-				return Response.status(Response.Status.BAD_GATEWAY).build();
+				try {
+					AppServices appServices = new AppServices();
+					otp = appServices.sendOTP(mobile.toString());
+				} catch (Exception e) {
+					e.printStackTrace();
+					return Response.status(Response.Status.BAD_GATEWAY).build();
+				}
+				return Response.ok(otp).build();
 			}
-			return Response.ok(otp).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 
@@ -182,24 +208,31 @@ public class RESTIstarUserService {
 	@Path("{userId}/verify/{isVerified}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response isVerified(@PathParam("userId") int userId, @PathParam("isVerified") boolean isVerified) {
+		try {
+			IstarUserServices istarUserServices = new IstarUserServices();
+			istarUserServices.updateIsVerified(userId, isVerified);
 
-		IstarUserServices istarUserServices = new IstarUserServices();
-		istarUserServices.updateIsVerified(userId, isVerified);
-		
-		return Response.status(Response.Status.CREATED).build();
+			return Response.status(Response.Status.CREATED).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 
 	@POST
 	@Path("{userId}/batch")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response assignBatchCode(@PathParam("userId") int istarUserId,
-			@FormParam("batchCode") String batchCode) {
+	public Response assignBatchCode(@PathParam("userId") int istarUserId, @FormParam("batchCode") String batchCode) {
 
-		// check if student batch already exists
-		AppBatchStudentsServices batchStudentServices = new AppBatchStudentsServices();
-		batchStudentServices.createBatchStudents(istarUserId, batchCode);
+		try {
+			AppBatchStudentsServices batchStudentServices = new AppBatchStudentsServices();
+			batchStudentServices.createBatchStudents(istarUserId, batchCode);
 
-		return Response.status(Response.Status.CREATED).build();
+			return Response.status(Response.Status.CREATED).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 
 	/*
