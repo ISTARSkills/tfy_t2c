@@ -21,6 +21,8 @@ import com.viksitpro.core.dao.entities.QuestionDAO;
 
 public class AppContentServiceUtility {
 
+	
+	
 	public Course getCourse(int courseId) {
 		Course course;
 		CourseDAO courseDAO = new CourseDAO();

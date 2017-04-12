@@ -13,7 +13,7 @@ public class ModulePOJO {
 	private String description;
 	private String imageURL;
 	private Integer orderId;
-	private ArrayList<LessonPOJO> lessons;
+	private ArrayList<LessonPOJO> lessons = new ArrayList<LessonPOJO>();
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {

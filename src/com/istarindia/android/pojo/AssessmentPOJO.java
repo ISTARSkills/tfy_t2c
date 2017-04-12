@@ -1,5 +1,6 @@
 package com.istarindia.android.pojo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -13,7 +14,7 @@ public class AssessmentPOJO {
 	private String name;
 	private String category;
 	private Integer durationInMinutes;
-	private List<QuestionPOJO> questions;
+	private List<QuestionPOJO> questions = new ArrayList<QuestionPOJO>();
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {

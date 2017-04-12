@@ -1,5 +1,6 @@
 package com.istarindia.android.pojo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -20,7 +21,7 @@ public class QuestionPOJO {
 	private String comprehensivePassageText;
 	private Integer points;
 	private List<OptionPOJO> options;
-	private List<Integer> answers;
+	private List<Integer> answers = new ArrayList<Integer>();
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {

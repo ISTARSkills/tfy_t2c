@@ -14,7 +14,7 @@ public class CoursePOJO {
 	private String category;
 	private String imageURL;
 	private String status;
-	private ArrayList<ModulePOJO> modules;
+	private ArrayList<ModulePOJO> modules = new ArrayList<ModulePOJO>();
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {

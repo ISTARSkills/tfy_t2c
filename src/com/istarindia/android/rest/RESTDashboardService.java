@@ -2,7 +2,6 @@ package com.istarindia.android.rest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -15,6 +14,7 @@ import com.istarindia.android.pojo.DashboardCard;
 import com.istarindia.android.utility.AppDashboardUtility;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Task;
+import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.utilities.TaskCategory;
 
@@ -29,12 +29,18 @@ public class RESTDashboardService {
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
-			Set<Task> allTaskOfUser = istarUser.getTasksForActor();
+			
+			System.out.println(istarUser.getEmail());
+			
+			TaskServices taskServices = new TaskServices();			
+			List<Task> allTaskOfUser = taskServices.getAllTaskOfActor(istarUser);
 
+			System.out.println("Size of task " + allTaskOfUser.size());
 			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
 			List<DashboardCard> allDashboardCard = new ArrayList<DashboardCard>();
 
 			for (Task task : allTaskOfUser) {
+				
 				if (task.getIsActive()) {
 					DashboardCard dashboardCard = null;
 					String itemType = task.getItemType();
@@ -48,8 +54,6 @@ public class RESTDashboardService {
 						break;
 					case TaskCategory.JOB:
 						dashboardCard = dashboardUtility.getDashboardCardForJob(task);
-					case TaskCategory.VIDEO:
-						dashboardCard = dashboardUtility.getDashboardCardForVideo(task);
 						break;
 					}
 

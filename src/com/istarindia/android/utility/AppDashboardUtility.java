@@ -8,10 +8,6 @@ import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Task;
 
 public class AppDashboardUtility {
-	
-	public DashboardCard getDashboardCardForVideo(Task task){
-		return null;
-	}
 
 	public DashboardCard getDashboardCardForAssessment(Task task) {
 
@@ -37,8 +33,18 @@ public class AppDashboardUtility {
 
 		DashboardCard dashboardCard = null;
 		if (lesson != null) {
-			dashboardCard = new DashboardCard(task.getId(), lesson.getTitle(), task.getState(), lesson.getDescription(),
-					"/root/talentify/presentation.jpeg", null, task.getItemType(), lesson.getId());
+			
+			if(lesson.getType().equals("VIDEO")){
+				System.out.println("LEsson is of type VIDEO");
+				String thumbnailURL = lesson.getVideoLesson().getVideo_thumb_url();
+				String videoURL = lesson.getVideoLesson().getVideo_url();
+				
+				dashboardCard = new DashboardCard(task.getId(), lesson.getTitle(), task.getState(), lesson.getDescription(),
+						thumbnailURL, videoURL, task.getItemType(), lesson.getId());
+			}else{
+				dashboardCard = new DashboardCard(task.getId(), lesson.getTitle(), task.getState(), lesson.getDescription(),
+						"/root/talentify/presentation.jpeg", null, task.getItemType(), lesson.getId());
+			}
 		}
 		return dashboardCard;
 	}
