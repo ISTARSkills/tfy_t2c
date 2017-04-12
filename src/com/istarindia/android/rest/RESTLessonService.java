@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.istarindia.apps.services.AppStudentPlaylistServices;
+import com.istarindia.apps.services.StudentPlaylistServices;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 
 @Path("user/{userId}/lessons")
@@ -20,7 +20,7 @@ public class RESTLessonService {
 	public Response updateLessonStatus(@PathParam("playlistId") int playlistId, @FormParam("status") String status) {
 
 		try {
-			AppStudentPlaylistServices studentPlaylistServices = new AppStudentPlaylistServices();
+			StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 			StudentPlaylist studentPlaylist = studentPlaylistServices.getStudentPlaylist(playlistId);
 
 			if (studentPlaylist == null) {

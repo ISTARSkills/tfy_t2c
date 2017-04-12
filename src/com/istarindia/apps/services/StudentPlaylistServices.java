@@ -7,7 +7,7 @@ import org.hibernate.Transaction;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.dao.entities.StudentPlaylistDAO;
 
-public class AppStudentPlaylistServices {
+public class StudentPlaylistServices {
 	
 	public StudentPlaylist updateStatus(StudentPlaylist studentPlaylist, String status){
 		
