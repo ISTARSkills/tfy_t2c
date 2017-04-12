@@ -98,6 +98,8 @@ public class AppContentServiceUtility {
 		return assessmentOption;
 	}
 
+	// do not remove comments (sysouts), else be ready to get screwed in the
+	// future!
 	public HashMap<String, Boolean> getAnsweredOptionsMap(Question question, List<Integer> options) {
 		boolean isCorrect = false;
 
