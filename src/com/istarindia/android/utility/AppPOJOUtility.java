@@ -66,15 +66,7 @@ public class AppPOJOUtility {
 			if (student.getUserProfile().getAddress() != null) {
 				studentProfile.setLocation(student.getUserProfile().getAddress().getPincode().getCity());
 			}
-			/*
-			 * studentPOJO.setProfileImage(student.getUserProfile().
-			 * getProfileImage());
-			 */
-			if (student.getUserProfile().getProfileImage() == null) {
-				studentProfile.setProfileImage("/root/recruiter/pictures/student.png");
-			} else {
-				studentProfile.setProfileImage(student.getUserProfile().getProfileImage());
-			}
+			studentProfile.setProfileImage(student.getUserProfile().getProfileImage());
 		}
 
 		if (student.getProfessionalProfile() != null) {
@@ -172,35 +164,35 @@ public class AppPOJOUtility {
 
 		return lessonPOJO;
 	}
-	
-	public AssessmentPOJO getAssessmentPOJO(Assessment assessment){
-		
+
+	public AssessmentPOJO getAssessmentPOJO(Assessment assessment) {
+
 		AssessmentPOJO assessmentPOJO = new AssessmentPOJO();
-		
+
 		assessmentPOJO.setId(assessment.getId());
 		assessmentPOJO.setType(assessment.getAssessmentType());
 		assessmentPOJO.setName(assessment.getAssessmenttitle());
 		assessmentPOJO.setCategory(assessment.getCategory());
 		assessmentPOJO.setDurationInMinutes(assessment.getAssessmentdurationminutes());
-		
+
 		Set<AssessmentQuestion> assessmentQuestions = assessment.getAssessmentQuestions();
 		ArrayList<QuestionPOJO> questions = new ArrayList<QuestionPOJO>();
-		
-		for(AssessmentQuestion assessmentQuestion: assessmentQuestions){
+
+		for (AssessmentQuestion assessmentQuestion : assessmentQuestions) {
 			questions.add(getQuestionPOJO(assessmentQuestion));
 		}
 		assessmentPOJO.setQuestions(questions);
-		
+
 		return assessmentPOJO;
 	}
-	
-	public QuestionPOJO getQuestionPOJO(AssessmentQuestion assessmentQuestion){
+
+	public QuestionPOJO getQuestionPOJO(AssessmentQuestion assessmentQuestion) {
 		QuestionPOJO questionPOJO = new QuestionPOJO();
-		
+
 		Question question = assessmentQuestion.getQuestion();
-		
+
 		int orderId = assessmentQuestion.getOrderId();
-		
+
 		questionPOJO.setId(question.getId());
 		questionPOJO.setOrderId(orderId);
 		questionPOJO.setText(question.getQuestionText());
@@ -210,31 +202,31 @@ public class AppPOJOUtility {
 		questionPOJO.setComprehensivePassageText(question.getComprehensivePassageText());
 		questionPOJO.setPoints(question.getPoints());
 		questionPOJO.setDurationInSec(question.getDurationInSec());
-		
+
 		Set<AssessmentOption> allAssessmentOption = question.getAssessmentOptions();
-		
+
 		List<OptionPOJO> options = new ArrayList<OptionPOJO>();
 		List<Integer> answers = new ArrayList<Integer>();
-		
-		for( AssessmentOption assessmentOption: allAssessmentOption){
+
+		for (AssessmentOption assessmentOption : allAssessmentOption) {
 			options.add(getOptionPOJO(assessmentOption));
-			if(assessmentOption.getMarkingScheme()==1){
+			if (assessmentOption.getMarkingScheme() == 1) {
 				answers.add(assessmentOption.getId());
-			}		
-		}		
+			}
+		}
 		questionPOJO.setOptions(options);
 		questionPOJO.setAnswers(answers);
-		
+
 		return questionPOJO;
 	}
-	
-	public OptionPOJO getOptionPOJO(AssessmentOption assessmentOption){
-		
-		OptionPOJO optionPOJO= new OptionPOJO();
-		
+
+	public OptionPOJO getOptionPOJO(AssessmentOption assessmentOption) {
+
+		OptionPOJO optionPOJO = new OptionPOJO();
+
 		optionPOJO.setId(assessmentOption.getId());
 		optionPOJO.setText(assessmentOption.getText());
-		
+
 		return optionPOJO;
 	}
 }

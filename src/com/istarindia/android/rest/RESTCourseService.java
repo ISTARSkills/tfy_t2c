@@ -17,7 +17,7 @@ import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
-@Path("user/{userId}/courses")
+@Path("courses/user/{userId}")
 public class RESTCourseService {
 
 	@GET

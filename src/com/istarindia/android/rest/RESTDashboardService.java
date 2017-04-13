@@ -19,11 +19,11 @@ import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.utilities.TaskCategory;
 
-@Path("user/{userId}")
+@Path("dashboard")
 public class RESTDashboardService {
 
 	@GET
-	@Path("dashboard")
+	@Path("user/{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getDashboardCard(@PathParam("userId") int userId) {
 

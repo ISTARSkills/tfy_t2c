@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response;
 import com.istarindia.apps.services.StudentPlaylistServices;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 
-@Path("user/{userId}/lessons")
+@Path("lessons/user/{userId}")
 public class RESTLessonService {
 
 	@PUT

@@ -23,7 +23,7 @@ import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Question;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
-@Path("user/{userId}/assessments")
+@Path("assessments/user/{userId}")
 public class RESTAssessmentService {
 
 	@GET
@@ -79,5 +79,13 @@ public class RESTAssessmentService {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
+	}
+	
+	@GET
+	@Path("{assessmentId}/report")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAssessmentReportOfUser(@PathParam("userId") int userId, @PathParam("assessmentId") int assessmentId){
+		
+		return null;
 	}
 }
