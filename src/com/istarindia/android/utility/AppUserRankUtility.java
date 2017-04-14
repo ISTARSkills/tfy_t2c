@@ -101,18 +101,16 @@ public class AppUserRankUtility {
 	public List<StudentRankPOJO> assignRankToUsersForACourseOfUsersBatch(Integer istarUserId, Integer courseId){
 		
 		List<StudentRankPOJO> allRankedStudentRankPOJOs = getStudentRankPOJOForACourseOfUsersBatch(istarUserId, courseId);
+		List<StudentRankPOJO> rankedPOJOs = new ArrayList<StudentRankPOJO>();
 		
 		Collections.sort(allRankedStudentRankPOJOs);
 		
-/*		for(int i=0; i < allRankedStudentRankPOJOs.size(); i++){			
+		for(int i=0; i < allRankedStudentRankPOJOs.size(); i++){			
 			StudentRankPOJO studentRankPOJO = allRankedStudentRankPOJOs.get(i);
 			studentRankPOJO.setBatchRank((i+1));			
-			allRankedStudentRankPOJOs.add(studentRankPOJO);
-		}*/
-
-		List<StudentRankPOJO> rankedPOJOs = new ArrayList<StudentRankPOJO>();
-		
-		return allRankedStudentRankPOJOs;
+			rankedPOJOs.add(studentRankPOJO);
+		}
+		return rankedPOJOs;
 	}
 	
 	public List<StudentRankPOJO> getStudentRankPOJOForACourseOfUsersBatch(Integer istarUserId, Integer courseId) {
@@ -155,6 +153,7 @@ public class AppUserRankUtility {
 			
 			studentRankPOJO.setId(istarUserInBatch.getId());
 			studentRankPOJO.setName(istarUserInBatch.getUserProfile().getFirstName());
+			studentRankPOJO.setImageURL(istarUserInBatch.getUserProfile().getProfileImage());
 			studentRankPOJO.setPoints(totalPoints.intValue());
 			studentRankPOJO.setCoins(totalCoins);
 
