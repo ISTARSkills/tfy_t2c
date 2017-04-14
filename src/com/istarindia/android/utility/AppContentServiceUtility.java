@@ -119,7 +119,7 @@ public class AppContentServiceUtility {
 	@SuppressWarnings("unchecked")
 	public List<AssessmentBenchmark> getAssessmentBenchmarksForAssessment(int assessmentId) {
 
-		String hql = "from AssessmentBenchmark assessmentBenchmark where assessment= :assessmentId";
+		String hql = "from AssessmentBenchmark assessmentBenchmark where assessment.id= :assessmentId";
 
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
@@ -135,7 +135,7 @@ public class AppContentServiceUtility {
 	@SuppressWarnings("unchecked")
 	public List<Assessment> getAssessmentsOfACourse(int courseId){
 		
-		String hql = "from Assessment assessment where course= :courseId";
+		String hql = "from Assessment assessment where course_id= :courseId";
 
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();

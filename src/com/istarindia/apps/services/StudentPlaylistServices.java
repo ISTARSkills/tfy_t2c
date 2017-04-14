@@ -24,7 +24,9 @@ public class StudentPlaylistServices {
 	@SuppressWarnings("unchecked")
 	public List<StudentPlaylist> getStudentPlaylistOfUser(int istarUserId){
 		
-		String hql = "from StudentPlaylist studentPlaylist where istarUser= :istarUser";
+		System.out.println("getStudentPlaylistOfUser START");
+		
+		String hql = "from StudentPlaylist studentPlaylist where istarUser.id= :istarUser";
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
@@ -33,6 +35,8 @@ public class StudentPlaylistServices {
 		query.setParameter("istarUser",istarUserId);
 		
 		List<StudentPlaylist> allStudentPlaylist = query.list();
+		
+		System.out.println("getStudentPlaylistOfUser END");
 		
 		return allStudentPlaylist;		
 	}

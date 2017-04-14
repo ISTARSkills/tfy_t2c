@@ -76,6 +76,8 @@ public class AppUserRankUtility {
 		for(Integer courseId: allCourses){
 			Course course = appContentServiceUtility.getCourse(courseId);			
 			if(course!=null){
+				System.out.println("Course--->" + course.getCourseName() + course.getId());
+				
 				CourseRankPOJO courseRankPOJO = new CourseRankPOJO();
 				List<StudentRankPOJO> allStudentRankPOJOOfCourse =assignRankToUsersForACourseOfUsersBatch(istarUserId, courseId);
 				
@@ -85,7 +87,11 @@ public class AppUserRankUtility {
 				courseRankPOJO.setDescription(course.getCourseDescription());
 				courseRankPOJO.setAllStudentRanks(allStudentRankPOJOOfCourse);
 				
+				System.out.println("Course--->" + allStudentRankPOJOOfCourse.size());
+				
 				allCourseRanks.add(courseRankPOJO);
+				
+				System.out.println("Course--->" + allCourseRanks.size());
 			}		
 		}
 		return allCourseRanks;
@@ -98,12 +104,14 @@ public class AppUserRankUtility {
 		
 		Collections.sort(allRankedStudentRankPOJOs);
 		
-		for(int i=0; i < allRankedStudentRankPOJOs.size(); i++){			
+/*		for(int i=0; i < allRankedStudentRankPOJOs.size(); i++){			
 			StudentRankPOJO studentRankPOJO = allRankedStudentRankPOJOs.get(i);
 			studentRankPOJO.setBatchRank((i+1));			
 			allRankedStudentRankPOJOs.add(studentRankPOJO);
-		}
-				
+		}*/
+
+		List<StudentRankPOJO> rankedPOJOs = new ArrayList<StudentRankPOJO>();
+		
 		return allRankedStudentRankPOJOs;
 	}
 	
@@ -123,15 +131,28 @@ public class AppUserRankUtility {
 
 			for (Assessment assessment : allAssessments) {
 				List<UserGamification> allUserGamifications = userGamificationServices
-						.getUserGamificationsOfUserForItem(istarUserId, assessment.getId(), "ASSESSMENT");
+						.getUserGamificationsOfUserForItem(istarUserInBatch.getId(), assessment.getId(), "ASSESSMENT");
+				
+				//System.out.println("allUserGamifications->" + allUserGamifications.size());
+				
 				for (UserGamification userGamification : allUserGamifications) {
+					
+					//System.out.println("userGamification.getPoints()->"+userGamification.getPoints());
+					//System.out.println("userGamification.getCoins()->"+userGamification.getCoins());
+					
 					totalPoints = totalPoints + userGamification.getPoints();
 					totalCoins = totalCoins + userGamification.getCoins();
+					
+					System.out.println("tPoints->"+totalPoints);
+					System.out.println("tCoins->"+totalCoins);
 				}
 			}
 
 			StudentRankPOJO studentRankPOJO = new StudentRankPOJO();
 
+			System.out.println("totalPoints->"+totalPoints);
+			System.out.println("totalCoins->"+totalCoins);
+			
 			studentRankPOJO.setId(istarUserInBatch.getId());
 			studentRankPOJO.setName(istarUserInBatch.getUserProfile().getFirstName());
 			studentRankPOJO.setPoints(totalPoints.intValue());
@@ -151,7 +172,7 @@ public class AppUserRankUtility {
 		if(allbatchStudents.size()>0){
 			BatchGroup batchGroup = allbatchStudents.get(0).getBatchGroup();
 			
-			for(BatchStudents batchStudent : getBatchStudentsOfABatchGroup(batchGroup)){
+			for(BatchStudents batchStudent : getBatchStudentsOfABatchGroup(batchGroup)){				
 				allUsersOfABatch.add(batchStudent.getIstarUser());
 			}	
 		}
@@ -161,7 +182,7 @@ public class AppUserRankUtility {
 	@SuppressWarnings("unchecked")
 	public List<BatchStudents> getBatchStudentsOfUser(Integer istarUserId){
 				
-		String hql = "from BatchStudents batchStudents where istarUser= :istarUser";
+		String hql = "from BatchStudents batchStudents where istarUser.id= :istarUser";
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
@@ -177,7 +198,7 @@ public class AppUserRankUtility {
 	@SuppressWarnings("unchecked")
 	public List<BatchStudents> getBatchStudentsOfABatchGroup(BatchGroup batchGroup){
 		
-		String hql = "from BatchStudents batchStudents where batchGroup= :batchGroup";
+		String hql = "from BatchStudents batchStudents where batchGroup.id= :batchGroup";
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();

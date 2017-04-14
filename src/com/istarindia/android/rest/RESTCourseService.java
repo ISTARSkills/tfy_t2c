@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 import com.istarindia.android.pojo.CoursePOJO;
+import com.istarindia.android.pojo.CourseRankPOJO;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.android.utility.AppUserRankUtility;
 import com.istarindia.apps.services.StudentPlaylistServices;
@@ -68,10 +69,10 @@ public class RESTCourseService {
 			}
 			
 			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
-			appUserRankUtility.getCourseRankPOJOForCoursesOfUsersBatch(userId, allCourseId);
+			List<CourseRankPOJO> allCourseRanks = appUserRankUtility.getCourseRankPOJOForCoursesOfUsersBatch(userId, allCourseId);
 			
 			Gson gson = new Gson();
-			String result = gson.toJson("");
+			String result = gson.toJson(allCourseRanks);
 			
 			return Response.ok(result).build();
 		}catch(Exception e){

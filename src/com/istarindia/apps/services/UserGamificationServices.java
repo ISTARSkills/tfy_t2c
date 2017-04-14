@@ -41,7 +41,7 @@ public class UserGamificationServices {
 	@SuppressWarnings("unchecked")
 	public List<UserGamification> getUserGamificationsOfUserForItem(int istarUserId, int itemId, String itemType){
 		
-		String hql = "from UserGamification userGamification where istarUser= :istarUser and itemId= :itemId and itemType= :itemType";
+		String hql = "from UserGamification userGamification where istarUser.id= :istarUser and itemId= :itemId and itemType= :itemType";
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
