@@ -11,16 +11,21 @@ public class AppDashboardUtility {
 
 	public DashboardCard getDashboardCardForAssessment(Task task) {
 
+		System.out.println("GEting Assessment Card");
+		
 		int itemId = task.getItemId();
 		AppContentServiceUtility contentServiceUtility = new AppContentServiceUtility();
 		Assessment assessment = contentServiceUtility.getAssessment(itemId);
 
 		DashboardCard dashboardCard = null;
 		if (assessment != null) {
+			System.out.println("Assessment Found");
 			dashboardCard = new DashboardCard(task.getId(), assessment.getAssessmenttitle(),
 					assessment.getAssessmenttitle(), assessment.getAssessmenttitle(), null,
 					assessment.getNumberOfQuestions(), assessment.getAssessmentdurationminutes(), 100, 50,
 					task.getItemType(), task.getItemId());
+		}else{
+			System.out.println("Assessment Not Found");
 		}
 		return dashboardCard;
 	}

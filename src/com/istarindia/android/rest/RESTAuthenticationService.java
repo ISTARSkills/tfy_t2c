@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.apps.services.AppServices;
@@ -45,7 +46,10 @@ public class RESTAuthenticationService {
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 			System.out.println("Returing system profile");
 
-			Gson gson = new Gson();
+			//Gson gson = new Gson();
+			
+
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(studentProfile);
 
 			return Response.ok(result).build();
@@ -93,7 +97,7 @@ public class RESTAuthenticationService {
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 			System.out.println("Returing system profile");
 
-			Gson gson = new Gson();
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(studentProfile);
 
 			return Response.ok(result).build();
