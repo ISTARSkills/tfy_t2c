@@ -1,10 +1,15 @@
 package com.istarindia.apps.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import com.viksitpro.core.dao.entities.Assessment;
+import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Question;
 import com.viksitpro.core.dao.entities.StudentAssessment;
@@ -37,7 +42,7 @@ public class StudentAssessmentServices {
 		return studentAssessment;
 	}
 	
-	public StudentAssessment getStudentAssessment(Integer studentAssessmentId){
+	public StudentAssessment getStudentAssessment(int studentAssessmentId){
 		StudentAssessmentDAO studentAssessmentDAO = new StudentAssessmentDAO();
 		StudentAssessment studentAssessment;
 		try{
@@ -46,6 +51,25 @@ public class StudentAssessmentServices {
 			studentAssessment = null;
 		}
 		return studentAssessment;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<StudentAssessment> getStudentAssessmentForUser(int istarUserId, int assessmentId) {
+
+		List<StudentAssessment> allStudentAssessment = new ArrayList<StudentAssessment>();
+
+		String hql = "from StudentAssessment studentAssessment where assessment= :assessment and istarUser= :istarUser";
+
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+
+		Query query = session.createQuery(hql);
+		query.setParameter("assessment", assessmentId);
+		query.setParameter("istarUser", istarUserId);
+
+		allStudentAssessment = query.list();
+
+		return allStudentAssessment;
 	}
 
 	public StudentAssessment saveStudentAssessmentToDAO(StudentAssessment studentAssessment) {

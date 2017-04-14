@@ -18,6 +18,8 @@ import com.viksitpro.core.dao.entities.Module;
 import com.viksitpro.core.dao.entities.ModuleDAO;
 import com.viksitpro.core.dao.entities.Question;
 import com.viksitpro.core.dao.entities.QuestionDAO;
+import com.viksitpro.core.dao.entities.SkillObjective;
+import com.viksitpro.core.dao.entities.SkillObjectiveDAO;
 
 public class AppContentServiceUtility {
 
@@ -98,6 +100,17 @@ public class AppContentServiceUtility {
 			assessmentOption = null;
 		}
 		return assessmentOption;
+	}
+	
+	public SkillObjective getSkillObjective(Integer skillObjectiveId){
+		SkillObjectiveDAO skillObjectiveDAO = new SkillObjectiveDAO();
+		SkillObjective skillObjective;
+		try{
+		skillObjective = skillObjectiveDAO.findById(skillObjectiveId);
+		}catch(IllegalArgumentException e){
+			skillObjective = null;
+		}
+		return skillObjective;
 	}
 
 	// do not remove comments (sysouts), else be ready to get screwed in the
