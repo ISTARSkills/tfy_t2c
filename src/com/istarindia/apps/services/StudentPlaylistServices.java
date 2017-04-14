@@ -1,9 +1,13 @@
 package com.istarindia.apps.services;
 
+import java.util.List;
+
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.dao.entities.StudentPlaylistDAO;
 
@@ -15,6 +19,22 @@ public class StudentPlaylistServices {
 		studentPlaylist = updateStudentPlaylistToDAO(studentPlaylist);
 		
 		return studentPlaylist;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<StudentPlaylist> getStudentPlaylistOfUser(int istarUserId){
+		
+		String hql = "from StudentPlaylist studentPlaylist where istarUser= :istarUser";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		Query query = session.createQuery(hql);
+		query.setParameter("istarUser",istarUserId);
+		
+		List<StudentPlaylist> allStudentPlaylist = query.list();
+		
+		return allStudentPlaylist;		
 	}
 	
 	public StudentPlaylist getStudentPlaylist(Integer studentPlaylistId){

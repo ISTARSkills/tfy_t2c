@@ -1,11 +1,14 @@
 package com.istarindia.apps.services;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.SkillObjective;
 import com.viksitpro.core.dao.entities.UserGamification;
@@ -33,6 +36,24 @@ public class UserGamificationServices {
 		userGamification = saveUserGamificationToDAO(userGamification);
 		
 		return userGamification;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<UserGamification> getUserGamificationsOfUserForItem(int istarUserId, int itemId, String itemType){
+		
+		String hql = "from UserGamification userGamification where istarUser= :istarUser and itemId= :itemId and itemType= :itemType";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		Query query = session.createQuery(hql);
+		query.setParameter("istarUser",istarUserId);
+		query.setParameter("itemId", itemId);
+		query.setParameter("itemType", itemType);
+		
+		List<UserGamification> allUserGamifications = query.list();
+				
+		return allUserGamifications;
 	}
 	
 	public UserGamification getUserGamification(Integer userGamificationId){

@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.hibernate.Query;
+import org.hibernate.Session;
+
 import com.viksitpro.core.dao.entities.Assessment;
+import com.viksitpro.core.dao.entities.AssessmentBenchmark;
 import com.viksitpro.core.dao.entities.AssessmentDAO;
 import com.viksitpro.core.dao.entities.AssessmentOption;
 import com.viksitpro.core.dao.entities.AssessmentOptionDAO;
+import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Cmsession;
 import com.viksitpro.core.dao.entities.CmsessionDAO;
 import com.viksitpro.core.dao.entities.Course;
@@ -23,8 +28,6 @@ import com.viksitpro.core.dao.entities.SkillObjectiveDAO;
 
 public class AppContentServiceUtility {
 
-	
-	
 	public Course getCourse(int courseId) {
 		Course course;
 		CourseDAO courseDAO = new CourseDAO();
@@ -101,16 +104,48 @@ public class AppContentServiceUtility {
 		}
 		return assessmentOption;
 	}
-	
-	public SkillObjective getSkillObjective(Integer skillObjectiveId){
+
+	public SkillObjective getSkillObjective(Integer skillObjectiveId) {
 		SkillObjectiveDAO skillObjectiveDAO = new SkillObjectiveDAO();
 		SkillObjective skillObjective;
-		try{
-		skillObjective = skillObjectiveDAO.findById(skillObjectiveId);
-		}catch(IllegalArgumentException e){
+		try {
+			skillObjective = skillObjectiveDAO.findById(skillObjectiveId);
+		} catch (IllegalArgumentException e) {
 			skillObjective = null;
 		}
 		return skillObjective;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<AssessmentBenchmark> getAssessmentBenchmarksForAssessment(int assessmentId) {
+
+		String hql = "from AssessmentBenchmark assessmentBenchmark where assessment= :assessmentId";
+
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+
+		Query query = session.createQuery(hql);
+		query.setParameter("assessmentId", assessmentId);
+
+		List<AssessmentBenchmark> allAssessmentBenchmark = query.list();
+
+		return allAssessmentBenchmark;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Assessment> getAssessmentsOfACourse(int courseId){
+		
+		String hql = "from Assessment assessment where course= :courseId";
+
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+
+		Query query = session.createQuery(hql);
+		query.setParameter("courseId", courseId);
+
+		List<Assessment> allAssessments = query.list();
+
+		return allAssessments;
 	}
 
 	// do not remove comments (sysouts), else be ready to get screwed in the

@@ -1,6 +1,8 @@
 package com.istarindia.android.rest;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.GET;
@@ -13,6 +15,8 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 import com.istarindia.android.pojo.CoursePOJO;
 import com.istarindia.android.utility.AppPOJOUtility;
+import com.istarindia.android.utility.AppUserRankUtility;
+import com.istarindia.apps.services.StudentPlaylistServices;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
@@ -45,5 +49,34 @@ public class RESTCourseService {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
+	}
+	
+	@GET
+	@Path("leaderboard")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getLeaderboardOfAllCoursesOfUser(@PathParam("userId") int userId){
+		
+		try{
+			
+			StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
+			List<StudentPlaylist> allStudentPlaylist = studentPlaylistServices.getStudentPlaylistOfUser(userId);
+			
+			Set<Integer> allCourseId = new HashSet<Integer>();
+			
+			for(StudentPlaylist StudentPlaylist : allStudentPlaylist){
+				allCourseId.add(StudentPlaylist.getCourse().getId());
+			}
+			
+			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
+			appUserRankUtility.getCourseRankPOJOForCoursesOfUsersBatch(userId, allCourseId);
+			
+			Gson gson = new Gson();
+			String result = gson.toJson("");
+			
+			return Response.ok(result).build();
+		}catch(Exception e){
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}		
 	}
 }
