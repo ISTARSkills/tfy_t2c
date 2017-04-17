@@ -1,20 +1,19 @@
 package com.istarindia.android.pojo;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "skillReport")
-public class SkillReportPOJO {
+public class SkillReportPOJO{
 
 	private Integer id;
 	private String name;
-	private Integer totalPoints;
-	private Integer userPoints;
-	private Integer percentage;
-	private List<SkillReportPOJO> skills = new ArrayList<SkillReportPOJO>();
+	private Double totalPoints = 0.0;
+	private Double userPoints = 0.0;
+	private Double percentage = 0.0;
+	private List<SkillReportPOJO> skills;
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
@@ -33,28 +32,53 @@ public class SkillReportPOJO {
 	}
 	
 	@XmlAttribute(name = "totalPoints", required = false)
-	public Integer getTotalPoints() {
+	public Double getTotalPoints() {
 		return totalPoints;
 	}
-	public void setTotalPoints(Integer totalPoints) {
+	public void setTotalPoints(Double totalPoints) {
+		this.totalPoints = totalPoints;
+	}
+	
+	public void setTotalPoints() {
+		Double totalPoints = 0.0;
+		
+		for(SkillReportPOJO temp : this.skills){
+			totalPoints = totalPoints + temp.getTotalPoints();
+		}
+		
 		this.totalPoints = totalPoints;
 	}
 	
 	@XmlAttribute(name = "userPoints", required = false)
-	public Integer getUserPoints() {
+	public Double getUserPoints() {
 		return userPoints;
 	}
-	public void setUserPoints(Integer userPoints) {
+	public void setUserPoints(Double userPoints) {
+		this.userPoints = userPoints;
+	}
+	
+	public void setUserPoints() {
+		Double userPoints = 0.0;
+		
+		for(SkillReportPOJO temp : this.skills){
+			userPoints = userPoints + temp.getUserPoints();
+		}		
 		this.userPoints = userPoints;
 	}
 	
 	@XmlAttribute(name = "userPoints", required = false)
-	public Integer getPercentage() {
+	public Double getPercentage() {
 		return percentage;
 	}
-	public void setPercentage(Integer percentage) {
-		this.percentage = percentage;
+	public void setPercentage() {
+		
+		if(this.totalPoints > 0){
+		this.percentage = (double) (Math.round((((double) this.userPoints)/this.totalPoints)*100*100)/100);
+		}else{
+			this.percentage = 0.0;
+		}
 	}
+	
 	@XmlAttribute(name = "skills", required = false)
 	public List<SkillReportPOJO> getSkills() {
 		return skills;

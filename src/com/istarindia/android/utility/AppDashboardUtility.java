@@ -1,6 +1,7 @@
 package com.istarindia.android.utility;
 
 import com.istarindia.android.pojo.DashboardCard;
+import com.istarindia.apps.services.AppAssessmentServices;
 import com.istarindia.apps.services.AppJobServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.Job;
@@ -14,8 +15,8 @@ public class AppDashboardUtility {
 		System.out.println("GEting Assessment Card");
 		
 		int itemId = task.getItemId();
-		AppContentServiceUtility contentServiceUtility = new AppContentServiceUtility();
-		Assessment assessment = contentServiceUtility.getAssessment(itemId);
+		AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
+		Assessment assessment = appAssessmentServices.getAssessment(itemId);
 
 		DashboardCard dashboardCard = null;
 		if (assessment != null) {

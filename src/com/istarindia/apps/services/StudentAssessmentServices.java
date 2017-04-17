@@ -58,7 +58,7 @@ public class StudentAssessmentServices {
 
 		List<StudentAssessment> allStudentAssessment = new ArrayList<StudentAssessment>();
 
-		String hql = "from StudentAssessment studentAssessment where assessment= :assessment and istarUser= :istarUser";
+		String hql = "from StudentAssessment studentAssessment where assessment.id= :assessment and istarUser.id= :istarUser";
 
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();

@@ -178,6 +178,19 @@ public class AppUserRankUtility {
 		return allUsersOfABatch;		
 	}
 	
+	public BatchGroup getBatchGroupOfUser(Integer istarUserId){
+		
+		BatchGroup batchGroup = null;
+		
+		List<BatchStudents> allbatchStudents = getBatchStudentsOfUser(istarUserId);
+		
+		if(allbatchStudents.size()>0){
+			batchGroup = allbatchStudents.get(0).getBatchGroup();
+		}
+		
+		return batchGroup;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public List<BatchStudents> getBatchStudentsOfUser(Integer istarUserId){
 				

@@ -16,7 +16,7 @@ import com.viksitpro.core.dao.entities.UserGamificationDAO;
 
 public class UserGamificationServices {
 	
-	public UserGamification createUserGamification(SkillObjective skillObjective, IstarUser istarUser, Integer points, Integer coins, 
+	public UserGamification createUserGamification(SkillObjective skillObjective, IstarUser istarUser, Double points, Integer coins, 
 			Integer itemId, String itemType){
 	
 		UserGamification userGamification = new UserGamification();

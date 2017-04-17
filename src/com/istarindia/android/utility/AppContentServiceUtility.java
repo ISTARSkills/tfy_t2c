@@ -72,17 +72,6 @@ public class AppContentServiceUtility {
 		return lesson;
 	}
 
-	public Assessment getAssessment(int assessmentId) {
-		Assessment assessment;
-		AssessmentDAO assessmentDAO = new AssessmentDAO();
-		try {
-			assessment = assessmentDAO.findById(assessmentId);
-		} catch (IllegalArgumentException e) {
-			assessment = null;
-		}
-		return assessment;
-	}
-
 	public Question getQuestion(int questionId) {
 		Question question;
 		QuestionDAO questionDAO = new QuestionDAO();
@@ -103,17 +92,6 @@ public class AppContentServiceUtility {
 			assessmentOption = null;
 		}
 		return assessmentOption;
-	}
-
-	public SkillObjective getSkillObjective(Integer skillObjectiveId) {
-		SkillObjectiveDAO skillObjectiveDAO = new SkillObjectiveDAO();
-		SkillObjective skillObjective;
-		try {
-			skillObjective = skillObjectiveDAO.findById(skillObjectiveId);
-		} catch (IllegalArgumentException e) {
-			skillObjective = null;
-		}
-		return skillObjective;
 	}
 
 	@SuppressWarnings("unchecked")
