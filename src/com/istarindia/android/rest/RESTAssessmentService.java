@@ -25,6 +25,7 @@ import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.BatchGroup;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Question;
+import com.viksitpro.core.dao.entities.StudentAssessment;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
 @Path("assessments/user/{userId}")
@@ -84,12 +85,19 @@ public class RESTAssessmentService {
 				HashMap<String, Boolean> optionsMap = appContentServiceUtility.getAnsweredOptionsMap(question,
 						questionResponsePOJO.getOptions());
 
+				StudentAssessment studentAssessment = studentAssessmentServices.getStudentAssessmentOfQuestionForUser(istarUserId, assessmentId, question.getId());
 				//check if the user has already attempted an assessment, if true-->update the fields else create 
-				
-				studentAssessmentServices.createStudentAssessment(assessment, question, istarUser,
-						optionsMap.get("isCorrect"), optionsMap.get("option0"), optionsMap.get("option1"),
-						optionsMap.get("option2"), optionsMap.get("option3"), optionsMap.get("option4"), null, null,
-						batchGroupId, questionResponsePOJO.getDuration());
+				if(studentAssessment!=null){
+					studentAssessment = studentAssessmentServices.updateStudentAssessment(studentAssessment,
+							optionsMap.get("isCorrect"), optionsMap.get("option0"), optionsMap.get("option1"),
+							optionsMap.get("option2"), optionsMap.get("option3"), optionsMap.get("option4"), null, null,
+							batchGroupId, questionResponsePOJO.getDuration());
+				}else{
+					studentAssessment = studentAssessmentServices.createStudentAssessment(assessment, question, istarUser,
+							optionsMap.get("isCorrect"), optionsMap.get("option0"), optionsMap.get("option1"),
+							optionsMap.get("option2"), optionsMap.get("option3"), optionsMap.get("option4"), null, null,
+							batchGroupId, questionResponsePOJO.getDuration());
+				}
 			}
 			return Response.status(Response.Status.CREATED).build();
 		} catch (Exception e) {

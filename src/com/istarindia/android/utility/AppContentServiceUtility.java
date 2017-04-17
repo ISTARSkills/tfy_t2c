@@ -170,7 +170,6 @@ public class AppContentServiceUtility {
 				optionsMap.put("option" + i, false);
 			}
 		}
-
 		optionsMap.put("isCorrect", isCorrect);
 		return optionsMap;
 	}

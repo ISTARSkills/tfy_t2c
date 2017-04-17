@@ -42,6 +42,28 @@ public class StudentAssessmentServices {
 		return studentAssessment;
 	}
 	
+	public StudentAssessment updateStudentAssessment(StudentAssessment studentAssessment, Boolean correct, 
+			Boolean option1, Boolean option2, Boolean option3, Boolean option4, Boolean option5, Integer countryId, 
+			Integer organizationId, Integer batchGroupId, Integer timeTaken){
+		
+		System.out.println("Updating to DAO");
+		
+		studentAssessment.setCorrect(correct);
+		studentAssessment.setOption1(option1);
+		studentAssessment.setOption2(option2);
+		studentAssessment.setOption3(option3);
+		studentAssessment.setOption4(option4);
+		studentAssessment.setOption5(option5);
+		studentAssessment.setCountryId(countryId);
+		studentAssessment.setOrganizationId(organizationId);
+		studentAssessment.setBatchGroupId(batchGroupId);
+		studentAssessment.setTimeTaken(timeTaken);
+		
+		studentAssessment = updateStudentAssessmentToDAO(studentAssessment);
+		
+		return studentAssessment;
+	}
+	
 	public StudentAssessment getStudentAssessment(int studentAssessmentId){
 		StudentAssessmentDAO studentAssessmentDAO = new StudentAssessmentDAO();
 		StudentAssessment studentAssessment;
@@ -72,6 +94,29 @@ public class StudentAssessmentServices {
 		return allStudentAssessment;
 	}
 
+	@SuppressWarnings("unchecked")
+	public StudentAssessment getStudentAssessmentOfQuestionForUser(int istarUserId, int assessmentId, int questionId){
+	
+		StudentAssessment studentAssessment = null;
+		
+		String hql = "from StudentAssessment studentAssessment where assessment.id= :assessment and istarUser.id= :istarUser and question.id= :question";
+
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+
+		Query query = session.createQuery(hql);
+		query.setParameter("assessment", assessmentId);
+		query.setParameter("istarUser", istarUserId);
+		query.setParameter("question", questionId);
+		
+		List<StudentAssessment> allStudentAssessment = query.list();
+		
+		if(allStudentAssessment.size() > 0){
+			studentAssessment = allStudentAssessment.get(0);
+		}
+		return studentAssessment;
+	}
+	
 	public StudentAssessment saveStudentAssessmentToDAO(StudentAssessment studentAssessment) {
 
 		StudentAssessmentDAO studentAssessmentDAO = new StudentAssessmentDAO();
