@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -54,6 +55,23 @@ public class UserGamificationServices {
 		List<UserGamification> allUserGamifications = query.list();
 				
 		return allUserGamifications;
+	}
+	
+	public Double getTotalPointsOfUserForItem(int istarUserId, int itemId, String itemType){
+		
+		String hql = "select COALESCE ((select sum(points) from user_gamification where istar_user= :istarUser and item_id= :itemId and item_type= :itemType),0)";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		SQLQuery query = session.createSQLQuery(hql);
+		query.setParameter("istarUser",istarUserId);
+		query.setParameter("itemId", itemId);
+		query.setParameter("itemType", itemType);
+		
+		Double points = (Double) query.list().get(0);
+				
+		return points;
 	}
 	
 	public UserGamification getUserGamification(Integer userGamificationId){

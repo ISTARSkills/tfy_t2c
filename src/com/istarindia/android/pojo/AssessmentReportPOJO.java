@@ -11,12 +11,14 @@ public class AssessmentReportPOJO {
 
 	private Integer id;
 	private String name;
-	private Integer userScore;
-	private Integer totalScore;
-	private Integer	accuracy;
-	private Integer batchAverage;
+	private Double userScore;
+	private Double totalScore;
+	private Double	accuracy;
+	private Double batchAverage;
 	private Integer usersAttemptedCount;
 	private Integer totalNumberOfUsersInBatch;
+	private Integer totalNumberOfQuestions;
+	private Integer totalNumberOfCorrectlyAnsweredQuestions;
 	private List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();
 	
 	@XmlAttribute(name = "id", required = false)
@@ -36,35 +38,35 @@ public class AssessmentReportPOJO {
 	}
 	
 	@XmlAttribute(name = "userScore", required = false)
-	public Integer getUserScore() {
+	public Double getUserScore() {
 		return userScore;
 	}
-	public void setUserScore(Integer userScore) {
-		this.userScore = userScore;
+	public void setUserScore(Double userScore) {
+		this.userScore = Math.round(userScore*100.0)/100.0;
 	}
 	
 	@XmlAttribute(name = "totalScore", required = false)
-	public Integer getTotalScore() {
+	public Double getTotalScore() {
 		return totalScore;
 	}
-	public void setTotalScore(Integer totalScore) {
-		this.totalScore = totalScore;
+	public void setTotalScore(Double totalScore) {
+		this.totalScore = Math.round(totalScore*100.0)/100.0;
 	}
 	
 	@XmlAttribute(name = "accuracy", required = false)
-	public Integer getAccuracy() {
+	public Double getAccuracy() {
 		return accuracy;
 	}
-	public void setAccuracy(Integer accuracy) {
+	public void setAccuracy(Double accuracy) {
 		this.accuracy = accuracy;
 	}
 	
 	@XmlAttribute(name = "batchAverage", required = false)
-	public Integer getBatchAverage() {
+	public Double getBatchAverage() {
 		return batchAverage;
 	}
-	public void setBatchAverage(Integer batchAverage) {
-		this.batchAverage = batchAverage;
+	public void setBatchAverage(Double batchAverage) {
+		this.batchAverage = Math.round(batchAverage*100.0*100.0)/100.0;
 	}
 	
 	@XmlAttribute(name = "usersAttemptedCount", required = false)
@@ -89,5 +91,41 @@ public class AssessmentReportPOJO {
 	}
 	public void setSkillsReport(List<SkillReportPOJO> skillsReport) {
 		this.skillsReport = skillsReport;
-	}	
+	}
+	
+	@XmlAttribute(name = "totalNumberOfQuestions", required = false)
+	public Integer getTotalNumberOfQuestions() {
+		return totalNumberOfQuestions;
+	}
+	public void setTotalNumberOfQuestions(Integer totalNumberOfQuestions) {
+		this.totalNumberOfQuestions = totalNumberOfQuestions;
+	}
+	
+	@XmlAttribute(name = "totalNumberOfCorrectlyAnsweredQuestions", required = false)
+	public Integer getTotalNumberOfCorrectlyAnsweredQuestions() {
+		return totalNumberOfCorrectlyAnsweredQuestions;
+	}
+	public void setTotalNumberOfCorrectlyAnsweredQuestions(Integer totalNumberOfCorrectlyAnsweredQuestions) {
+		this.totalNumberOfCorrectlyAnsweredQuestions = totalNumberOfCorrectlyAnsweredQuestions;
+	}		
+	
+	public void calculateUserScore() {
+		double userScore = 0.0;
+		for(SkillReportPOJO skillReportPOJO : this.skillsReport){
+			userScore = userScore + skillReportPOJO.getUserPoints();
+		}
+		this.userScore = Math.round(userScore*100.0)/100.0;
+	}
+	
+	public void calculateTotalScore() {
+		double totalScore = 0.0;
+		for(SkillReportPOJO skillReportPOJO : this.skillsReport){
+			totalScore = totalScore + skillReportPOJO.getTotalPoints();
+		}
+		this.totalScore = Math.round(totalScore*100.0)/100.0;
+	}
+	
+	public void calculateAccuracy() {
+		this.accuracy = (double) (Math.round((((double) this.totalNumberOfCorrectlyAnsweredQuestions)/this.totalNumberOfQuestions)*100.0*100.0)/100.0);	
+		}
 }

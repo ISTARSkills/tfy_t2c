@@ -11,6 +11,7 @@ import org.hibernate.Session;
 
 import com.istarindia.android.pojo.CourseRankPOJO;
 import com.istarindia.android.pojo.StudentRankPOJO;
+import com.istarindia.apps.services.AppBatchStudentsServices;
 import com.istarindia.apps.services.UserGamificationServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
@@ -119,8 +120,9 @@ public class AppUserRankUtility {
 
 		AppContentServiceUtility appContentServiceUtility = new AppContentServiceUtility();
 		UserGamificationServices userGamificationServices = new UserGamificationServices();
-
-		List<IstarUser> allUsersOfBatch = getBatchColleaguesOfUsers(istarUserId);
+		AppBatchStudentsServices appBatchStudentsServices = new AppBatchStudentsServices();
+		
+		List<IstarUser> allUsersOfBatch = appBatchStudentsServices.getBatchColleaguesOfUsers(istarUserId);
 		List<Assessment> allAssessments = appContentServiceUtility.getAssessmentsOfACourse(courseId);
 
 		for (IstarUser istarUserInBatch : allUsersOfBatch) {
@@ -163,63 +165,4 @@ public class AppUserRankUtility {
 		return allStudentRanksOfABatch;
 	}
 	
-	public List<IstarUser> getBatchColleaguesOfUsers(Integer istarUserId){
-		
-		List<IstarUser> allUsersOfABatch = new ArrayList<IstarUser>();		
-		List<BatchStudents> allbatchStudents = getBatchStudentsOfUser(istarUserId);
-				
-		if(allbatchStudents.size()>0){
-			BatchGroup batchGroup = allbatchStudents.get(0).getBatchGroup();
-			
-			for(BatchStudents batchStudent : getBatchStudentsOfABatchGroup(batchGroup)){				
-				allUsersOfABatch.add(batchStudent.getIstarUser());
-			}	
-		}
-		return allUsersOfABatch;		
-	}
-	
-	public BatchGroup getBatchGroupOfUser(Integer istarUserId){
-		
-		BatchGroup batchGroup = null;
-		
-		List<BatchStudents> allbatchStudents = getBatchStudentsOfUser(istarUserId);
-		
-		if(allbatchStudents.size()>0){
-			batchGroup = allbatchStudents.get(0).getBatchGroup();
-		}
-		
-		return batchGroup;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public List<BatchStudents> getBatchStudentsOfUser(Integer istarUserId){
-				
-		String hql = "from BatchStudents batchStudents where istarUser.id= :istarUser";
-		
-		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
-		Session session = baseHibernateDAO.getSession();
-		
-		Query query = session.createQuery(hql);
-		query.setParameter("istarUser",istarUserId);
-		
-		List<BatchStudents> allBatchStudents = query.list();
-
-		return allBatchStudents;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public List<BatchStudents> getBatchStudentsOfABatchGroup(BatchGroup batchGroup){
-		
-		String hql = "from BatchStudents batchStudents where batchGroup.id= :batchGroup";
-		
-		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
-		Session session = baseHibernateDAO.getSession();
-		
-		Query query = session.createQuery(hql);
-		query.setParameter("batchGroup",batchGroup.getId());
-		
-		List<BatchStudents> allBatchStudents = query.list();
-		
-		return allBatchStudents;
-	}
 }

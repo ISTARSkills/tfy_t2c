@@ -39,16 +39,6 @@ public class SkillReportPOJO{
 		this.totalPoints = totalPoints;
 	}
 	
-	public void setTotalPoints() {
-		Double totalPoints = 0.0;
-		
-		for(SkillReportPOJO temp : this.skills){
-			totalPoints = totalPoints + temp.getTotalPoints();
-		}
-		
-		this.totalPoints = totalPoints;
-	}
-	
 	@XmlAttribute(name = "userPoints", required = false)
 	public Double getUserPoints() {
 		return userPoints;
@@ -57,26 +47,9 @@ public class SkillReportPOJO{
 		this.userPoints = userPoints;
 	}
 	
-	public void setUserPoints() {
-		Double userPoints = 0.0;
-		
-		for(SkillReportPOJO temp : this.skills){
-			userPoints = userPoints + temp.getUserPoints();
-		}		
-		this.userPoints = userPoints;
-	}
-	
 	@XmlAttribute(name = "userPoints", required = false)
 	public Double getPercentage() {
 		return percentage;
-	}
-	public void setPercentage() {
-		
-		if(this.totalPoints > 0){
-		this.percentage = (double) (Math.round((((double) this.userPoints)/this.totalPoints)*100*100)/100);
-		}else{
-			this.percentage = 0.0;
-		}
 	}
 	
 	@XmlAttribute(name = "skills", required = false)
@@ -85,5 +58,32 @@ public class SkillReportPOJO{
 	}
 	public void setSkills(List<SkillReportPOJO> skills) {
 		this.skills = skills;
+	}
+	
+	public void calculateTotalPoints() {
+		Double totalPoints = 0.0;
+		
+		for(SkillReportPOJO temp : this.skills){
+			totalPoints = totalPoints + temp.getTotalPoints();
+		}		
+		this.totalPoints = Math.round(totalPoints*100.0)/100.0;
+	}
+	
+	public void calculateUserPoints() {
+		Double userPoints = 0.0;
+		
+		for(SkillReportPOJO temp : this.skills){
+			userPoints = userPoints + temp.getUserPoints();
+		}		
+		this.userPoints = Math.round(userPoints*100.0)/100.0;
+	}
+	
+	public void calculatePercentage() {
+		
+		if(this.totalPoints > 0){
+		this.percentage = (double) (Math.round((((double) this.userPoints)/this.totalPoints)*100.0*100.0)/100.0);
+		}else{
+			this.percentage = 0.0;
+		}
 	}
 }

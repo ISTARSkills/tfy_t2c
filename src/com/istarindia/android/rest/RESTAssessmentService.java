@@ -19,6 +19,7 @@ import com.istarindia.android.utility.AppContentServiceUtility;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.android.utility.AppUserRankUtility;
 import com.istarindia.apps.services.AppAssessmentServices;
+import com.istarindia.apps.services.AppBatchStudentsServices;
 import com.istarindia.apps.services.StudentAssessmentServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.BatchGroup;
@@ -65,8 +66,9 @@ public class RESTAssessmentService {
 			Assessment assessment = appAssessmentServices.getAssessment(assessmentId);
 
 			StudentAssessmentServices studentAssessmentServices = new StudentAssessmentServices();
-			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
-			BatchGroup batchGroupOfStudent = appUserRankUtility.getBatchGroupOfUser(istarUser.getId());
+
+			AppBatchStudentsServices appBatchStudentsServices = new AppBatchStudentsServices();
+			BatchGroup batchGroupOfStudent = appBatchStudentsServices.getBatchGroupOfStudent(istarUser.getId());
 			
 			Integer batchGroupId = null;
 			

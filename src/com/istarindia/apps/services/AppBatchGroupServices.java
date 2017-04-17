@@ -2,10 +2,13 @@ package com.istarindia.apps.services;
 
 import java.util.List;
 
+import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.BatchGroup;
 import com.viksitpro.core.dao.entities.BatchGroupDAO;
+import com.viksitpro.core.dao.entities.IstarUser;
 
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -21,7 +24,7 @@ public class AppBatchGroupServices {
 		}
 		return batchGroup;
 	}
-
+	
 	public BatchGroup getBatchGroupByBatchCode(String batchCode) {
 		BatchGroup batchGroup = null;
 		BatchGroupDAO batchGroupDAO = new BatchGroupDAO();
