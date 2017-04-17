@@ -53,6 +53,7 @@ public class AppBatchStudentsServices {
 		return batchStudents;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public BatchGroup getBatchGroupOfStudent(int istarUserId){
 	
 		BatchGroup batchGroup = null;

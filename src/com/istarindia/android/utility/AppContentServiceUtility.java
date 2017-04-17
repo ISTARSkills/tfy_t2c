@@ -9,7 +9,6 @@ import org.hibernate.Session;
 
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.AssessmentBenchmark;
-import com.viksitpro.core.dao.entities.AssessmentDAO;
 import com.viksitpro.core.dao.entities.AssessmentOption;
 import com.viksitpro.core.dao.entities.AssessmentOptionDAO;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
@@ -23,8 +22,6 @@ import com.viksitpro.core.dao.entities.Module;
 import com.viksitpro.core.dao.entities.ModuleDAO;
 import com.viksitpro.core.dao.entities.Question;
 import com.viksitpro.core.dao.entities.QuestionDAO;
-import com.viksitpro.core.dao.entities.SkillObjective;
-import com.viksitpro.core.dao.entities.SkillObjectiveDAO;
 
 public class AppContentServiceUtility {
 

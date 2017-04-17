@@ -14,10 +14,10 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 import com.istarindia.android.pojo.AssessmentPOJO;
+import com.istarindia.android.pojo.AssessmentReportPOJO;
 import com.istarindia.android.pojo.QuestionResponsePOJO;
 import com.istarindia.android.utility.AppContentServiceUtility;
 import com.istarindia.android.utility.AppPOJOUtility;
-import com.istarindia.android.utility.AppUserRankUtility;
 import com.istarindia.apps.services.AppAssessmentServices;
 import com.istarindia.apps.services.AppBatchStudentsServices;
 import com.istarindia.apps.services.StudentAssessmentServices;
@@ -103,15 +103,16 @@ public class RESTAssessmentService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAssessmentReportOfUser(@PathParam("userId") int userId, @PathParam("assessmentId") int assessmentId){
 		
+		try{
 		AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
-		
+		AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReport(userId, assessmentId);
 		Gson gson = new Gson();
-		String result = gson.toJson(appAssessmentServices.getAssessmentReport(userId, assessmentId));
+		String result = gson.toJson(assessmentReportPOJO);
 
 		return Response.ok(result).build();
-		
-		//Calculate Score of the student for assessment--> score/accuracy/batch average
-		//get details of skill breakdown--> Points for each skill from AssessmentBechmark and get parent of that skill
-		//Get the skill from question_skill_Objective and find its parent
+		}catch(Exception e){
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 }

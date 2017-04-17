@@ -2,13 +2,10 @@ package com.istarindia.apps.services;
 
 import java.util.List;
 
-import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.BatchGroup;
 import com.viksitpro.core.dao.entities.BatchGroupDAO;
-import com.viksitpro.core.dao.entities.IstarUser;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
