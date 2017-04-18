@@ -1,6 +1,7 @@
 package com.istarindia.android.utility;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -80,8 +81,11 @@ public class AppPOJOUtility {
 					student.getProfessionalProfile().getPostGraduationSpecializationName());
 			studentProfile.setResumeURL(student.getProfessionalProfile().getResumeUrl());
 		}
-		studentProfile.setCoins(250);
-		studentProfile.setExperiencePoints(3450);
+		
+		AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
+		HashMap<String, Integer> pointsAndCoins = appUserRankUtility.getPointsAndCoinsOfUser(student.getId());
+		studentProfile.setCoins(pointsAndCoins.get("coins"));
+		studentProfile.setExperiencePoints(pointsAndCoins.get("points"));
 		studentProfile.setBatchRank(2);
 		return studentProfile;
 	}
