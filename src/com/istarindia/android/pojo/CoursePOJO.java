@@ -16,9 +16,9 @@ public class CoursePOJO {
 	private String imageURL;
 	private String status;
 	private Integer rank;
-	private Double userPoints;
-	private Double totalPoints;	
-	private Double accuracy;
+	private Double userPoints = 0.0;
+	private Double totalPoints = 0.0;	
+	private Double progress = 0.0;
 	private ArrayList<ModulePOJO> modules = new ArrayList<ModulePOJO>();
 	
 	@XmlAttribute(name = "id", required = false)
@@ -98,15 +98,15 @@ public class CoursePOJO {
 		return totalPoints;
 	}
 	public void setTotalPoints(Double totalPoints) {
-		this.totalPoints = totalPoints;
+		this.totalPoints = Math.round(totalPoints*100.0)/100.0;
 	}
 	
-	@XmlAttribute(name = "accuracy", required = false)
-	public Double getAccuracy() {
-		return accuracy;
+	@XmlAttribute(name = "progress", required = false)
+	public Double getProgress() {
+		return progress;
 	}
-	public void setAccuracy(Double accuracy) {
-		this.accuracy = accuracy;
+	public void setProgress(Double progress) {
+		this.progress = progress;
 	}
 		
 	public CoursePOJO sortModulesAndAssignStatus(){		

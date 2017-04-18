@@ -34,6 +34,11 @@ public class RESTCourseService {
 			List<CoursePOJO> courses = new ArrayList<CoursePOJO>();
 			for(CoursePOJO coursePOJO : coursesWithoutModuleStatus){
 				coursePOJO = coursePOJO.sortModulesAndAssignStatus();
+				
+				coursePOJO.setProgress(appCourseServices.getProgressOfUserForCourse(istarUserId, coursePOJO.getId()));
+				coursePOJO.setTotalPoints(appCourseServices.getMaxPointsOfCourse(coursePOJO.getId()));
+				//coursePOJO.setUserPoints(userPoints);
+				//coursePOJO.setBatchRank(); to be added once java code for leaderboard is replaced with SQL
 				courses.add(coursePOJO);
 			}
 			

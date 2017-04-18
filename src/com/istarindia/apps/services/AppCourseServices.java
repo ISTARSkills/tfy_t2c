@@ -40,11 +40,11 @@ public class AppCourseServices {
 			Course course = studentPlaylist.getCourse();
 			Lesson lesson = studentPlaylist.getLesson();
 			Module module = getModuleOfLesson(lesson.getId());
-			
-			if(studentPlaylist.getStatus().equals("INCOMPLETE")){
+
+			if (studentPlaylist.getStatus().equals("INCOMPLETE")) {
 				incompleteModules.add(module.getId());
 			}
-			
+
 			System.out.println("Course->" + course.getId() + " lesson->" + lesson.getId() + " module-->" + module);
 			if (module != null) {
 				CoursePOJO coursePOJO = null;
@@ -72,8 +72,8 @@ public class AppCourseServices {
 					modulePOJO.setDescription(module.getModule_description());
 					modulePOJO.setImageURL(module.getImage_url());
 
-					Set<String> allSkillObjectivesOfModule = new HashSet<String>();					
-					for(SkillObjective skillObjective : module.getSkillObjectives()){
+					Set<String> allSkillObjectivesOfModule = new HashSet<String>();
+					for (SkillObjective skillObjective : module.getSkillObjectives()) {
 						allSkillObjectivesOfModule.add(skillObjective.getName());
 					}
 
@@ -96,33 +96,59 @@ public class AppCourseServices {
 						modulePOJO.setDescription(module.getModule_description());
 						modulePOJO.setImageURL(module.getImage_url());
 
-						Set<String> allSkillObjectivesOfModule = new HashSet<String>();					
-						for(SkillObjective skillObjective : module.getSkillObjectives()){
+						Set<String> allSkillObjectivesOfModule = new HashSet<String>();
+						for (SkillObjective skillObjective : module.getSkillObjectives()) {
 							allSkillObjectivesOfModule.add(skillObjective.getName());
 						}
 
 						modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
 						coursePOJO.getModules().add(modulePOJO);
-											
+
 					} else {
 						System.out.println("Module Already Added");
 					}
 				}
-				if(incompleteModules.contains(module.getId())){
+				if (incompleteModules.contains(module.getId())) {
 					modulePOJO.setStatus("INCOMPLETE");
-				}else{
+				} else {
 					modulePOJO.setStatus("COMPLETE");
 				}
+								
+/*				if(studentPlaylist.getStatus().equals("COMPLETE")){
+					Double progress = coursePOJO.getProgress();
+					Integer TotalLessons = allStudentPlaylistItems.size();
+					
+					Double numberOfPreviouslyAnsweredQuestions = (progress * TotalLessons)/100; 
+					
+					Double newProgress = ((numberOfPreviouslyAnsweredQuestions+1)/TotalLessons)*100.0;
+					coursePOJO.setProgress(newProgress);
+				}	*/
 			}
 		}
-		return allCoursePOJO;		
+		return allCoursePOJO;
 	}
 	
+	public Double getProgressOfUserForCourse(int istarUserId, int courseId){
+		String sql = "select COALESCE(cast(count(case when status='INCOMPLETE' then 1 end) as integer),0) as incomplete, COALESCE(cast(count(case when status='COMPLETE' then 1 end) as integer),0) as complete  from student_playlist where student_id= :istarUserId and course_id= :courseId";
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+
+		SQLQuery query = session.createSQLQuery(sql);
+		query.setParameter("istarUserId", istarUserId);
+		query.setParameter("courseId", courseId);
+		
+		Object[] result = (Object[]) query.list().get(0);
+		
+		Integer completedQuestions = (Integer) result[1];
+		Integer totalQuestions = (Integer) result[0] + (Integer) result[1];
+		
+		Double progress = ((completedQuestions*1.0)/totalQuestions)*100.0;
+		return progress;
+	}
 	
 	public Module getModuleOfLesson(int lessonId){
 	
-		Module module = null;
-		
+		Module module = null;		
 		String sql = "select module_id from cmsession_module where cmsession_id in( select cmsession_id from lesson_cmsession where lesson_id="+lessonId+" limit 1) limit 1";
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
@@ -137,6 +163,21 @@ public class AppCourseServices {
 		}
 		
 		return module;
+	}
+	
+	public Double getMaxPointsOfCourse(Integer courseId){
+		
+		String sql = "select COALESCE(sum(max_points),0) from assessment_benchmark where assessment_id in (select distinct assessment.id from assessment where course_id= :courseId)";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+
+		SQLQuery query = session.createSQLQuery(sql);
+		query.setParameter("courseId", courseId);
+		
+		Double maxPoints = (Double) query.list().get(0);
+		
+		return maxPoints;
 	}
 	
 	public Course getCourse(int courseId) {

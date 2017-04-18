@@ -77,7 +77,7 @@ public class AppContentServiceUtility {
 		boolean isCorrect = false;
 
 		HashMap<String, Boolean> optionsMap = new HashMap<String, Boolean>();
-		if (!options.contains(-1)) {
+		if (options!=null && options.size() > 0) {
 			// System.out.println("Checking Options with MaRKED Answers");
 			ArrayList<AssessmentOption> allOptions = new ArrayList<AssessmentOption>(question.getAssessmentOptions());
 
