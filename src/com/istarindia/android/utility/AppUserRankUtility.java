@@ -6,17 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-
 import com.istarindia.android.pojo.CourseRankPOJO;
 import com.istarindia.android.pojo.StudentRankPOJO;
 import com.istarindia.apps.services.AppBatchStudentsServices;
+import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.UserGamificationServices;
 import com.viksitpro.core.dao.entities.Assessment;
-import com.viksitpro.core.dao.entities.BaseHibernateDAO;
-import com.viksitpro.core.dao.entities.BatchGroup;
-import com.viksitpro.core.dao.entities.BatchStudents;
 import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.UserGamification;
@@ -72,10 +67,10 @@ public class AppUserRankUtility {
 		
 		List<CourseRankPOJO> allCourseRanks = new ArrayList<CourseRankPOJO>();
 		
-		AppContentServiceUtility appContentServiceUtility = new AppContentServiceUtility();
+		AppCourseServices appCourseServices = new AppCourseServices();
 		
 		for(Integer courseId: allCourses){
-			Course course = appContentServiceUtility.getCourse(courseId);			
+			Course course = appCourseServices.getCourse(courseId);			
 			if(course!=null){
 				System.out.println("Course--->" + course.getCourseName() + course.getId());
 				
@@ -154,8 +149,10 @@ public class AppUserRankUtility {
 			System.out.println("totalCoins->"+totalCoins);
 			
 			studentRankPOJO.setId(istarUserInBatch.getId());
+			if(istarUserInBatch.getUserProfile()!=null){
 			studentRankPOJO.setName(istarUserInBatch.getUserProfile().getFirstName());
 			studentRankPOJO.setImageURL(istarUserInBatch.getUserProfile().getProfileImage());
+			}
 			studentRankPOJO.setPoints(totalPoints.intValue());
 			studentRankPOJO.setCoins(totalCoins);
 

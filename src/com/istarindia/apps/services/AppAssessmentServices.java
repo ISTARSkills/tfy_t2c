@@ -245,12 +245,12 @@ public class AppAssessmentServices {
 
 	public Double getMaxPointsOfAssessment(Integer assessmentId) {
 
-		String sql = "select sum(maxPoints) from AssessmentBenchmark assessmentBenchmark where assessment.id= :assessmentId";
+		String sql = "select COALESCE(sum(max_points),0) from assessment_benchmark where assessment_id= :assessmentId";
 
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
 
-		Query query = session.createQuery(sql);
+		SQLQuery query = session.createSQLQuery(sql);
 		query.setParameter("assessmentId", assessmentId);
 
 		Double totalPoints = (Double) query.list().get(0);

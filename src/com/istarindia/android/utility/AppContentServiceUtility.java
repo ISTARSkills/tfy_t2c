@@ -12,62 +12,10 @@ import com.viksitpro.core.dao.entities.AssessmentBenchmark;
 import com.viksitpro.core.dao.entities.AssessmentOption;
 import com.viksitpro.core.dao.entities.AssessmentOptionDAO;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
-import com.viksitpro.core.dao.entities.Cmsession;
-import com.viksitpro.core.dao.entities.CmsessionDAO;
-import com.viksitpro.core.dao.entities.Course;
-import com.viksitpro.core.dao.entities.CourseDAO;
-import com.viksitpro.core.dao.entities.Lesson;
-import com.viksitpro.core.dao.entities.LessonDAO;
-import com.viksitpro.core.dao.entities.Module;
-import com.viksitpro.core.dao.entities.ModuleDAO;
 import com.viksitpro.core.dao.entities.Question;
 import com.viksitpro.core.dao.entities.QuestionDAO;
 
 public class AppContentServiceUtility {
-
-	public Course getCourse(int courseId) {
-		Course course;
-		CourseDAO courseDAO = new CourseDAO();
-		try {
-			course = courseDAO.findById(courseId);
-		} catch (IllegalArgumentException e) {
-			course = null;
-		}
-		return course;
-	}
-
-	public Module getModule(int moduleId) {
-		Module module;
-		ModuleDAO moduleDAO = new ModuleDAO();
-		try {
-			module = moduleDAO.findById(moduleId);
-		} catch (IllegalArgumentException e) {
-			module = null;
-		}
-		return module;
-	}
-
-	public Cmsession getCmsession(int cmsessionId) {
-		Cmsession cmsession;
-		CmsessionDAO cmsessionDAO = new CmsessionDAO();
-		try {
-			cmsession = cmsessionDAO.findById(cmsessionId);
-		} catch (IllegalArgumentException e) {
-			cmsession = null;
-		}
-		return cmsession;
-	}
-
-	public Lesson getLesson(int lessonId) {
-		Lesson lesson;
-		LessonDAO lessonDAO = new LessonDAO();
-		try {
-			lesson = lessonDAO.findById(lessonId);
-		} catch (IllegalArgumentException e) {
-			lesson = null;
-		}
-		return lesson;
-	}
 
 	public Question getQuestion(int questionId) {
 		Question question;

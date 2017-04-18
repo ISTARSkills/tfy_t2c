@@ -12,6 +12,7 @@ import com.istarindia.android.pojo.ModulePOJO;
 import com.istarindia.android.pojo.OptionPOJO;
 import com.istarindia.android.pojo.QuestionPOJO;
 import com.istarindia.android.pojo.StudentProfile;
+import com.istarindia.apps.services.AppAssessmentServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.AssessmentOption;
 import com.viksitpro.core.dao.entities.AssessmentQuestion;
@@ -113,9 +114,10 @@ public class AppPOJOUtility {
 				modulePOJO.setDescription(module.getModule_description());
 				modulePOJO.setImageURL(module.getImage_url());
 				modulePOJO.setOrderId(module.getOrderId());
+				modulePOJO.setStatus("");
 
 				ArrayList<LessonPOJO> lessons = new ArrayList<LessonPOJO>();
-
+				
 				for (Cmsession cmsession : module.getCmsessions()) {
 					for (Lesson lesson : cmsession.getLessons()) {
 						LessonPOJO lessonPOJO = new LessonPOJO();
@@ -133,7 +135,7 @@ public class AppPOJOUtility {
 						lessons.add(lessonPOJO);
 					}
 				}
-				modulePOJO.setLessons(lessons);
+				//modulePOJO.setLessons(lessons);
 				modules.add(modulePOJO);
 			}
 			coursePOJO.setModules(modules);
@@ -178,7 +180,11 @@ public class AppPOJOUtility {
 		assessmentPOJO.setName(assessment.getAssessmenttitle());
 		assessmentPOJO.setCategory(assessment.getCategory());
 		assessmentPOJO.setDurationInMinutes(assessment.getAssessmentdurationminutes());
-
+		
+		Double maxPoints = 0.0;
+		AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
+		maxPoints = appAssessmentServices.getMaxPointsOfAssessment(assessment.getId());
+		assessmentPOJO.setPoints((double) Math.round(maxPoints));
 		Set<AssessmentQuestion> assessmentQuestions = assessment.getAssessmentQuestions();
 		ArrayList<QuestionPOJO> questions = new ArrayList<QuestionPOJO>();
 
@@ -213,9 +219,11 @@ public class AppPOJOUtility {
 		List<Integer> answers = new ArrayList<Integer>();
 
 		for (AssessmentOption assessmentOption : allAssessmentOption) {
-			options.add(getOptionPOJO(assessmentOption));
-			if (assessmentOption.getMarkingScheme() == 1) {
-				answers.add(assessmentOption.getId());
+			if(assessmentOption.getText()!=null && !assessmentOption.getText().trim().isEmpty()){
+				options.add(getOptionPOJO(assessmentOption));
+				if (assessmentOption.getMarkingScheme() == 1) {
+					answers.add(assessmentOption.getId());
+				}
 			}
 		}
 		questionPOJO.setOptions(options);

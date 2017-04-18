@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "lesson")
-public class LessonPOJO {
+public class LessonPOJO implements Comparable<LessonPOJO>{
 
 	private Integer id;
 	private Integer playlistId;
@@ -87,8 +87,8 @@ public class LessonPOJO {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-
-	
-	
-	
+	@Override
+	public int compareTo(LessonPOJO o) {
+		return this.orderId -o.orderId;
+	}
 }

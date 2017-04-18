@@ -75,15 +75,13 @@ public class AppBatchStudentsServices {
 	
 	public List<IstarUser> getBatchColleaguesOfUsers(Integer istarUserId){
 		
-		AppBatchStudentsServices appBatchStudentsServices = new AppBatchStudentsServices();
-		
 		List<IstarUser> allUsersOfABatch = new ArrayList<IstarUser>();		
-		List<BatchStudents> allbatchStudents = appBatchStudentsServices.getBatchStudentsOfUser(istarUserId);
+		List<BatchStudents> allbatchStudents = getBatchStudentsOfUser(istarUserId);
 				
 		if(allbatchStudents.size()>0){
 			BatchGroup batchGroup = allbatchStudents.get(0).getBatchGroup();
 			
-			for(BatchStudents batchStudent : appBatchStudentsServices.getBatchStudentsOfABatchGroup(batchGroup)){				
+			for(BatchStudents batchStudent : getBatchStudentsOfABatchGroup(batchGroup)){				
 				allUsersOfABatch.add(batchStudent.getIstarUser());
 			}	
 		}

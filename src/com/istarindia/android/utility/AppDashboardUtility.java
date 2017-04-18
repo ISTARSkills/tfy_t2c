@@ -2,6 +2,7 @@ package com.istarindia.android.utility;
 
 import com.istarindia.android.pojo.DashboardCard;
 import com.istarindia.apps.services.AppAssessmentServices;
+import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.AppJobServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.Job;
@@ -34,8 +35,8 @@ public class AppDashboardUtility {
 	public DashboardCard getDashboardCardForLesson(Task task) {
 
 		int itemId = task.getItemId();
-		AppContentServiceUtility contentServiceUtility = new AppContentServiceUtility();
-		Lesson lesson = contentServiceUtility.getLesson(itemId);
+		AppCourseServices appCourseServices = new AppCourseServices();
+		Lesson lesson = appCourseServices.getLesson(itemId);
 
 		DashboardCard dashboardCard = null;
 		if (lesson != null) {

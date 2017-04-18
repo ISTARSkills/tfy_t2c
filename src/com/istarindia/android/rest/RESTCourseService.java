@@ -15,12 +15,10 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 import com.istarindia.android.pojo.CoursePOJO;
 import com.istarindia.android.pojo.CourseRankPOJO;
-import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.android.utility.AppUserRankUtility;
+import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.StudentPlaylistServices;
-import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
-import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
 @Path("courses/user/{userId}")
 public class RESTCourseService {
@@ -30,18 +28,15 @@ public class RESTCourseService {
 	public Response getAllCourseOfUser(@PathParam("userId") int istarUserId) {
 
 		try {
-			IstarUserServices istarUserServices = new IstarUserServices();
-			IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
+			AppCourseServices appCourseServices = new AppCourseServices();
 
-			Set<StudentPlaylist> allStudentPlaylistItems = istarUser.getStudentPlaylists();
-
-			ArrayList<CoursePOJO> courses = new ArrayList<CoursePOJO>();
-			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-
-			for (StudentPlaylist studentPlaylist : allStudentPlaylistItems) {
-				courses.add(appPOJOUtility.getCoursePOJO(studentPlaylist));
+			List<CoursePOJO> coursesWithoutModuleStatus = appCourseServices.getCoursesOfUser(istarUserId);
+			List<CoursePOJO> courses = new ArrayList<CoursePOJO>();
+			for(CoursePOJO coursePOJO : coursesWithoutModuleStatus){
+				coursePOJO = coursePOJO.assignStatusForModules();
+				courses.add(coursePOJO);
 			}
-
+			
 			Gson gson = new Gson();
 			String result = gson.toJson(courses);
 
@@ -57,8 +52,7 @@ public class RESTCourseService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getLeaderboardOfAllCoursesOfUser(@PathParam("userId") int userId){
 		
-		try{
-			
+		try{			
 			StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 			List<StudentPlaylist> allStudentPlaylist = studentPlaylistServices.getStudentPlaylistOfUser(userId);
 			

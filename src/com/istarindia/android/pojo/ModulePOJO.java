@@ -6,14 +6,16 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "module")
-public class ModulePOJO {
+public class ModulePOJO implements Comparable<ModulePOJO>{
 
 	private Integer id;
 	private String name;
 	private String description;
+	private String status;
 	private String imageURL;
 	private Integer orderId;
-	private ArrayList<LessonPOJO> lessons = new ArrayList<LessonPOJO>();
+	//private ArrayList<LessonPOJO> lessons = new ArrayList<LessonPOJO>();
+	private ArrayList<String> skillObjectives = new ArrayList<String>();
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
@@ -55,13 +57,32 @@ public class ModulePOJO {
 		this.orderId = orderId;
 	}
 	
-	@XmlAttribute(name = "lessons", required = false)
+/*	@XmlAttribute(name = "lessons", required = false)
 	public ArrayList<LessonPOJO> getLessons() {
 		return lessons;
 	}
 	public void setLessons(ArrayList<LessonPOJO> lessons) {
 		this.lessons = lessons;
 	}
+	*/
+	@XmlAttribute(name = "skillObjectives", required = false)
+	public ArrayList<String> getSkillObjectives() {
+		return skillObjectives;
+	}
+	public void setSkillObjectives(ArrayList<String> skillObjectives) {
+		this.skillObjectives = skillObjectives;
+	}
 	
+	@XmlAttribute(name = "status", required = false)
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	
+	@Override
+	public int compareTo(ModulePOJO o) {
+		return this.orderId -o.orderId;
+	}
 }

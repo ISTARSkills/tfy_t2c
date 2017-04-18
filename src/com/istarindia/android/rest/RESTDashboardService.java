@@ -30,7 +30,7 @@ public class RESTDashboardService {
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
-			
+			System.out.println("DASHBOARD SERVICE:" + istarUser);
 			System.out.println(istarUser.getEmail());
 			
 			TaskServices taskServices = new TaskServices();			

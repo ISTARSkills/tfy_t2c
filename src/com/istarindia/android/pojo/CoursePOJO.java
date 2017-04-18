@@ -1,6 +1,7 @@
 package com.istarindia.android.pojo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -14,6 +15,10 @@ public class CoursePOJO {
 	private String category;
 	private String imageURL;
 	private String status;
+	private Integer rank;
+	private Double userPoints;
+	private Double totalPoints;	
+	private Double accuracy;
 	private ArrayList<ModulePOJO> modules = new ArrayList<ModulePOJO>();
 	
 	@XmlAttribute(name = "id", required = false)
@@ -72,5 +77,41 @@ public class CoursePOJO {
 		this.modules = modules;
 	}
 	
+	@XmlAttribute(name = "rank", required = false)
+	public Integer getRank() {
+		return rank;
+	}
+	public void setRank(Integer rank) {
+		this.rank = rank;
+	}
 	
+	@XmlAttribute(name = "userPoints", required = false)
+	public Double getUserPoints() {
+		return userPoints;
+	}
+	public void setUserPoints(Double userPoints) {
+		this.userPoints = userPoints;
+	}
+	
+	@XmlAttribute(name = "totalPoints", required = false)
+	public Double getTotalPoints() {
+		return totalPoints;
+	}
+	public void setTotalPoints(Double totalPoints) {
+		this.totalPoints = totalPoints;
+	}
+	
+	@XmlAttribute(name = "accuracy", required = false)
+	public Double getAccuracy() {
+		return accuracy;
+	}
+	public void setAccuracy(Double accuracy) {
+		this.accuracy = accuracy;
+	}
+		
+	public CoursePOJO assignStatusForModules(){		
+		CoursePOJO coursePOJO = this;		
+		Collections.sort(coursePOJO.getModules());	
+	return coursePOJO;
+	}
 }

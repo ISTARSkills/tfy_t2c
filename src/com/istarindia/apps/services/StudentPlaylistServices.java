@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -23,9 +24,7 @@ public class StudentPlaylistServices {
 	
 	@SuppressWarnings("unchecked")
 	public List<StudentPlaylist> getStudentPlaylistOfUser(int istarUserId){
-		
-		System.out.println("getStudentPlaylistOfUser START");
-		
+
 		String hql = "from StudentPlaylist studentPlaylist where istarUser.id= :istarUser";
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
@@ -35,10 +34,24 @@ public class StudentPlaylistServices {
 		query.setParameter("istarUser",istarUserId);
 		
 		List<StudentPlaylist> allStudentPlaylist = query.list();
-		
-		System.out.println("getStudentPlaylistOfUser END");
-		
+
 		return allStudentPlaylist;		
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Integer> getStudentPlaylistOfCourseforUser(int istarUserId){
+
+		String sql = "select distinct course_id from student_playlist where student_id= :istarUser";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		SQLQuery query = session.createSQLQuery(sql);
+		query.setParameter("istarUser",istarUserId);
+		
+		List<Integer> allCourses = query.list();
+		
+		return allCourses;		
 	}
 	
 	public StudentPlaylist getStudentPlaylist(Integer studentPlaylistId){
