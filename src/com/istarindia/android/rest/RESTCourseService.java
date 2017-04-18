@@ -33,7 +33,7 @@ public class RESTCourseService {
 			List<CoursePOJO> coursesWithoutModuleStatus = appCourseServices.getCoursesOfUser(istarUserId);
 			List<CoursePOJO> courses = new ArrayList<CoursePOJO>();
 			for(CoursePOJO coursePOJO : coursesWithoutModuleStatus){
-				coursePOJO = coursePOJO.assignStatusForModules();
+				coursePOJO = coursePOJO.sortModulesAndAssignStatus();
 				courses.add(coursePOJO);
 			}
 			

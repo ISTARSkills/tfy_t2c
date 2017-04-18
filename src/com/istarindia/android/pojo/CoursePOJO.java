@@ -109,9 +109,18 @@ public class CoursePOJO {
 		this.accuracy = accuracy;
 	}
 		
-	public CoursePOJO assignStatusForModules(){		
+	public CoursePOJO sortModulesAndAssignStatus(){		
 		CoursePOJO coursePOJO = this;		
-		Collections.sort(coursePOJO.getModules());	
+		Collections.sort(coursePOJO.getModules());
+		
+		String courseStatus = "COMPLETE";
+		
+		for(ModulePOJO module: coursePOJO.getModules()){
+			if(module.getStatus().equals("INCOMPLETE")){
+				courseStatus = "INCOMPLETE";
+			}
+		}
+		coursePOJO.setStatus(courseStatus);	
 	return coursePOJO;
 	}
 }
