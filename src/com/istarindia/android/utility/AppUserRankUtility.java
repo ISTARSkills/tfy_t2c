@@ -11,10 +11,8 @@ import org.hibernate.Session;
 
 import com.istarindia.android.pojo.CourseRankPOJO;
 import com.istarindia.android.pojo.StudentRankPOJO;
-import com.istarindia.apps.services.AppBatchStudentsServices;
 import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.UserGamificationServices;
-import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.IstarUser;
