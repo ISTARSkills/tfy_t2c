@@ -6,12 +6,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+
 import com.istarindia.android.pojo.CourseRankPOJO;
 import com.istarindia.android.pojo.StudentRankPOJO;
 import com.istarindia.apps.services.AppBatchStudentsServices;
 import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.UserGamificationServices;
 import com.viksitpro.core.dao.entities.Assessment;
+import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.UserGamification;
@@ -63,38 +67,75 @@ public class AppUserRankUtility {
 		return pointAndCoins;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<CourseRankPOJO> getCourseRankPOJOForCoursesOfUsersBatch(Integer istarUserId, Set<Integer> allCourses){
 		
 		List<CourseRankPOJO> allCourseRanks = new ArrayList<CourseRankPOJO>();
 		
 		AppCourseServices appCourseServices = new AppCourseServices();
+		IstarUserServices istarUserServices = new IstarUserServices();
 		
 		for(Integer courseId: allCourses){
+						
 			Course course = appCourseServices.getCourse(courseId);			
 			if(course!=null){
-				System.out.println("Course--->" + course.getCourseName() + course.getId());
-				
 				CourseRankPOJO courseRankPOJO = new CourseRankPOJO();
-				List<StudentRankPOJO> allStudentRankPOJOOfCourse =assignRankToUsersForACourseOfUsersBatch(istarUserId, courseId);
 				
 				courseRankPOJO.setId(course.getId());
 				courseRankPOJO.setName(course.getCourseName());
 				courseRankPOJO.setImageURL(course.getImage_url());
 				courseRankPOJO.setDescription(course.getCourseDescription());
-				courseRankPOJO.setAllStudentRanks(allStudentRankPOJOOfCourse);
 				
-				System.out.println("Course--->" + allStudentRankPOJOOfCourse.size());
+			List<StudentRankPOJO> allStudentRanksOfABatch = new ArrayList<StudentRankPOJO>();
+			
+			String sql = "select *, cast(rank() over (order by total_points desc) as integer) from "
+					+ "(select user_gamification.istar_user, cast(sum(user_gamification.points) as integer)as total_points, cast(sum(user_gamification.coins) as integer) as total_coins "
+					+ "from assessment,user_gamification where user_gamification.item_id=assessment.id and course_id= :courseId  and user_gamification.istar_user in "
+					+ "(select student_id from batch_students where batch_group_id in "
+					+ "(select batch_group_id from batch_students where batch_students.student_id= :istarUserId)) "
+					+ "group by user_gamification.istar_user order by total_points desc) as batch_ranks";
+			
+			BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+			Session session = baseHibernateDAO.getSession();
+			
+			SQLQuery query = session.createSQLQuery(sql);
+			query.setParameter("istarUserId",istarUserId);
+			query.setParameter("courseId",course.getId());
+			
+			List<Object[]> allStudentsWithPoints = query.list();
+						
+			for(Object[] studentData : allStudentsWithPoints){
 				
-				allCourseRanks.add(courseRankPOJO);
+				Integer istarUserInBatchId = (Integer) studentData[0];
+				Integer points = (Integer) studentData[1];
+				Integer coins = (Integer) studentData[2];
+				Integer rank = (Integer) studentData[3];
 				
-				System.out.println("Course--->" + allCourseRanks.size());
-			}		
+				IstarUser istarUserInBatch = istarUserServices.getIstarUser(istarUserInBatchId);
+				
+				StudentRankPOJO studentRankPOJO = new StudentRankPOJO();
+
+				studentRankPOJO.setId(istarUserInBatch.getId());
+				if(istarUserInBatch.getUserProfile()!=null){
+				studentRankPOJO.setName(istarUserInBatch.getUserProfile().getFirstName());
+				studentRankPOJO.setImageURL(istarUserInBatch.getUserProfile().getProfileImage());
+				}
+				studentRankPOJO.setPoints(points);
+				studentRankPOJO.setCoins(coins);
+				studentRankPOJO.setBatchRank(rank);
+
+				allStudentRanksOfABatch.add(studentRankPOJO);
+			}
+			Collections.sort(allStudentRanksOfABatch);
+			courseRankPOJO.setAllStudentRanks(allStudentRanksOfABatch);
+			allCourseRanks.add(courseRankPOJO);
+			}
 		}
 		return allCourseRanks;
 	}
 	
 	
-	public List<StudentRankPOJO> assignRankToUsersForACourseOfUsersBatch(Integer istarUserId, Integer courseId){
+/*	public List<StudentRankPOJO> assignRankToUsersForACourseOfUsersBatch(Integer istarUserId, Integer courseId){
 		
 		List<StudentRankPOJO> allRankedStudentRankPOJOs = getStudentRankPOJOForACourseOfUsersBatch(istarUserId, courseId);
 		List<StudentRankPOJO> rankedPOJOs = new ArrayList<StudentRankPOJO>();
@@ -107,9 +148,9 @@ public class AppUserRankUtility {
 			rankedPOJOs.add(studentRankPOJO);
 		}
 		return rankedPOJOs;
-	}
+	}*/
 	
-	public List<StudentRankPOJO> getStudentRankPOJOForACourseOfUsersBatch(Integer istarUserId, Integer courseId) {
+/*	public List<StudentRankPOJO> getStudentRankPOJOForACourseOfUsersBatch(Integer istarUserId, Integer courseId) {
 
 		List<StudentRankPOJO> allStudentRanksOfABatch = new ArrayList<StudentRankPOJO>();
 
@@ -160,6 +201,6 @@ public class AppUserRankUtility {
 		}		
 		Collections.sort(allStudentRanksOfABatch);
 		return allStudentRanksOfABatch;
-	}
+	}*/
 	
 }

@@ -62,6 +62,6 @@ public class StudentRankPOJO implements Comparable<StudentRankPOJO>{
 	}
 	
 	public int compareTo(StudentRankPOJO thatStudentRankPOJO){
-		return thatStudentRankPOJO.getPoints() - this.points;
+		return this.batchRank-thatStudentRankPOJO.getBatchRank();
 	}
 }
