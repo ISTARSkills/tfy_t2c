@@ -28,11 +28,47 @@ import com.viksitpro.core.dao.entities.BatchGroup;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Question;
 import com.viksitpro.core.dao.entities.StudentAssessment;
+import com.viksitpro.core.dao.entities.Task;
+import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
 @Path("assessments/user/{userId}")
 public class RESTAssessmentService {
 
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllAssessments(@PathParam("userId") int userId) {
+
+		try {			
+			List<AssessmentPOJO> allAssessmentsOfUser = new ArrayList<AssessmentPOJO>();
+			
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+
+			TaskServices taskServices = new TaskServices();			
+			List<Task> allTaskOfUser = taskServices.getAllTaskOfActor(istarUser);
+			
+			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
+			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+			
+			for (Task task : allTaskOfUser) {				
+				if (task.getIsActive() && task.getItemType().equals("ASSESSMENT")) {
+					Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());	
+					if(assessment!=null){
+					AssessmentPOJO assessmentPOJO = appPOJOUtility.getAssessmentPOJO(assessment);
+					allAssessmentsOfUser.add(assessmentPOJO);
+					}
+				}
+			}	
+			Gson gson = new Gson();
+			String result = gson.toJson(allAssessmentsOfUser);
+			return Response.ok(result).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
 	@GET
 	@Path("{assessmentId}")
 	@Produces(MediaType.APPLICATION_JSON)
