@@ -41,12 +41,13 @@ public class AppCourseServices {
 			Lesson lesson = studentPlaylist.getLesson();
 			Module module = getModuleOfLesson(lesson.getId());
 
-			if (studentPlaylist.getStatus().equals("INCOMPLETE")) {
-				incompleteModules.add(module.getId());
-			}
-
 			System.out.println("Course->" + course.getId() + " lesson->" + lesson.getId() + " module-->" + module);
 			if (module != null) {
+				
+				if (studentPlaylist.getStatus().equals("INCOMPLETE")) {
+					incompleteModules.add(module.getId());
+				}
+				
 				CoursePOJO coursePOJO = null;
 				ModulePOJO modulePOJO = null;
 
@@ -146,6 +147,7 @@ public class AppCourseServices {
 		return progress;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Module getModuleOfLesson(int lessonId){
 	
 		Module module = null;		
@@ -156,7 +158,13 @@ public class AppCourseServices {
 
 		SQLQuery query = session.createSQLQuery(sql);
 		
-		Integer moduleId = (Integer) query.list().get(0);
+		List<Integer> results = query.list();
+		
+		Integer moduleId = null;
+		
+		if(results.size()>0){
+			moduleId = (Integer) query.list().get(0);
+		}
 		
 		if(moduleId!=null){
 			module = getModule(moduleId);

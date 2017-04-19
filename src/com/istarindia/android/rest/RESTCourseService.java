@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 import com.istarindia.android.pojo.CoursePOJO;
 import com.istarindia.android.pojo.CourseRankPOJO;
+import com.istarindia.android.pojo.StudentRankPOJO;
 import com.istarindia.android.utility.AppUserRankUtility;
 import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.StudentPlaylistServices;
@@ -29,6 +30,7 @@ public class RESTCourseService {
 
 		try {
 			AppCourseServices appCourseServices = new AppCourseServices();
+			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
 
 			List<CoursePOJO> coursesWithoutModuleStatus = appCourseServices.getCoursesOfUser(istarUserId);
 			List<CoursePOJO> courses = new ArrayList<CoursePOJO>();
@@ -37,8 +39,13 @@ public class RESTCourseService {
 				
 				coursePOJO.setProgress(appCourseServices.getProgressOfUserForCourse(istarUserId, coursePOJO.getId()));
 				coursePOJO.setTotalPoints(appCourseServices.getMaxPointsOfCourse(coursePOJO.getId()));
-				//coursePOJO.setUserPoints(userPoints);
-				//coursePOJO.setBatchRank(); to be added once java code for leaderboard is replaced with SQL
+								
+				StudentRankPOJO studentRankPOJO = appUserRankUtility.getStudentRankPOJOForCourseOfAUser(istarUserId, coursePOJO.getId());
+				
+				if(studentRankPOJO!=null){
+					coursePOJO.setUserPoints(studentRankPOJO.getPoints()*1.0);
+					coursePOJO.setRank(studentRankPOJO.getBatchRank());
+				}
 				courses.add(coursePOJO);
 			}
 			
