@@ -1,6 +1,7 @@
 package com.istarindia.android.pojo;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -15,6 +16,7 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 	private String imageURL;
 	private Integer orderId;
 	//private ArrayList<LessonPOJO> lessons = new ArrayList<LessonPOJO>();
+	private List<CmsessionSkillObjectivePOJO> sessions = new ArrayList<CmsessionSkillObjectivePOJO>();
 	private ArrayList<String> skillObjectives = new ArrayList<String>();
 	
 	@XmlAttribute(name = "id", required = false)
@@ -79,6 +81,14 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	
+	@XmlAttribute(name = "sessions", required = false)
+	public List<CmsessionSkillObjectivePOJO> getSessions() {
+		return sessions;
+	}
+	public void setSessions(List<CmsessionSkillObjectivePOJO> sessions) {
+		this.sessions = sessions;
 	}
 	
 	@Override

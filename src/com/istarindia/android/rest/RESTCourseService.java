@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 import com.istarindia.android.pojo.CoursePOJO;
 import com.istarindia.android.pojo.CourseRankPOJO;
+import com.istarindia.android.pojo.SkillReportPOJO;
 import com.istarindia.android.pojo.StudentRankPOJO;
 import com.istarindia.android.utility.AppUserRankUtility;
 import com.istarindia.apps.services.AppCourseServices;
@@ -46,6 +47,15 @@ public class RESTCourseService {
 					coursePOJO.setUserPoints(studentRankPOJO.getPoints()*1.0);
 					coursePOJO.setRank(studentRankPOJO.getBatchRank());
 				}
+				
+				//coursePOJO.setSkillObjectives(appCourseServices.getSkillsReportForCourseOfUser(istarUserId, coursePOJO.getId()));
+				
+				for(SkillReportPOJO skillReport : coursePOJO.getSkillObjectives()){
+					skillReport.calculateUserPoints();
+					skillReport.calculateTotalPoints();
+					skillReport.calculatePercentage();
+				}
+				
 				courses.add(coursePOJO);
 			}
 			

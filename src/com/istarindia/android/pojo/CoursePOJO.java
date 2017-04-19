@@ -2,6 +2,7 @@ package com.istarindia.android.pojo;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -19,7 +20,8 @@ public class CoursePOJO {
 	private Double userPoints = 0.0;
 	private Double totalPoints = 0.0;	
 	private Double progress = 0.0;
-	private ArrayList<ModulePOJO> modules = new ArrayList<ModulePOJO>();
+	private List<ModulePOJO> modules = new ArrayList<ModulePOJO>();
+	private List<SkillReportPOJO> skillObjectives = new ArrayList<SkillReportPOJO>();
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
@@ -70,10 +72,10 @@ public class CoursePOJO {
 	}
 	
 	@XmlAttribute(name = "modules", required = false)
-	public ArrayList<ModulePOJO> getModules() {
+	public List<ModulePOJO> getModules() {
 		return modules;
 	}
-	public void setModules(ArrayList<ModulePOJO> modules) {
+	public void setModules(List<ModulePOJO> modules) {
 		this.modules = modules;
 	}
 	
@@ -109,6 +111,14 @@ public class CoursePOJO {
 		this.progress = progress;
 	}
 		
+	@XmlAttribute(name = "progress", required = false)
+	public List<SkillReportPOJO> getSkillObjectives() {
+		return skillObjectives;
+	}
+	public void setSkillObjectives(List<SkillReportPOJO> skillObjectives) {
+		this.skillObjectives = skillObjectives;
+	}
+	
 	public CoursePOJO sortModulesAndAssignStatus(){		
 		CoursePOJO coursePOJO = this;		
 		Collections.sort(coursePOJO.getModules());
@@ -123,4 +133,5 @@ public class CoursePOJO {
 		coursePOJO.setStatus(courseStatus);	
 	return coursePOJO;
 	}
+	
 }

@@ -36,7 +36,7 @@ public class SkillReportPOJO{
 		return totalPoints;
 	}
 	public void setTotalPoints(Double totalPoints) {
-		this.totalPoints = totalPoints;
+		this.totalPoints = Math.round(totalPoints*100.0)/100.0;
 	}
 	
 	@XmlAttribute(name = "userPoints", required = false)
@@ -44,7 +44,7 @@ public class SkillReportPOJO{
 		return userPoints;
 	}
 	public void setUserPoints(Double userPoints) {
-		this.userPoints = userPoints;
+		this.userPoints = Math.round(userPoints*100.0)/100.0;
 	}
 	
 	@XmlAttribute(name = "userPoints", required = false)
