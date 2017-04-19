@@ -54,9 +54,9 @@ public class RESTAssessmentService {
 			for (Task task : allTaskOfUser) {				
 				if (task.getIsActive() && task.getItemType().equals("ASSESSMENT")) {
 					Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());	
-					if(assessment!=null){
+					if(assessment!=null && assessment.getAssessmentQuestions().size() > 0){
 					AssessmentPOJO assessmentPOJO = appPOJOUtility.getAssessmentPOJO(assessment);
-					allAssessmentsOfUser.add(assessmentPOJO);
+						allAssessmentsOfUser.add(assessmentPOJO);
 					}
 				}
 			}	
@@ -77,10 +77,12 @@ public class RESTAssessmentService {
 		try {
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
 			Assessment assessment = appAssessmentServices.getAssessment(assessmentId);
-
+			AssessmentPOJO assessmentPOJO=null;
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-			AssessmentPOJO assessmentPOJO = appPOJOUtility.getAssessmentPOJO(assessment);
-
+				if(assessment!=null && assessment.getAssessmentQuestions().size() > 0){
+					assessmentPOJO = appPOJOUtility.getAssessmentPOJO(assessment);
+			}
+			
 			Gson gson = new Gson();
 			String result = gson.toJson(assessmentPOJO);
 
