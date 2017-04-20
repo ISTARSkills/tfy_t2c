@@ -3,6 +3,7 @@ package com.istarindia.android.pojo;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "questionResponse")
@@ -12,6 +13,10 @@ public class QuestionResponsePOJO {
 	private List<Integer> options;
 	private Integer duration;
 	
+	public QuestionResponsePOJO(){
+		
+	}
+	
 	@XmlAttribute(name = "questionId", required = false)
 	public Integer getQuestionId() {
 		return questionId;
@@ -20,7 +25,7 @@ public class QuestionResponsePOJO {
 		this.questionId = questionId;
 	}
 	
-	@XmlAttribute(name = "options", required = false)
+	@XmlElement(name = "options", required = false)
 	public List<Integer> getOptions() {
 		return options;
 	}

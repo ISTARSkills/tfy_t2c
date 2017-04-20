@@ -16,6 +16,10 @@ public class LessonPOJO implements Comparable<LessonPOJO>{
 	private Integer duration;
 	private String status;
 	
+	public LessonPOJO(){
+		
+	}
+	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
 		return id;

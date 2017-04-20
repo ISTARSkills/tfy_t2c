@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "courseRank")
@@ -14,6 +15,10 @@ public class CourseRankPOJO {
 	private String description;
 	private String imageURL;
 	private List<StudentRankPOJO> allStudentRanks = new ArrayList<StudentRankPOJO>();
+	
+	public CourseRankPOJO(){
+		
+	}
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
@@ -47,7 +52,7 @@ public class CourseRankPOJO {
 		this.imageURL = imageURL;
 	}
 	
-	@XmlAttribute(name = "allStudentRanks", required = false)
+	@XmlElement(name = "allStudentRanks", required = false)
 	public List<StudentRankPOJO> getAllStudentRanks() {
 		return allStudentRanks;
 	}

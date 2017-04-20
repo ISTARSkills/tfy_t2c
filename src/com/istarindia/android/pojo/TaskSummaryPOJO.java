@@ -15,6 +15,10 @@ public class TaskSummaryPOJO {
 	private String status;
 	private Timestamp date;
 	
+	public TaskSummaryPOJO(){
+		
+	}
+	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
 		return id;

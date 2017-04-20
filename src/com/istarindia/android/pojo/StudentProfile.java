@@ -31,6 +31,10 @@ public class StudentProfile {
 	private String postGraduationCollege;
 	private String resumeURL;
 
+	public StudentProfile(){
+		
+	}
+	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
 		return id;

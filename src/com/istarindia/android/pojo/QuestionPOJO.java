@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.sun.xml.internal.txw2.annotation.XmlCDATA;
@@ -22,6 +23,10 @@ public class QuestionPOJO {
 	private Integer points;
 	private List<OptionPOJO> options;
 	private List<Integer> answers = new ArrayList<Integer>();
+	
+	public QuestionPOJO(){
+		
+	}
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
@@ -95,7 +100,7 @@ public class QuestionPOJO {
 		this.points = points;
 	}
 	
-	@XmlAttribute(name = "options", required = false)
+	@XmlElement(name = "options", required = false)
 	public List<OptionPOJO> getOptions() {
 		return options;
 	}
@@ -103,7 +108,7 @@ public class QuestionPOJO {
 		this.options = options;
 	}
 	
-	@XmlAttribute(name = "answers", required = false)
+	@XmlElement(name = "answers", required = false)
 	public List<Integer> getAnswers() {
 		return answers;
 	}

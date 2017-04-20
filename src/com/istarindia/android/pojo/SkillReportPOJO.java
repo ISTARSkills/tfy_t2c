@@ -3,6 +3,7 @@ package com.istarindia.android.pojo;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "skillReport")
@@ -17,6 +18,10 @@ public class SkillReportPOJO{
 	private Double userPoints = 0.0;
 	private Double percentage = 0.0;
 	private List<SkillReportPOJO> skills;
+	
+	public SkillReportPOJO(){
+		
+	}
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
@@ -79,7 +84,7 @@ public class SkillReportPOJO{
 		return percentage;
 	}
 	
-	@XmlAttribute(name = "skills", required = false)
+	@XmlElement(name = "skills", required = false)
 	public List<SkillReportPOJO> getSkills() {
 		return skills;
 	}

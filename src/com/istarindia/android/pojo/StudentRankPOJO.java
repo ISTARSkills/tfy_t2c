@@ -13,6 +13,10 @@ public class StudentRankPOJO implements Comparable<StudentRankPOJO>{
 	private Integer points;
 	private Integer coins;
 	
+	public StudentRankPOJO(){
+		
+	}
+	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
 		return id;

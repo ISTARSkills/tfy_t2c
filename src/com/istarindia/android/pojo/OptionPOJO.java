@@ -11,6 +11,10 @@ public class OptionPOJO {
 	private Integer id;
 	private String text;
 	
+	public OptionPOJO(){
+		
+	}
+	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
 		return id;

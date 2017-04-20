@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "skillReport")
@@ -20,6 +21,10 @@ public class AssessmentReportPOJO {
 	private Integer totalNumberOfQuestions;
 	private Integer totalNumberOfCorrectlyAnsweredQuestions;
 	private List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();
+	
+	public AssessmentReportPOJO(){
+		
+	}
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
@@ -85,7 +90,7 @@ public class AssessmentReportPOJO {
 		this.totalNumberOfUsersInBatch = totalNumberOfUsersInBatch;
 	}
 	
-	@XmlAttribute(name = "skillsReport", required = false)
+	@XmlElement(name = "skillsReport", required = false)
 	public List<SkillReportPOJO> getSkillsReport() {
 		return skillsReport;
 	}

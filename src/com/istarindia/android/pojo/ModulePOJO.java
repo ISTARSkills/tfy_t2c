@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "module")
@@ -15,9 +16,12 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 	private String status;
 	private String imageURL;
 	private Integer orderId;
-	//private List<LessonPOJO> lessons = new ArrayList<LessonPOJO>();
 	private List<SkillReportPOJO> sessionSkills = new ArrayList<SkillReportPOJO>();
 	private ArrayList<String> skillObjectives = new ArrayList<String>();
+	
+	public ModulePOJO(){
+		
+	}
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
@@ -67,7 +71,7 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 		this.lessons = lessons;
 	}*/
 	
-	@XmlAttribute(name = "skillObjectives", required = false)
+	@XmlElement(name = "skillObjectives", required = false)
 	public ArrayList<String> getSkillObjectives() {
 		return skillObjectives;
 	}
@@ -83,7 +87,7 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 		this.status = status;
 	}
 	
-	@XmlAttribute(name = "sessionSkills", required = false)
+	@XmlElement(name = "sessionSkills", required = false)
 	public List<SkillReportPOJO> getSessionSkills() {
 		return sessionSkills;
 	}

@@ -28,6 +28,7 @@ public class DashboardCard implements Serializable {
 	public DashboardCard(){
 		
 	}
+	
 	//Lesson, Video
 	public DashboardCard(Integer id, String header, String title, String description, String imageURL, String videoURL, String itemType,
 			Integer itemId) {

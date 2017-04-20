@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "assessment")
@@ -16,6 +17,10 @@ public class AssessmentPOJO {
 	private Integer durationInMinutes;
 	private Double points;
 	private List<QuestionPOJO> questions = new ArrayList<QuestionPOJO>();
+	
+	public AssessmentPOJO(){
+		
+	}
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
@@ -65,7 +70,7 @@ public class AssessmentPOJO {
 		this.points = points;
 	}
 	
-	@XmlAttribute(name = "questions", required = false)
+	@XmlElement(name = "questions", required = false)
 	public List<QuestionPOJO> getQuestions() {
 		return questions;
 	}

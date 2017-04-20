@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "course")
@@ -22,6 +23,10 @@ public class CoursePOJO {
 	private Double progress = 0.0;
 	private List<ModulePOJO> modules = new ArrayList<ModulePOJO>();
 	private List<SkillReportPOJO> skillObjectives = new ArrayList<SkillReportPOJO>();
+	
+	public CoursePOJO(){
+		
+	}
 	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
@@ -71,7 +76,7 @@ public class CoursePOJO {
 		this.status = status;
 	}
 	
-	@XmlAttribute(name = "modules", required = false)
+	@XmlElement(name = "modules", required = false)
 	public List<ModulePOJO> getModules() {
 		return modules;
 	}
@@ -111,7 +116,7 @@ public class CoursePOJO {
 		this.progress = Math.round(progress*100.0)/100.0;
 	}
 		
-	@XmlAttribute(name = "progress", required = false)
+	@XmlElement(name = "progress", required = false)
 	public List<SkillReportPOJO> getSkillObjectives() {
 		return skillObjectives;
 	}
