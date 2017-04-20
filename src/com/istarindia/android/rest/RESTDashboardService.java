@@ -13,37 +13,71 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 import com.istarindia.android.pojo.DashboardCard;
 import com.istarindia.android.utility.AppDashboardUtility;
+import com.istarindia.apps.services.AppAssessmentServices;
+import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.utilities.TaskCategory;
 
-@Path("dashboard")
+@Path("tasks/user/{userId}")
 public class RESTDashboardService {
 
 	@GET
-	@Path("user/{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getDashboardCard(@PathParam("userId") int userId) {
+	public Response getAllTaskIds(@PathParam("userId") int userId) {
 
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
-			System.out.println("DASHBOARD SERVICE:" + istarUser);
-			System.out.println(istarUser.getEmail());
 			
 			TaskServices taskServices = new TaskServices();			
 			List<Task> allTaskOfUser = taskServices.getAllTaskOfActor(istarUser);
+	
+			List<Integer> allTasks = new ArrayList<Integer>();
+			
+			for(Task task : allTaskOfUser){				
+				if(task.getIsActive()){
+					String itemType = task.getItemType();
+					Integer itemId = task.getItemId();
+					if(itemType.equals(TaskCategory.ASSESSMENT)){
+						AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
+						Assessment assessment = appAssessmentServices.getAssessment(itemId);						
+							if (assessment != null && assessment.getAssessmentQuestions().size() > 0) {
+								allTasks.add(task.getId());
+							}
+						}else{
+							allTasks.add(task.getId());
+						}
+					}
+				}
+			Gson gson = new Gson();
+			String result = gson.toJson(allTasks);
+			
+			return Response.ok(result).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@GET
+	@Path("{taskId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getDashboardCards(@PathParam("userId") int userId, @PathParam("taskId") int taskId) {
 
-			System.out.println("Size of task " + allTaskOfUser.size());
+		try {
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+			
+			TaskServices taskServices = new TaskServices();			
+			Task task = taskServices.getTask(taskId);
+			
 			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
-			List<DashboardCard> allDashboardCard = new ArrayList<DashboardCard>();
+			DashboardCard dashboardCard = null;
 
-			for (Task task : allTaskOfUser) {
-				
-				if (task.getIsActive()) {
-					DashboardCard dashboardCard = null;
+				if (task!=null && task.getIsActive() && task.getIstarUserByActor().getId()==istarUser.getId()) {
 					String itemType = task.getItemType();
 
 					switch (itemType) {
@@ -57,15 +91,12 @@ public class RESTDashboardService {
 						dashboardCard = dashboardUtility.getDashboardCardForJob(task);
 						break;
 					}
-
-					if (dashboardCard != null) {
-						allDashboardCard.add(dashboardCard);
-					}
+				}else{
+					return Response.status(Response.Status.BAD_REQUEST).build();
 				}
-			}
-			
+
 			Gson gson = new Gson();
-			String result = gson.toJson(allDashboardCard);
+			String result = gson.toJson(dashboardCard);
 			
 			return Response.ok(result).build();
 		} catch (Exception e) {
