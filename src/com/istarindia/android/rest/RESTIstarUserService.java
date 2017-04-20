@@ -1,6 +1,7 @@
 package com.istarindia.android.rest;
 
 import java.util.HashSet;
+import java.util.List;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -14,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
+import com.istarindia.android.pojo.SkillReportPOJO;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.android.utility.AppUtility;
@@ -230,6 +232,26 @@ public class RESTIstarUserService {
 
 			return Response.status(Response.Status.CREATED).build();
 		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@GET
+	@Path("{userId}/skills")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getSkillsMap(@PathParam("userId") int istarUserId){
+		
+		try{
+			AppServices appServices= new AppServices();
+			List<SkillReportPOJO> allSkills = appServices.getSkillsMapOfUser(istarUserId);
+			
+			Gson gson = new Gson();
+			String result = gson.toJson(allSkills);
+
+			return Response.ok(result).build();
+			
+		}catch(Exception e){
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}

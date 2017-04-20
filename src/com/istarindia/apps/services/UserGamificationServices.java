@@ -74,6 +74,23 @@ public class UserGamificationServices {
 		return points;
 	}
 	
+	
+	@SuppressWarnings("unchecked")
+	public List<UserGamification> getAllUserGamificationsOfUser(int istarUserId){
+		
+		String hql = "from UserGamification userGamification where istarUser.id= :istarUser";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		Query query = session.createQuery(hql);
+		query.setParameter("istarUser",istarUserId);
+		
+		List<UserGamification> allUserGamifications = query.list();
+				
+		return allUserGamifications;
+	}
+	
 	public UserGamification getUserGamification(Integer userGamificationId){
 		UserGamificationDAO userGamificationDAO = new UserGamificationDAO();
 		UserGamification userGamification;

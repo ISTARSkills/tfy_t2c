@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -105,7 +106,7 @@ public class RESTDashboardService {
 	@GET
 	@Path("{taskId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getDashboardCards(@PathParam("userId") int userId, @PathParam("taskId") int taskId) {
+	public Response getDashboardCardOfTask(@PathParam("userId") int userId, @PathParam("taskId") int taskId) {
 
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
@@ -140,6 +141,24 @@ public class RESTDashboardService {
 			
 			return Response.ok(result).build();
 		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@PUT
+	@Path("{taskId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response completeTask(@PathParam("userId") int userId, @PathParam("taskId") int taskId){
+		try{
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+			
+		TaskServices taskServices = new TaskServices();
+		taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
+		
+			return Response.status(Response.Status.CREATED).build();
+		}catch(Exception e){
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
