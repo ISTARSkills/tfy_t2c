@@ -10,6 +10,9 @@ public class SkillReportPOJO{
 
 	private Integer id;
 	private String name;
+	private String description;
+	private String itemType;
+	private Integer itemId;
 	private Double totalPoints = 0.0;
 	private Double userPoints = 0.0;
 	private Double percentage = 0.0;
@@ -31,6 +34,30 @@ public class SkillReportPOJO{
 		this.name = name;
 	}
 	
+	@XmlAttribute(name = "description", required = false)
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	@XmlAttribute(name = "itemType", required = false)
+	public String getItemType() {
+		return itemType;
+	}
+	public void setItemType(String itemType) {
+		this.itemType = itemType;
+	}
+	
+	@XmlAttribute(name = "itemId", required = false)
+	public Integer getItemId() {
+		return itemId;
+	}
+	public void setItemId(Integer itemId) {
+		this.itemId = itemId;
+	}
+
 	@XmlAttribute(name = "totalPoints", required = false)
 	public Double getTotalPoints() {
 		return totalPoints;
@@ -47,7 +74,7 @@ public class SkillReportPOJO{
 		this.userPoints = Math.round(userPoints*100.0)/100.0;
 	}
 	
-	@XmlAttribute(name = "userPoints", required = false)
+	@XmlAttribute(name = "percentage", required = false)
 	public Double getPercentage() {
 		return percentage;
 	}

@@ -108,7 +108,7 @@ public class CoursePOJO {
 		return progress;
 	}
 	public void setProgress(Double progress) {
-		this.progress = progress;
+		this.progress = Math.round(progress*100.0)/100.0;
 	}
 		
 	@XmlAttribute(name = "progress", required = false)

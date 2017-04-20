@@ -13,6 +13,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 
+import com.istarindia.android.pojo.CmsessionSkillObjectivePOJO;
 import com.istarindia.android.pojo.CoursePOJO;
 import com.istarindia.android.pojo.LessonPOJO;
 import com.istarindia.android.pojo.ModulePOJO;
@@ -64,7 +65,6 @@ public class AppCourseServices {
 				CoursePOJO coursePOJO = null;
 				ModulePOJO modulePOJO = null;
 				List<SkillReportPOJO> allSkillsReport = null;
-				List<LessonPOJO> allLessons = null;
 				for (CoursePOJO tempCoursePOJO : allCoursePOJO) {
 					if (tempCoursePOJO.getId() == course.getId()) {
 						coursePOJO = tempCoursePOJO;
@@ -89,29 +89,13 @@ public class AppCourseServices {
 					modulePOJO.setOrderId(module.getOrderId());
 					modulePOJO.setDescription(module.getModule_description());
 					modulePOJO.setImageURL(module.getImage_url());
-
-					allLessons = new ArrayList<LessonPOJO>();
-					
-					LessonPOJO lessonPOJO = new LessonPOJO();
-					
-					lessonPOJO.setId(lesson.getId());
-					lessonPOJO.setTitle(lesson.getTitle());
-					lessonPOJO.setDescription(lesson.getDescription());
-					lessonPOJO.setDuration(lesson.getDuration());
-					lessonPOJO.setPlaylistId(studentPlaylist.getId());
-					lessonPOJO.setStatus(studentPlaylist.getStatus());
-					lessonPOJO.setSubject(lesson.getSubject());
-					lessonPOJO.setType(lesson.getType());
-					lessonPOJO.setOrderId(lesson.getOrderId());
-					
-					allLessons.add(lessonPOJO);
-					modulePOJO.setLessons(allLessons);
 					
 					Set<String> allSkillObjectivesOfModule = new HashSet<String>();
 					for (SkillObjective skillObjective : module.getSkillObjectives()) {
 						allSkillObjectivesOfModule.add(skillObjective.getName());
 					}
-									
+					modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
+					
 					for(SkillObjective skillObjective : cmsession.getSkillObjectives()){
 						SkillReportPOJO cmsessionSkillReportPOJO = null;
 						
@@ -121,7 +105,6 @@ public class AppCourseServices {
 								break;
 							}
 						}
-						modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
 						
 						if(moduleSkillReportPOJO==null){
 							SkillObjective moduleSkillObjective = (new AppAssessmentServices()).getSkillObjective(skillObjective.getParentSkill());
@@ -137,7 +120,9 @@ public class AppCourseServices {
 							
 							cmsessionSkillReportPOJO.setId(skillObjective.getId());
 							cmsessionSkillReportPOJO.setName(skillObjective.getName());
-							
+							cmsessionSkillReportPOJO.setDescription(cmsession.getDescription());
+							cmsessionSkillReportPOJO.setItemId(cmsession.getId());
+							cmsessionSkillReportPOJO.setItemType("CMSESSION_SKILL");
 							HashMap<String, Object> map = getPointsAndCoinsOfUserForSkillOfCourse(istarUserId, skillObjective.getId(), course.getId());
 							
 							if(map.containsKey("points")){
@@ -151,6 +136,7 @@ public class AppCourseServices {
 
 							allSkillReportsOfCmsession.add(cmsessionSkillReportPOJO);
 							moduleSkillReportPOJO.setSkills(allSkillReportsOfCmsession);
+							modulePOJO.getSessionSkills().add(cmsessionSkillReportPOJO);
 						}else{						
 							for(SkillReportPOJO tempCmsessionSkillReportPOJO : moduleSkillReportPOJO.getSkills()){
 								if(tempCmsessionSkillReportPOJO.getId()==skillObjective.getId()){
@@ -164,6 +150,9 @@ public class AppCourseServices {
 								
 								cmsessionSkillReportPOJO.setId(skillObjective.getId());
 								cmsessionSkillReportPOJO.setName(skillObjective.getName());
+								cmsessionSkillReportPOJO.setDescription(cmsession.getDescription());
+								cmsessionSkillReportPOJO.setItemId(cmsession.getId());
+								cmsessionSkillReportPOJO.setItemType("CMSESSION_SKILL");
 								
 								HashMap<String, Object> map = getPointsAndCoinsOfUserForSkillOfCourse(istarUserId, skillObjective.getId(), course.getId());
 								
@@ -177,6 +166,7 @@ public class AppCourseServices {
 								cmsessionSkillReportPOJO.calculatePercentage();
 								
 								moduleSkillReportPOJO.getSkills().add(cmsessionSkillReportPOJO);
+								modulePOJO.getSessionSkills().add(cmsessionSkillReportPOJO);
 							}
 						}
 					}
@@ -200,23 +190,6 @@ public class AppCourseServices {
 						modulePOJO.setOrderId(module.getOrderId());
 						modulePOJO.setDescription(module.getModule_description());
 						modulePOJO.setImageURL(module.getImage_url());
-
-						allLessons = new ArrayList<LessonPOJO>();
-						
-						LessonPOJO lessonPOJO = new LessonPOJO();
-						
-						lessonPOJO.setId(lesson.getId());
-						lessonPOJO.setTitle(lesson.getTitle());
-						lessonPOJO.setDescription(lesson.getDescription());
-						lessonPOJO.setDuration(lesson.getDuration());
-						lessonPOJO.setPlaylistId(studentPlaylist.getId());
-						lessonPOJO.setStatus(studentPlaylist.getStatus());
-						lessonPOJO.setSubject(lesson.getSubject());
-						lessonPOJO.setType(lesson.getType());
-						lessonPOJO.setOrderId(lesson.getOrderId());
-						
-						allLessons.add(lessonPOJO);
-						modulePOJO.setLessons(allLessons);
 						
 						SkillReportPOJO moduleSkillReportPOJO=null;
 						
@@ -227,6 +200,8 @@ public class AppCourseServices {
 
 						modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
 						
+						System.out.println("SIZE OF CMSESSION SKILL OBJECTIVES ARE-->"+cmsession.getSkillObjectives().size());
+						
 						for(SkillObjective skillObjective : cmsession.getSkillObjectives()){
 							SkillReportPOJO cmsessionSkillReportPOJO = null;
 							
@@ -236,7 +211,6 @@ public class AppCourseServices {
 									break;
 								}
 							}
-							modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
 							
 							if(moduleSkillReportPOJO==null){
 								SkillObjective moduleSkillObjective = (new AppAssessmentServices()).getSkillObjective(skillObjective.getParentSkill());
@@ -252,6 +226,9 @@ public class AppCourseServices {
 								
 								cmsessionSkillReportPOJO.setId(skillObjective.getId());
 								cmsessionSkillReportPOJO.setName(skillObjective.getName());
+								cmsessionSkillReportPOJO.setDescription(cmsession.getDescription());
+								cmsessionSkillReportPOJO.setItemId(cmsession.getId());
+								cmsessionSkillReportPOJO.setItemType("CMSESSION_SKILL");
 								
 								HashMap<String, Object> map = getPointsAndCoinsOfUserForSkillOfCourse(istarUserId, skillObjective.getId(), course.getId());
 								
@@ -266,6 +243,7 @@ public class AppCourseServices {
 								
 								allSkillReportsOfCmsession.add(cmsessionSkillReportPOJO);
 								moduleSkillReportPOJO.setSkills(allSkillReportsOfCmsession);
+								modulePOJO.getSessionSkills().add(cmsessionSkillReportPOJO);
 							}else{						
 								for(SkillReportPOJO tempCmsessionSkillReportPOJO : moduleSkillReportPOJO.getSkills()){
 									if(tempCmsessionSkillReportPOJO.getId()==skillObjective.getId()){
@@ -279,6 +257,9 @@ public class AppCourseServices {
 									
 									cmsessionSkillReportPOJO.setId(skillObjective.getId());
 									cmsessionSkillReportPOJO.setName(skillObjective.getName());
+									cmsessionSkillReportPOJO.setDescription(cmsession.getDescription());
+									cmsessionSkillReportPOJO.setItemId(cmsession.getId());
+									cmsessionSkillReportPOJO.setItemType("CMSESSION_SKILL");
 									
 									HashMap<String, Object> map = getPointsAndCoinsOfUserForSkillOfCourse(istarUserId, skillObjective.getId(), course.getId());
 									
@@ -292,26 +273,15 @@ public class AppCourseServices {
 									cmsessionSkillReportPOJO.calculatePercentage();
 									
 									moduleSkillReportPOJO.getSkills().add(cmsessionSkillReportPOJO);
+									modulePOJO.getSessionSkills().add(cmsessionSkillReportPOJO);
 								}
 							}
 						}
 						
 						coursePOJO.getModules().add(modulePOJO);
 
-					} else {						
-						LessonPOJO lessonPOJO = new LessonPOJO();
-						
-						lessonPOJO.setId(lesson.getId());
-						lessonPOJO.setTitle(lesson.getTitle());
-						lessonPOJO.setDescription(lesson.getDescription());
-						lessonPOJO.setDuration(lesson.getDuration());
-						lessonPOJO.setPlaylistId(studentPlaylist.getId());
-						lessonPOJO.setStatus(studentPlaylist.getStatus());
-						lessonPOJO.setSubject(lesson.getSubject());
-						lessonPOJO.setType(lesson.getType());
-						lessonPOJO.setOrderId(lesson.getOrderId());
-
-						modulePOJO.getLessons().add(lessonPOJO);
+					} else {		
+						System.out.println("Module Already Added");
 					}
 				}
 				if (incompleteModules.contains(module.getId())) {
