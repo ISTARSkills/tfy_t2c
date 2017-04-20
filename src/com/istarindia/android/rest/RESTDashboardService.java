@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 import com.istarindia.android.pojo.DashboardCard;
+import com.istarindia.android.pojo.TaskSummaryPOJO;
 import com.istarindia.android.utility.AppDashboardUtility;
 import com.istarindia.apps.services.AppAssessmentServices;
 import com.viksitpro.core.dao.entities.Assessment;
@@ -60,6 +61,45 @@ public class RESTDashboardService {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
+	}
+	
+	@GET
+	@Path("summary")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getSummaryOfTasks(@PathParam("userId") int userId, @PathParam("taskId") int taskId){
+				
+		try{
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+			
+			TaskServices taskServices = new TaskServices();			
+			List<Task> allTaskOfUser = taskServices.getAllTaskOfActorForToday(istarUser);
+			List<TaskSummaryPOJO> allTaskSummary = new ArrayList<TaskSummaryPOJO>();
+			
+			for(Task task : allTaskOfUser){
+				TaskSummaryPOJO taskSummaryPOJO = new TaskSummaryPOJO();
+				
+				taskSummaryPOJO.setId(task.getId());
+				taskSummaryPOJO.setItemId(task.getItemId());
+				taskSummaryPOJO.setItemType(task.getItemType());
+				if(task.getIsActive()){
+					taskSummaryPOJO.setStatus("INCOMPLETE");
+					taskSummaryPOJO.setDate(task.getEndDate());
+				}else{
+					taskSummaryPOJO.setStatus("COMPLETE");
+					taskSummaryPOJO.setDate(task.getUpdatedAt());
+				}
+				taskSummaryPOJO.setName(task.getName());					
+				allTaskSummary.add(taskSummaryPOJO);
+			}
+			Gson gson = new Gson();
+			String result = gson.toJson(allTaskSummary);
+			
+			return Response.ok(result).build();			
+		}catch(Exception e){
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}		
 	}
 	
 	@GET

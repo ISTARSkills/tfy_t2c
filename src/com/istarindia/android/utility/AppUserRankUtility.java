@@ -117,6 +117,9 @@ public class AppUserRankUtility {
 				if(istarUserInBatch.getUserProfile()!=null){
 				studentRankPOJO.setName(istarUserInBatch.getUserProfile().getFirstName());
 				studentRankPOJO.setImageURL(istarUserInBatch.getUserProfile().getProfileImage());
+				}else{
+				studentRankPOJO.setName(istarUserInBatch.getEmail());
+				studentRankPOJO.setImageURL("http://api.talentify.in/video/android_images/" + istarUserInBatch.getEmail().substring(0, 1).toUpperCase() + ".png");
 				}
 				studentRankPOJO.setPoints(points);
 				studentRankPOJO.setCoins(coins);

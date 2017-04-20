@@ -25,6 +25,9 @@ public class DashboardCard implements Serializable {
 	private Integer challengerRank;
 	private Integer challengerExperience;
 
+	public DashboardCard(){
+		
+	}
 	//Lesson, Video
 	public DashboardCard(Integer id, String header, String title, String description, String imageURL, String videoURL, String itemType,
 			Integer itemId) {
