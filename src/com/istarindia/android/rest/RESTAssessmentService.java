@@ -94,11 +94,11 @@ public class RESTAssessmentService {
 	}
 
 	@POST
-	@Path("{assessmentId}")
+	@Path("{assessmentId}/{taskId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response submitUserAssessmentResponse(@PathParam("userId") int istarUserId,
-			@PathParam("assessmentId") int assessmentId, List<QuestionResponsePOJO> questionResponses) {
+			@PathParam("assessmentId") int assessmentId, @PathParam("taskId") int taskId, List<QuestionResponsePOJO> questionResponses) {
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
@@ -139,6 +139,13 @@ public class RESTAssessmentService {
 							batchGroupId, questionResponsePOJO.getDuration());
 				}
 			}
+			
+			TaskServices taskServices = new TaskServices();
+			Task task = taskServices.getTask(taskId);
+			
+			taskServices.markTaskAsInactive(task, istarUser.getAuthToken());
+			taskServices.updateTaskState("COMPLETED", istarUser.getAuthToken(), task.getId());
+			
 			return Response.status(Response.Status.CREATED).build();
 		} catch (Exception e) {
 			e.printStackTrace();
