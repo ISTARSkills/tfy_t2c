@@ -54,8 +54,7 @@ public class RESTCourseService {
 					skillReport.calculateUserPoints();
 					skillReport.calculateTotalPoints();
 					skillReport.calculatePercentage();
-				}
-				
+				}				
 				courses.add(coursePOJO);
 			}
 			

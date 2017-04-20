@@ -15,8 +15,8 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 	private String status;
 	private String imageURL;
 	private Integer orderId;
-	//private ArrayList<LessonPOJO> lessons = new ArrayList<LessonPOJO>();
-	private List<CmsessionSkillObjectivePOJO> sessions = new ArrayList<CmsessionSkillObjectivePOJO>();
+	private List<LessonPOJO> lessons = new ArrayList<LessonPOJO>();
+	//private List<CmsessionSkillObjectivePOJO> sessions = new ArrayList<CmsessionSkillObjectivePOJO>();
 	private ArrayList<String> skillObjectives = new ArrayList<String>();
 	
 	@XmlAttribute(name = "id", required = false)
@@ -59,14 +59,14 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 		this.orderId = orderId;
 	}
 	
-/*	@XmlAttribute(name = "lessons", required = false)
-	public ArrayList<LessonPOJO> getLessons() {
+	@XmlAttribute(name = "lessons", required = false)
+	public List<LessonPOJO> getLessons() {
 		return lessons;
 	}
-	public void setLessons(ArrayList<LessonPOJO> lessons) {
+	public void setLessons(List<LessonPOJO> lessons) {
 		this.lessons = lessons;
 	}
-	*/
+	
 	@XmlAttribute(name = "skillObjectives", required = false)
 	public ArrayList<String> getSkillObjectives() {
 		return skillObjectives;
@@ -83,13 +83,13 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 		this.status = status;
 	}
 	
-	@XmlAttribute(name = "sessions", required = false)
+/*	@XmlAttribute(name = "sessions", required = false)
 	public List<CmsessionSkillObjectivePOJO> getSessions() {
 		return sessions;
 	}
 	public void setSessions(List<CmsessionSkillObjectivePOJO> sessions) {
 		this.sessions = sessions;
-	}
+	}*/
 	
 	@Override
 	public int compareTo(ModulePOJO o) {

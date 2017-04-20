@@ -14,6 +14,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 
 import com.istarindia.android.pojo.CoursePOJO;
+import com.istarindia.android.pojo.LessonPOJO;
 import com.istarindia.android.pojo.ModulePOJO;
 import com.istarindia.android.pojo.SkillReportPOJO;
 import com.viksitpro.core.dao.entities.Assessment;
@@ -63,7 +64,7 @@ public class AppCourseServices {
 				CoursePOJO coursePOJO = null;
 				ModulePOJO modulePOJO = null;
 				List<SkillReportPOJO> allSkillsReport = null;
-				
+				List<LessonPOJO> allLessons = null;
 				for (CoursePOJO tempCoursePOJO : allCoursePOJO) {
 					if (tempCoursePOJO.getId() == course.getId()) {
 						coursePOJO = tempCoursePOJO;
@@ -89,6 +90,23 @@ public class AppCourseServices {
 					modulePOJO.setDescription(module.getModule_description());
 					modulePOJO.setImageURL(module.getImage_url());
 
+					allLessons = new ArrayList<LessonPOJO>();
+					
+					LessonPOJO lessonPOJO = new LessonPOJO();
+					
+					lessonPOJO.setId(lesson.getId());
+					lessonPOJO.setTitle(lesson.getTitle());
+					lessonPOJO.setDescription(lesson.getDescription());
+					lessonPOJO.setDuration(lesson.getDuration());
+					lessonPOJO.setPlaylistId(studentPlaylist.getId());
+					lessonPOJO.setStatus(studentPlaylist.getStatus());
+					lessonPOJO.setSubject(lesson.getSubject());
+					lessonPOJO.setType(lesson.getType());
+					lessonPOJO.setOrderId(lesson.getOrderId());
+					
+					allLessons.add(lessonPOJO);
+					modulePOJO.setLessons(allLessons);
+					
 					Set<String> allSkillObjectivesOfModule = new HashSet<String>();
 					for (SkillObjective skillObjective : module.getSkillObjectives()) {
 						allSkillObjectivesOfModule.add(skillObjective.getName());
@@ -183,6 +201,23 @@ public class AppCourseServices {
 						modulePOJO.setDescription(module.getModule_description());
 						modulePOJO.setImageURL(module.getImage_url());
 
+						allLessons = new ArrayList<LessonPOJO>();
+						
+						LessonPOJO lessonPOJO = new LessonPOJO();
+						
+						lessonPOJO.setId(lesson.getId());
+						lessonPOJO.setTitle(lesson.getTitle());
+						lessonPOJO.setDescription(lesson.getDescription());
+						lessonPOJO.setDuration(lesson.getDuration());
+						lessonPOJO.setPlaylistId(studentPlaylist.getId());
+						lessonPOJO.setStatus(studentPlaylist.getStatus());
+						lessonPOJO.setSubject(lesson.getSubject());
+						lessonPOJO.setType(lesson.getType());
+						lessonPOJO.setOrderId(lesson.getOrderId());
+						
+						allLessons.add(lessonPOJO);
+						modulePOJO.setLessons(allLessons);
+						
 						SkillReportPOJO moduleSkillReportPOJO=null;
 						
 						Set<String> allSkillObjectivesOfModule = new HashSet<String>();
@@ -263,8 +298,20 @@ public class AppCourseServices {
 						
 						coursePOJO.getModules().add(modulePOJO);
 
-					} else {
-						System.out.println("Module Already Added");
+					} else {						
+						LessonPOJO lessonPOJO = new LessonPOJO();
+						
+						lessonPOJO.setId(lesson.getId());
+						lessonPOJO.setTitle(lesson.getTitle());
+						lessonPOJO.setDescription(lesson.getDescription());
+						lessonPOJO.setDuration(lesson.getDuration());
+						lessonPOJO.setPlaylistId(studentPlaylist.getId());
+						lessonPOJO.setStatus(studentPlaylist.getStatus());
+						lessonPOJO.setSubject(lesson.getSubject());
+						lessonPOJO.setType(lesson.getType());
+						lessonPOJO.setOrderId(lesson.getOrderId());
+
+						modulePOJO.getLessons().add(lessonPOJO);
 					}
 				}
 				if (incompleteModules.contains(module.getId())) {
