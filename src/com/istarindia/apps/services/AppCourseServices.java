@@ -53,7 +53,6 @@ public class AppCourseServices {
 			}
 			
 			Module module = getModuleOfLesson(lesson.getId());
-			
 
 			if (module != null) {
 				
@@ -65,7 +64,6 @@ public class AppCourseServices {
 				ModulePOJO modulePOJO = null;
 				List<SkillReportPOJO> allSkillsReport = null;
 				
-
 				for (CoursePOJO tempCoursePOJO : allCoursePOJO) {
 					if (tempCoursePOJO.getId() == course.getId()) {
 						coursePOJO = tempCoursePOJO;

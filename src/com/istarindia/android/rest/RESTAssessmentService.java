@@ -126,7 +126,7 @@ public class RESTAssessmentService {
 						questionResponsePOJO.getOptions());
 
 				StudentAssessment studentAssessment = studentAssessmentServices.getStudentAssessmentOfQuestionForUser(istarUserId, assessmentId, question.getId());
-				//check if the user has already attempted an assessment, if true-->update the fields else create 
+
 				if(studentAssessment!=null){
 					studentAssessment = studentAssessmentServices.updateStudentAssessment(studentAssessment,
 							optionsMap.get("isCorrect"), optionsMap.get("option0"), optionsMap.get("option1"),
@@ -141,10 +141,7 @@ public class RESTAssessmentService {
 			}
 			
 			TaskServices taskServices = new TaskServices();
-			Task task = taskServices.getTask(taskId);
-			
-			taskServices.markTaskAsInactive(task, istarUser.getAuthToken());
-			taskServices.updateTaskState("COMPLETED", istarUser.getAuthToken(), task.getId());
+			taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
 			
 			return Response.status(Response.Status.CREATED).build();
 		} catch (Exception e) {
