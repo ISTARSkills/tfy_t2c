@@ -126,7 +126,50 @@ public class RESTDashboardService {
 						dashboardCard = dashboardUtility.getDashboardCardForAssessment(task);
 						break;
 					case TaskCategory.LESSON:
-						dashboardCard = dashboardUtility.getDashboardCardForLesson(task);
+						//dashboardCard = dashboardUtility.getDashboardCardForLesson(task);
+						break;
+					case TaskCategory.JOB:
+						dashboardCard = dashboardUtility.getDashboardCardForJob(task);
+						break;
+					}
+				}else{
+					return Response.status(Response.Status.BAD_REQUEST).build();
+				}
+
+			Gson gson = new Gson();
+			String result = gson.toJson(dashboardCard);
+			
+			return Response.ok(result).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@GET
+	@Path("{taskId}/test")
+	@Produces(MediaType.APPLICATION_XML)
+	public Response getDashboardCardOfTaskTEST(@PathParam("userId") int userId, @PathParam("taskId") int taskId) {
+
+		try {
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+			
+			TaskServices taskServices = new TaskServices();			
+			Task task = taskServices.getTask(taskId);
+			
+			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
+			Object dashboardCard = null;
+
+				if (task!=null && task.getIsActive() && task.getIstarUserByActor().getId()==istarUser.getId()) {
+					String itemType = task.getItemType();
+
+					switch (itemType) {
+					case TaskCategory.ASSESSMENT:
+						dashboardCard = dashboardUtility.getDashboardCardForAssessment(task);
+						break;
+					case TaskCategory.LESSON:
+						dashboardCard = dashboardUtility.getDashboardCardForLessonTest(task);
 						break;
 					case TaskCategory.JOB:
 						dashboardCard = dashboardUtility.getDashboardCardForJob(task);

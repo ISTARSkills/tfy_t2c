@@ -32,6 +32,32 @@ public class AppDashboardUtility {
 		return dashboardCard;
 	}
 
+	public Object getDashboardCardForLessonTest(Task task) {
+
+		int itemId = task.getItemId();
+		AppCourseServices appCourseServices = new AppCourseServices();
+		Lesson lesson = appCourseServices.getLesson(itemId);
+
+		Object dashboardCard = null;
+		if (lesson != null) {
+			
+			if(lesson.getType().equals("VIDEO")){
+				System.out.println("LEsson is of type VIDEO");
+				String thumbnailURL = lesson.getVideoLesson().getVideo_thumb_url();
+				String videoURL = lesson.getVideoLesson().getVideo_url();
+				
+				dashboardCard = new DashboardCard(task.getId(), lesson.getTitle(), task.getState(), lesson.getDescription(),
+						thumbnailURL, videoURL, task.getItemType(), lesson.getId());
+			}else if(lesson.getType().equals("INTERACTIVE")){
+				dashboardCard = lesson.getLessonXml();
+			}else{
+				dashboardCard = new DashboardCard(task.getId(), lesson.getTitle(), task.getState(), lesson.getDescription(),
+						"/root/talentify/presentation.jpeg", null, task.getItemType(), lesson.getId());
+			}
+		}
+		return dashboardCard;
+	}
+	
 	public DashboardCard getDashboardCardForLesson(Task task) {
 
 		int itemId = task.getItemId();
