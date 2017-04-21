@@ -12,11 +12,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
-import com.istarindia.android.pojo.DashboardCard;
+import com.istarindia.android.pojo.AssessmentPOJO;
 import com.istarindia.android.pojo.TaskSummaryPOJO;
 import com.istarindia.android.utility.AppDashboardUtility;
-import com.istarindia.apps.services.AppAssessmentServices;
-import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
@@ -27,6 +25,101 @@ import com.viksitpro.core.utilities.TaskCategory;
 public class RESTDashboardService {
 
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getTaskSummaryForUser(@PathParam("userId") int userId){
+		
+		try{
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+			
+			TaskServices taskServices = new TaskServices();			
+			List<Task> allTaskOfUser = taskServices.getAllTaskOfActorForToday(istarUser);
+			List<TaskSummaryPOJO> allTaskSummary = new ArrayList<TaskSummaryPOJO>();
+			
+			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
+			
+			for(Task task : allTaskOfUser){
+				TaskSummaryPOJO taskSummaryPOJO = null;
+				String itemType = task.getItemType();
+
+				switch (itemType) {
+				case TaskCategory.ASSESSMENT:
+					taskSummaryPOJO = dashboardUtility.getTaskSummaryPOJOForAssessment(task);								
+					break;
+				case TaskCategory.LESSON:
+					taskSummaryPOJO = dashboardUtility.getTaskSummaryPOJOForLesson(task);			
+					break;
+				}				
+				if(taskSummaryPOJO!=null){
+					allTaskSummary.add(taskSummaryPOJO);
+				}
+			}
+			
+			Gson gson = new Gson();
+			String result = gson.toJson(allTaskSummary);
+			
+			return Response.ok(result).build();
+		}catch(Exception e){
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@GET
+	@Path("{taskId}")
+	@Produces(MediaType.APPLICATION_XML)	
+	public Response getTaskDetails(@PathParam("userId") int userId, @PathParam("taskId") int taskId){
+		
+		try{
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+			
+			TaskServices taskServices = new TaskServices();			
+			Task task = taskServices.getTask(taskId);
+			
+			Object result = null;
+			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
+			
+			if (task!=null && task.getIsActive() && task.getIstarUserByActor().getId()==istarUser.getId()) {				
+				String itemType = task.getItemType();
+
+				switch (itemType) {
+				case TaskCategory.ASSESSMENT:
+					result = (AssessmentPOJO) dashboardUtility.getAssessmentForTask(task);
+					System.out.println("Assessment returning");
+					break;
+				case TaskCategory.LESSON:
+					result = (String) dashboardUtility.getLessonForTask(task);
+					break;
+				}
+				return Response.ok(result).build();	
+			}else{
+				return Response.status(Response.Status.BAD_REQUEST).build();
+			}
+		}catch(Exception e){
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@PUT
+	@Path("{taskId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response completeTask(@PathParam("userId") int userId, @PathParam("taskId") int taskId){
+		try{
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+			
+		TaskServices taskServices = new TaskServices();
+		taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
+		
+			return Response.status(Response.Status.CREATED).build();
+		}catch(Exception e){
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+/*	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllTaskIds(@PathParam("userId") int userId) {
 
@@ -62,9 +155,9 @@ public class RESTDashboardService {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
-	}
+	}*/
 	
-	@GET
+/*	@GET
 	@Path("summary")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSummaryOfTasks(@PathParam("userId") int userId, @PathParam("taskId") int taskId){
@@ -90,6 +183,8 @@ public class RESTDashboardService {
 					taskSummaryPOJO.setStatus("COMPLETE");
 					taskSummaryPOJO.setDate(task.getUpdatedAt());
 				}
+				
+				
 				taskSummaryPOJO.setName(task.getName());					
 				allTaskSummary.add(taskSummaryPOJO);
 			}
@@ -101,9 +196,9 @@ public class RESTDashboardService {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}		
-	}
+	}*/
 	
-	@GET
+/*	@GET
 	@Path("{taskId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getDashboardCardOfTask(@PathParam("userId") int userId, @PathParam("taskId") int taskId) {
@@ -116,14 +211,15 @@ public class RESTDashboardService {
 			Task task = taskServices.getTask(taskId);
 			
 			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
-			DashboardCard dashboardCard = null;
+			Object dashboardCard = null;
 
 				if (task!=null && task.getIsActive() && task.getIstarUserByActor().getId()==istarUser.getId()) {
 					String itemType = task.getItemType();
+					Integer itemId = task.getItemId();
 
 					switch (itemType) {
 					case TaskCategory.ASSESSMENT:
-						dashboardCard = dashboardUtility.getDashboardCardForAssessment(task);
+						dashboardCard = dashboardUtility.getAssessment(task);
 						break;
 					case TaskCategory.LESSON:
 						//dashboardCard = dashboardUtility.getDashboardCardForLesson(task);
@@ -144,9 +240,9 @@ public class RESTDashboardService {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
-	}
+	}*/
 	
-	@GET
+/*	@GET
 	@Path("{taskId}/test")
 	@Produces(MediaType.APPLICATION_XML)
 	public Response getDashboardCardOfTaskTEST(@PathParam("userId") int userId, @PathParam("taskId") int taskId) {
@@ -187,23 +283,5 @@ public class RESTDashboardService {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
-	}
-	
-	@PUT
-	@Path("{taskId}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response completeTask(@PathParam("userId") int userId, @PathParam("taskId") int taskId){
-		try{
-			IstarUserServices istarUserServices = new IstarUserServices();
-			IstarUser istarUser = istarUserServices.getIstarUser(userId);
-			
-		TaskServices taskServices = new TaskServices();
-		taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
-		
-			return Response.status(Response.Status.CREATED).build();
-		}catch(Exception e){
-			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-		}
-	}
+	}*/
 }

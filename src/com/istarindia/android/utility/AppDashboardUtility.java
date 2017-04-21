@@ -1,38 +1,92 @@
 package com.istarindia.android.utility;
 
-import com.istarindia.android.pojo.DashboardCard;
+import com.istarindia.android.pojo.AssessmentPOJO;
+import com.istarindia.android.pojo.TaskSummaryPOJO;
 import com.istarindia.apps.services.AppAssessmentServices;
 import com.istarindia.apps.services.AppCourseServices;
-import com.istarindia.apps.services.AppJobServices;
 import com.viksitpro.core.dao.entities.Assessment;
-import com.viksitpro.core.dao.entities.Job;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Task;
 
 public class AppDashboardUtility {
 
-	public DashboardCard getDashboardCardForAssessment(Task task) {
-
-		System.out.println("GEting Assessment Card");
+	public TaskSummaryPOJO getTaskSummaryPOJOForAssessment(Task task){
+	
+		TaskSummaryPOJO taskSummaryPOJO = null;
 		
-		int itemId = task.getItemId();
-		AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
-		Assessment assessment = appAssessmentServices.getAssessment(itemId);
-
-		DashboardCard dashboardCard = null;
-		if (assessment != null) {
-			System.out.println("Assessment Found");
-			dashboardCard = new DashboardCard(task.getId(), assessment.getAssessmenttitle(),
-					assessment.getAssessmenttitle(), assessment.getAssessmenttitle(), null,
-					assessment.getNumberOfQuestions(), assessment.getAssessmentdurationminutes(), 100, 50,
-					task.getItemType(), task.getItemId());
-		}else{
-			System.out.println("Assessment Not Found");
+		AppAssessmentServices appAssessmentServices= new AppAssessmentServices();
+		Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());
+		
+		if(assessment!=null && assessment.getAssessmentQuestions().size()>0){
+			taskSummaryPOJO = new TaskSummaryPOJO();
+			
+			taskSummaryPOJO.setId(task.getId());
+			taskSummaryPOJO.setItemId(task.getItemId());
+			taskSummaryPOJO.setItemType(task.getItemType());
+			if(task.getIsActive()){
+				taskSummaryPOJO.setStatus("INCOMPLETE");
+				taskSummaryPOJO.setDate(task.getEndDate());
+			}else{
+				taskSummaryPOJO.setStatus("COMPLETE");
+				taskSummaryPOJO.setDate(task.getUpdatedAt());
+			}
+			taskSummaryPOJO.setName(assessment.getAssessmenttitle());
 		}
-		return dashboardCard;
+		return taskSummaryPOJO;
+	}
+	
+	public TaskSummaryPOJO getTaskSummaryPOJOForLesson(Task task){
+		
+		TaskSummaryPOJO taskSummaryPOJO = null;
+		
+		AppCourseServices appCourseServices= new AppCourseServices();
+		Lesson lesson = appCourseServices.getLesson(task.getItemId());
+		
+		if(lesson!=null){
+			taskSummaryPOJO = new TaskSummaryPOJO();
+			
+			taskSummaryPOJO.setId(task.getId());
+			taskSummaryPOJO.setItemId(task.getItemId());
+			taskSummaryPOJO.setItemType(task.getItemType()+"_"+lesson.getType());
+			if(task.getIsActive()){
+				taskSummaryPOJO.setStatus("INCOMPLETE");
+				taskSummaryPOJO.setDate(task.getEndDate());
+			}else{
+				taskSummaryPOJO.setStatus("COMPLETE");
+				taskSummaryPOJO.setDate(task.getUpdatedAt());
+			}
+			taskSummaryPOJO.setName(lesson.getTitle());
+		}
+		return taskSummaryPOJO;
+	}
+	
+	public AssessmentPOJO getAssessmentForTask(Task task) {
+
+		AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
+		Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());
+		AssessmentPOJO assessmentPOJO=null;
+		AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+			if(assessment!=null && assessment.getAssessmentQuestions().size() > 0){
+				System.out.println("Assessment not null");
+				assessmentPOJO = appPOJOUtility.getAssessmentPOJO(assessment);
+		}
+		return assessmentPOJO;
+	}
+	
+	public String getLessonForTask(Task task) {
+
+		int itemId = task.getItemId();
+		AppCourseServices appCourseServices = new AppCourseServices();
+		Lesson lesson = appCourseServices.getLesson(itemId);
+
+		String lessonXML = null;
+		if (lesson != null) {
+			lessonXML = lesson.getLessonXml();
+		}
+		return lessonXML;
 	}
 
-	public Object getDashboardCardForLessonTest(Task task) {
+/*	public Object getDashboardCardForLessonTest(Task task) {
 
 		int itemId = task.getItemId();
 		AppCourseServices appCourseServices = new AppCourseServices();
@@ -56,43 +110,5 @@ public class AppDashboardUtility {
 			}
 		}
 		return dashboardCard;
-	}
-	
-	public DashboardCard getDashboardCardForLesson(Task task) {
-
-		int itemId = task.getItemId();
-		AppCourseServices appCourseServices = new AppCourseServices();
-		Lesson lesson = appCourseServices.getLesson(itemId);
-
-		DashboardCard dashboardCard = null;
-		if (lesson != null) {
-			
-			if(lesson.getType().equals("VIDEO")){
-				System.out.println("LEsson is of type VIDEO");
-				String thumbnailURL = lesson.getVideoLesson().getVideo_thumb_url();
-				String videoURL = lesson.getVideoLesson().getVideo_url();
-				
-				dashboardCard = new DashboardCard(task.getId(), lesson.getTitle(), task.getState(), lesson.getDescription(),
-						thumbnailURL, videoURL, task.getItemType(), lesson.getId());
-			}else{
-				dashboardCard = new DashboardCard(task.getId(), lesson.getTitle(), task.getState(), lesson.getDescription(),
-						"/root/talentify/presentation.jpeg", null, task.getItemType(), lesson.getId());
-			}
-		}
-		return dashboardCard;
-	}
-
-	public DashboardCard getDashboardCardForJob(Task task) {
-
-		int itemId = task.getItemId();
-		AppJobServices jobServices = new AppJobServices();
-		Job job = jobServices.getJob(itemId);
-
-		DashboardCard dashboardCard = null;
-		if (job != null) {
-			dashboardCard = new DashboardCard(task.getId(), job.getTitle(), task.getState(), job.getDescription(),
-					job.getOrganization().getImage(), task.getItemType(), job.getId());
-		}
-		return dashboardCard;
-	}
+	}*/
 }
