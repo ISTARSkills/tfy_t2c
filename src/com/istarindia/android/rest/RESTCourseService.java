@@ -25,7 +25,7 @@ import com.viksitpro.core.dao.entities.StudentPlaylist;
 @Path("courses/user/{userId}")
 public class RESTCourseService {
 
-	@GET
+/*	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllCourseOfUser(@PathParam("userId") int istarUserId) {
 
@@ -66,44 +66,45 @@ public class RESTCourseService {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
-	}
+	}*/
+	
 	
 	@GET
 	@Path("{courseId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getCourseOfUser(@PathParam("userId") int istarUserId, @PathParam("courseId") int courseId) {
-		//to be changed with single logic
 		try {
 			AppCourseServices appCourseServices = new AppCourseServices();
-			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
+			CoursePOJO coursePOJO = appCourseServices.getCourseOfUser(istarUserId, courseId);
+			coursePOJO.setSkillObjectives(appCourseServices.getSkillsReportForCourseOfUser(istarUserId, courseId));
+						
+			Gson gson = new Gson();
+			String result = gson.toJson(coursePOJO);
 
-			List<CoursePOJO> coursesWithoutModuleStatus = appCourseServices.getCoursesOfUser(istarUserId);
-			List<CoursePOJO> courses = new ArrayList<CoursePOJO>();
-			for(CoursePOJO coursePOJO : coursesWithoutModuleStatus){
-				if(courseId==coursePOJO.getId()){
-				coursePOJO = coursePOJO.sortModulesAndAssignStatus();
-				
-				coursePOJO.setProgress(appCourseServices.getProgressOfUserForCourse(istarUserId, coursePOJO.getId()));
-				coursePOJO.setTotalPoints(appCourseServices.getMaxPointsOfCourse(coursePOJO.getId()));
-								
-				StudentRankPOJO studentRankPOJO = appUserRankUtility.getStudentRankPOJOForCourseOfAUser(istarUserId, coursePOJO.getId());
-				
-				if(studentRankPOJO!=null){
-					coursePOJO.setUserPoints(studentRankPOJO.getPoints()*1.0);
-					coursePOJO.setRank(studentRankPOJO.getBatchRank());
-				}
-				for(SkillReportPOJO skillReport : coursePOJO.getSkillObjectives()){
-					skillReport.calculateUserPoints();
-					skillReport.calculateTotalPoints();
-					skillReport.calculatePercentage();
-				}
-				
-				courses.add(coursePOJO);
-				}
+			return Response.ok(result).build();
+		}catch(Exception e){
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllCoursesOfUser(@PathParam("userId") int istarUserId) {
+
+		try {
+			List<CoursePOJO> allCoursePOJO = new ArrayList<CoursePOJO>();
+			StudentPlaylistServices studentPlaylistServices= new StudentPlaylistServices();
+			List<Integer> allCourseId = studentPlaylistServices.getCoursesforUser(istarUserId);
+			AppCourseServices appCourseServices = new AppCourseServices();
+			for(Integer courseId : allCourseId){
+				CoursePOJO coursePOJO = appCourseServices.getCourseOfUser(istarUserId, courseId);
+				coursePOJO.setSkillObjectives(appCourseServices.getSkillsReportForCourseOfUser(istarUserId, courseId));
+				allCoursePOJO.add(coursePOJO);
 			}
 			
 			Gson gson = new Gson();
-			String result = gson.toJson(courses);
+			String result = gson.toJson(allCoursePOJO);
 
 			return Response.ok(result).build();
 		}catch(Exception e){

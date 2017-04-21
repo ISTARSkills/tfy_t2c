@@ -1,6 +1,7 @@
 package com.istarindia.android.pojo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -16,8 +17,8 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 	private String status;
 	private String imageURL;
 	private Integer orderId;
-	private List<SkillReportPOJO> sessionSkills = new ArrayList<SkillReportPOJO>();
-	private ArrayList<String> skillObjectives = new ArrayList<String>();
+	private List<CmsessionPOJO> lessons = new ArrayList<CmsessionPOJO>();
+	private List<String> skillObjectives = new ArrayList<String>();
 	
 	public ModulePOJO(){
 		
@@ -63,19 +64,20 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 		this.orderId = orderId;
 	}
 	
-/*	@XmlAttribute(name = "lessons", required = false)
-	public List<LessonPOJO> getLessons() {
+	@XmlAttribute(name = "lessons", required = false)
+	public List<CmsessionPOJO> getLessons() {
 		return lessons;
 	}
-	public void setLessons(List<LessonPOJO> lessons) {
+
+	public void setLessons(List<CmsessionPOJO> lessons) {
 		this.lessons = lessons;
-	}*/
-	
+	}
+
 	@XmlElement(name = "skillObjectives", required = false)
-	public ArrayList<String> getSkillObjectives() {
+	public List<String> getSkillObjectives() {
 		return skillObjectives;
 	}
-	public void setSkillObjectives(ArrayList<String> skillObjectives) {
+	public void setSkillObjectives(List<String> skillObjectives) {
 		this.skillObjectives = skillObjectives;
 	}
 	
@@ -86,15 +88,22 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
-	@XmlElement(name = "sessionSkills", required = false)
-	public List<SkillReportPOJO> getSessionSkills() {
-		return sessionSkills;
-	}
-	public void setSessionSkills(List<SkillReportPOJO> sessionSkills) {
-		this.sessionSkills = sessionSkills;
-	}
 
+	public ModulePOJO sortLessonsAndAssignStatus(){		
+		ModulePOJO modulePOJO = this;		
+		Collections.sort(modulePOJO.getLessons());
+		
+		String moduleStatus = "COMPLETE";
+		
+		for(CmsessionPOJO cmsession: modulePOJO.getLessons()){
+			if((cmsession.getStatus().equals("INCOMPLETE"))){
+				moduleStatus = "INCOMPLETE";
+			}
+		}
+		modulePOJO.setStatus(moduleStatus);	
+	return modulePOJO;
+	}
+	
 	@Override
 	public int compareTo(ModulePOJO o) {
 		return this.orderId -o.orderId;

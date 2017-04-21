@@ -39,7 +39,29 @@ public class StudentPlaylistServices {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Integer> getStudentPlaylistOfCourseforUser(int istarUserId){
+	public StudentPlaylist getStudentPlaylistOfUserForLessonOfCourse(int istarUserId, int courseId, int lessonId){
+		
+		String hql = "from StudentPlaylist studentPlaylist where istarUser.id= :istarUserId and course.id= :courseId and lesson.id= :lessonId";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		Query query = session.createQuery(hql);
+		query.setParameter("istarUserId",istarUserId);
+		query.setParameter("courseId",courseId);
+		query.setParameter("lessonId",lessonId);
+		
+		List<StudentPlaylist> allStudentPlaylist = query.list();
+
+		if(allStudentPlaylist.size()>0){
+			return allStudentPlaylist.get(0);
+		}else{
+			return null;
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Integer> getCoursesforUser(int istarUserId){
 
 		String sql = "select distinct course_id from student_playlist where student_id= :istarUser";
 		
@@ -52,6 +74,40 @@ public class StudentPlaylistServices {
 		List<Integer> allCourses = query.list();
 		
 		return allCourses;		
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Integer> getLessonsOfUserForCourse(int istarUserId, int courseId){
+		
+		String sql = "select distinct lesson_id from student_playlist where student_id= :istarUserId and course_id= :courseId";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		SQLQuery query = session.createSQLQuery(sql);
+		query.setParameter("istarUserId",istarUserId);
+		query.setParameter("courseId",courseId);
+		
+		List<Integer> allLessons = query.list();
+		
+		return allLessons;		
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Integer> getCompletedLessonsOfUserForCourse(int istarUserId, int courseId){
+		
+		String sql = "select distinct lesson_id from student_playlist where student_id= :istarUserId and course_id= :courseId and status!='INCOMPLETE'";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		SQLQuery query = session.createSQLQuery(sql);
+		query.setParameter("istarUserId",istarUserId);
+		query.setParameter("courseId",courseId);
+		
+		List<Integer> allLessons = query.list();
+		
+		return allLessons;		
 	}
 	
 	public StudentPlaylist getStudentPlaylist(Integer studentPlaylistId){
