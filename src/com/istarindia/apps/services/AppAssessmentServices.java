@@ -10,10 +10,13 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 
 import com.istarindia.android.pojo.AssessmentReportPOJO;
+import com.istarindia.android.pojo.AssessmentResponsePOJO;
+import com.istarindia.android.pojo.QuestionResponsePOJO;
 import com.istarindia.android.pojo.SkillReportPOJO;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.AssessmentBenchmark;
 import com.viksitpro.core.dao.entities.AssessmentDAO;
+import com.viksitpro.core.dao.entities.AssessmentOption;
 import com.viksitpro.core.dao.entities.AssessmentQuestion;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.IstarUser;
@@ -26,8 +29,8 @@ import com.viksitpro.core.dao.entities.UserGamification;
 public class AppAssessmentServices {
 
 	public AssessmentReportPOJO getAssessmentReport(int istarUserId, int assessmentId) {
-
-		AssessmentReportPOJO assessmentReportPOJO = new AssessmentReportPOJO();
+			System.out.println("Getting assessment report");
+		AssessmentReportPOJO assessmentReportPOJO = null;
 
 		Assessment assessment = getAssessment(assessmentId);
 
@@ -116,12 +119,13 @@ public class AppAssessmentServices {
 			List<StudentAssessment> allStudentAssessment = studentAssessmentServices
 					.getStudentAssessmentForUser(istarUserId, assessmentId);
 
+			if(allStudentAssessment.size()>0){
 			int totalNumberOfQuestions = allStudentAssessment.size();
 			Integer totalNumberOfCorrectlyAnsweredQuestions = getNumberOfCorrectlyAnsweredQuestions(istarUserId,
 					assessment.getId());
 			Integer numberOfUsersAttemptedTheAssessment = getNumberOfUsersAttemptedTheAssessment(istarUserId,
 					assessment.getId());
-
+			assessmentReportPOJO = new AssessmentReportPOJO();
 			assessmentReportPOJO.setId(assessment.getId());
 			assessmentReportPOJO.setName(assessment.getAssessmenttitle());
 			assessmentReportPOJO.setTotalNumberOfQuestions(totalNumberOfQuestions);
@@ -135,9 +139,58 @@ public class AppAssessmentServices {
 			assessmentReportPOJO.calculateTotalScore();
 			assessmentReportPOJO.calculateUserScore();
 			assessmentReportPOJO.calculateAccuracy();
-
+			}
 		}
 		return assessmentReportPOJO;
+	}
+	
+	public AssessmentResponsePOJO getAssessmentResponseOfUser(int assessmentId, int istarUserId){
+		
+		AssessmentResponsePOJO assessmentResponsePOJO = new AssessmentResponsePOJO();
+		StudentAssessmentServices studentAssessmentServices = new StudentAssessmentServices();
+		List<StudentAssessment> allStudentAssessments = studentAssessmentServices
+				.getStudentAssessmentForUser(istarUserId, assessmentId);
+		List<QuestionResponsePOJO> allQuestionsResponse = new ArrayList<QuestionResponsePOJO>();
+
+		if(allStudentAssessments.size()>0){
+		for (StudentAssessment studentAssessment : allStudentAssessments) {
+			QuestionResponsePOJO questionResponsePOJO = new QuestionResponsePOJO();
+			List<Integer> markedOptions = new ArrayList<Integer>();
+			questionResponsePOJO.setQuestionId(studentAssessment.getQuestion().getId());
+
+			List<AssessmentOption> allOptionsOfQuestion = new ArrayList<AssessmentOption>(
+					studentAssessment.getQuestion().getAssessmentOptions());
+
+			for (int i = 0; i < 5; i++) {
+				if (i == 0 && studentAssessment.getOption1()) {
+					markedOptions.add(allOptionsOfQuestion.get(i).getId());
+				}
+
+				if (i == 1 && studentAssessment.getOption2()) {
+					markedOptions.add(allOptionsOfQuestion.get(i).getId());
+				}
+
+				if (i == 2 && studentAssessment.getOption3()) {
+					markedOptions.add(allOptionsOfQuestion.get(i).getId());
+				}
+
+				if (i == 3 && studentAssessment.getOption4()) {
+					markedOptions.add(allOptionsOfQuestion.get(i).getId());
+				}
+
+				if (i == 4 && studentAssessment.getOption5()) {
+					markedOptions.add(allOptionsOfQuestion.get(i).getId());
+				}
+			}
+			questionResponsePOJO.setOptions(markedOptions);
+			questionResponsePOJO.setDuration(studentAssessment.getTimeTaken());
+			allQuestionsResponse.add(questionResponsePOJO);
+			}
+		assessmentResponsePOJO = new AssessmentResponsePOJO();
+		assessmentResponsePOJO.setId(assessmentId);
+		assessmentResponsePOJO.setResponse(allQuestionsResponse);
+		}
+		return assessmentResponsePOJO;
 	}
 
 	public HashMap<String, Object> calculateBatchAverageOfAssessment(Assessment assessment, Integer istarUserId,

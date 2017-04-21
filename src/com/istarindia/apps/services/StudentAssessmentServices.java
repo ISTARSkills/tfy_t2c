@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -74,6 +75,25 @@ public class StudentAssessmentServices {
 		}
 		return studentAssessment;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Integer> getAllAssessmentsAttemptedByUser(int istarUserId){
+	
+		List<Integer> allAssessmentIds = new ArrayList<Integer>();
+		
+		String sql = "select distinct assessment_id from student_assessment where student_id= :istarUserId";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+
+		SQLQuery query = session.createSQLQuery(sql);
+		query.setParameter("istarUserId", istarUserId);
+		
+		allAssessmentIds = query.list();
+
+		return allAssessmentIds;
+	}
+	
 	
 	@SuppressWarnings("unchecked")
 	public List<StudentAssessment> getStudentAssessmentForUser(int istarUserId, int assessmentId) {

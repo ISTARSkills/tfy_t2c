@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.istarindia.android.pojo.AssessmentPOJO;
 import com.istarindia.android.pojo.TaskSummaryPOJO;
 import com.istarindia.android.utility.AppDashboardUtility;
@@ -55,7 +56,7 @@ public class RESTDashboardService {
 				}
 			}
 			
-			Gson gson = new Gson();
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(allTaskSummary);
 			
 			return Response.ok(result).build();

@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 import com.istarindia.android.pojo.AssessmentPOJO;
 import com.istarindia.android.pojo.AssessmentReportPOJO;
+import com.istarindia.android.pojo.AssessmentResponsePOJO;
 import com.istarindia.android.pojo.QuestionResponsePOJO;
 import com.istarindia.android.utility.AppContentServiceUtility;
 import com.istarindia.android.utility.AppPOJOUtility;
@@ -23,7 +24,6 @@ import com.istarindia.apps.services.AppAssessmentServices;
 import com.istarindia.apps.services.AppBatchStudentsServices;
 import com.istarindia.apps.services.StudentAssessmentServices;
 import com.viksitpro.core.dao.entities.Assessment;
-import com.viksitpro.core.dao.entities.AssessmentOption;
 import com.viksitpro.core.dao.entities.BatchGroup;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Question;
@@ -157,46 +157,40 @@ public class RESTAssessmentService {
 			@PathParam("assessmentId") int assessmentId) {
 
 		try {
-			StudentAssessmentServices studentAssessmentServices = new StudentAssessmentServices();
-			List<StudentAssessment> allStudentAssessments = studentAssessmentServices
-					.getStudentAssessmentForUser(userId, assessmentId);
-			List<QuestionResponsePOJO> allQuestionsResponse = new ArrayList<QuestionResponsePOJO>();
+			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
+			AssessmentResponsePOJO response = appAssessmentServices.getAssessmentResponseOfUser(assessmentId, userId);
 
-			for (StudentAssessment studentAssessment : allStudentAssessments) {
-				QuestionResponsePOJO questionResponsePOJO = new QuestionResponsePOJO();
-				List<Integer> markedOptions = new ArrayList<Integer>();
-				questionResponsePOJO.setQuestionId(studentAssessment.getQuestion().getId());
+			Gson gson = new Gson();
+			String result = gson.toJson(response);
 
-				List<AssessmentOption> allOptionsOfQuestion = new ArrayList<AssessmentOption>(
-						studentAssessment.getQuestion().getAssessmentOptions());
+			return Response.ok(result).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@GET
+	@Path("results")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getUserResponseOfAllAssessment(@PathParam("userId") int userId) {
 
-				for (int i = 0; i < 5; i++) {
-					if (i == 0 && studentAssessment.getOption1()) {
-						markedOptions.add(allOptionsOfQuestion.get(i).getId());
-					}
-
-					if (i == 1 && studentAssessment.getOption2()) {
-						markedOptions.add(allOptionsOfQuestion.get(i).getId());
-					}
-
-					if (i == 2 && studentAssessment.getOption3()) {
-						markedOptions.add(allOptionsOfQuestion.get(i).getId());
-					}
-
-					if (i == 3 && studentAssessment.getOption4()) {
-						markedOptions.add(allOptionsOfQuestion.get(i).getId());
-					}
-
-					if (i == 4 && studentAssessment.getOption5()) {
-						markedOptions.add(allOptionsOfQuestion.get(i).getId());
-					}
+		try {
+			List<AssessmentResponsePOJO> allResponse = new ArrayList<AssessmentResponsePOJO>();
+			
+			StudentAssessmentServices studentAssessmentServices= new StudentAssessmentServices();
+			List<Integer> allAssessmentIds = studentAssessmentServices.getAllAssessmentsAttemptedByUser(userId);
+			
+			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
+			
+			for(Integer assessmentId : allAssessmentIds){
+				AssessmentResponsePOJO response = appAssessmentServices.getAssessmentResponseOfUser(assessmentId, userId);
+				if(response!=null){
+					allResponse.add(response);
 				}
-				questionResponsePOJO.setOptions(markedOptions);
-				questionResponsePOJO.setDuration(studentAssessment.getTimeTaken());
-				allQuestionsResponse.add(questionResponsePOJO);
 			}
 			Gson gson = new Gson();
-			String result = gson.toJson(allQuestionsResponse);
+			String result = gson.toJson(allResponse);
 
 			return Response.ok(result).build();
 		} catch (Exception e) {
@@ -215,6 +209,36 @@ public class RESTAssessmentService {
 		AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReport(userId, assessmentId);
 		Gson gson = new Gson();
 		String result = gson.toJson(assessmentReportPOJO);
+
+		return Response.ok(result).build();
+		}catch(Exception e){
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@GET
+	@Path("reports")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllAssessmentReportOfUser(@PathParam("userId") int userId){
+		
+		try{
+			List<AssessmentReportPOJO> allAssessmentReport = new ArrayList<AssessmentReportPOJO>();
+			
+			StudentAssessmentServices studentAssessmentServices= new StudentAssessmentServices();
+			List<Integer> allAssessmentIds = studentAssessmentServices.getAllAssessmentsAttemptedByUser(userId);
+			
+			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
+			
+			for(Integer assessmentId : allAssessmentIds){
+				AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReport(userId, assessmentId);
+				if(assessmentReportPOJO!=null){
+					allAssessmentReport.add(assessmentReportPOJO);	
+				}
+			}
+
+		Gson gson = new Gson();
+		String result = gson.toJson(allAssessmentReport);
 
 		return Response.ok(result).build();
 		}catch(Exception e){
