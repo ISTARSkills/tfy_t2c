@@ -1,5 +1,6 @@
 package com.istarindia.apps.services;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -131,10 +132,11 @@ public class AppAssessmentServices {
 			assessmentReportPOJO.setTotalNumberOfQuestions(totalNumberOfQuestions);
 			assessmentReportPOJO.setTotalNumberOfCorrectlyAnsweredQuestions(totalNumberOfCorrectlyAnsweredQuestions);
 			assessmentReportPOJO.setSkillsReport(allSkillsReport);
-			assessmentReportPOJO.setBatchAverage((Double) calculateBatchAverageOfAssessment(assessment, istarUserId,
-					numberOfUsersAttemptedTheAssessment).get("batchAverage"));
-			assessmentReportPOJO.setTotalNumberOfUsersInBatch((Integer) calculateBatchAverageOfAssessment(assessment,
-					istarUserId, numberOfUsersAttemptedTheAssessment).get("totalStudents"));
+			
+			HashMap<String, Object> batchAverageMap = calculateBatchAverageOfAssessment(assessment, istarUserId);
+			
+			assessmentReportPOJO.setBatchAverage((Double) batchAverageMap.get("batchAverage"));
+			assessmentReportPOJO.setTotalNumberOfUsersInBatch((Integer) batchAverageMap.get("totalStudents"));
 			assessmentReportPOJO.setUsersAttemptedCount(numberOfUsersAttemptedTheAssessment);
 			assessmentReportPOJO.calculateTotalScore();
 			assessmentReportPOJO.calculateUserScore();
@@ -161,7 +163,7 @@ public class AppAssessmentServices {
 			List<AssessmentOption> allOptionsOfQuestion = new ArrayList<AssessmentOption>(
 					studentAssessment.getQuestion().getAssessmentOptions());
 
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < allOptionsOfQuestion.size(); i++) {
 				if (i == 0 && studentAssessment.getOption1()) {
 					markedOptions.add(allOptionsOfQuestion.get(i).getId());
 				}
@@ -193,7 +195,7 @@ public class AppAssessmentServices {
 		return assessmentResponsePOJO;
 	}
 
-	public HashMap<String, Object> calculateBatchAverageOfAssessment(Assessment assessment, Integer istarUserId,
+/*	public HashMap<String, Object> calculateBatchAverageOfAssessment(Assessment assessment, Integer istarUserId,
 			Integer numberOfUsersAttemptedTheAssessment) {
 
 		Double batchAverage = 0.0;
@@ -223,8 +225,38 @@ public class AppAssessmentServices {
 		batchMap.put("totalStudents", totalStudentsInBatch);
 		
 		return batchMap;
-	}
+	}*/
 
+	public HashMap<String, Object> calculateBatchAverageOfAssessment(Assessment assessment, Integer istarUserId) {
+
+		Double batchAverage = 0.0;
+		Integer totalStudentsInBatch = 0;
+		HashMap<String, Object> batchMap = new HashMap<String, Object>();
+		
+		String sql = "select COALESCE(sum(total_points)/count(batch_assessment.istar_user),0), COALESCE(cast(count(batch_assessment.istar_user) as integer),0) as total_students from (select user_gamification.istar_user, sum(user_gamification.points) as total_points, sum(user_gamification.coins) as total_coins from assessment,user_gamification where user_gamification.item_id=assessment.id and assessment.id= :assessmentId and user_gamification.istar_user in (select student_id from batch_students where batch_group_id in (select batch_group_id from batch_students where batch_students.student_id= :istarUserId)) group by user_gamification.istar_user order by total_points desc) as batch_assessment";
+
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		SQLQuery query = session.createSQLQuery(sql);
+		query.setParameter("istarUserId",istarUserId);
+		query.setParameter("assessmentId",assessment.getId());
+		
+		List results = query.list();
+		
+		if(results.size() > 0){
+			Object[] batchData = (Object[]) query.list().get(0);
+			
+			batchAverage = (Double) batchData[0];
+			totalStudentsInBatch = (Integer) batchData[1];
+			
+		}
+		batchMap.put("batchAverage", batchAverage);
+		batchMap.put("totalStudents", totalStudentsInBatch);
+		
+		return batchMap;
+	}
+	
 	public Integer getNumberOfUsersAttemptedTheAssessment(int istarUserId, int assessmentId) {
 
 		String sql = "select COALESCE(cast (count(DISTINCT istar_user)  as integer),0) from user_gamification where istar_user in "

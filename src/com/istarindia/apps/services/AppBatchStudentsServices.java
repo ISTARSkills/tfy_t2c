@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -73,19 +74,24 @@ public class AppBatchStudentsServices {
 		return batchGroup;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<IstarUser> getBatchColleaguesOfUsers(Integer istarUserId){
 		
-		List<IstarUser> allUsersOfABatch = new ArrayList<IstarUser>();		
-		List<BatchStudents> allbatchStudents = getBatchStudentsOfUser(istarUserId);
-				
-		if(allbatchStudents.size()>0){
-			BatchGroup batchGroup = allbatchStudents.get(0).getBatchGroup();
-			
-			for(BatchStudents batchStudent : getBatchStudentsOfABatchGroup(batchGroup)){				
-				allUsersOfABatch.add(batchStudent.getIstarUser());
-			}	
+		List<IstarUser> batchStudents = new ArrayList<IstarUser>();
+		
+		String sql = "select bs2.student_id from batch_students bs1 inner join batch_students bs2 on bs1.batch_group_id=bs2.batch_group_id where bs1.student_id= :istarUserId";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+
+		SQLQuery query = session.createSQLQuery(sql);
+
+		List<Integer> batchStudentIds = query.list();
+		IstarUserServices istarUserServices = new IstarUserServices();
+		for(Integer studentId : batchStudentIds){
+			batchStudents.add(istarUserServices.getIstarUser(studentId));
 		}
-		return allUsersOfABatch;		
+		return batchStudents;		
 	}	
 	
 	@SuppressWarnings("unchecked")

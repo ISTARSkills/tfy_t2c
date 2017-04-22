@@ -16,11 +16,13 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.istarindia.android.pojo.ComplexObject;
 import com.istarindia.android.pojo.SkillReportPOJO;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.android.utility.AppUtility;
 import com.istarindia.apps.services.AppBatchStudentsServices;
+import com.istarindia.apps.services.AppComplexObjectServices;
 import com.istarindia.apps.services.AppServices;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Role;
@@ -84,7 +86,7 @@ public class RESTIstarUserService {
 
 			if (istarUser == null) {
 				// User does not exists
-				return Response.status(404).build();
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 			} else {
 				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
@@ -258,6 +260,27 @@ public class RESTIstarUserService {
 		}
 	}
 
+	@GET
+	@Path("{userId}/complex")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getComplexObject(@PathParam("userId") int istarUserId){
+		try{			
+			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
+			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(istarUserId);
+						
+			if(complexObject!=null){				
+				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+				String result = gson.toJson(complexObject);
+
+				return Response.ok(result).build();
+			}else{
+				throw new Exception();
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
 	/*
 	 * @GET
 	 * 

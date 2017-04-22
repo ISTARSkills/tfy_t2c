@@ -99,7 +99,7 @@ public class AppCourseServices {
 							cmsessionPOJO.setId(lesson.getId());
 							cmsessionPOJO.setType("LESSON_"+lesson.getType());
 							cmsessionPOJO.setItem(lessonPOJO);
-							cmsessionPOJO.setOrderId(lesson.getOrderId());
+							cmsessionPOJO.setOrderId(studentPlaylist.getId());
 							cmsessionPOJO.setStatus(studentPlaylist.getStatus());
 							allLessons.add(cmsessionPOJO);
 						}
