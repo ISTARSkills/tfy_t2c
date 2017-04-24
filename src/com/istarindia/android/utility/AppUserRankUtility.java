@@ -159,7 +159,7 @@ public class AppUserRankUtility {
 		List results = query.list();
 		
 		if(results.size() > 0){
-		Object[] studentData = (Object[]) query.list().get(0);
+		Object[] studentData = (Object[]) results.get(0);
 		
 		Integer istarUserInBatchId = (Integer) studentData[0];
 		Integer points = (Integer) studentData[1];

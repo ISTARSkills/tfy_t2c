@@ -42,7 +42,7 @@ public class UserGamificationServices {
 	@SuppressWarnings("unchecked")
 	public List<UserGamification> getUserGamificationsOfUserForItem(int istarUserId, int itemId, String itemType){
 		
-		String hql = "from UserGamification userGamification where istarUser.id= :istarUser and itemId= :itemId and itemType= :itemType";
+		String hql = "from UserGamification userGamification where istarUser.id= :istarUser and itemId= :itemId and itemType= :itemType order by itemId";
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
@@ -50,6 +50,23 @@ public class UserGamificationServices {
 		Query query = session.createQuery(hql);
 		query.setParameter("istarUser",istarUserId);
 		query.setParameter("itemId", itemId);
+		query.setParameter("itemType", itemType);
+		
+		List<UserGamification> allUserGamifications = query.list();
+				
+		return allUserGamifications;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<UserGamification> getUserGamificationsOfUserForItemType(int istarUserId, String itemType){
+		
+		String hql = "from UserGamification userGamification where istarUser.id= :istarUser and itemType= :itemType order by itemId";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		Query query = session.createQuery(hql);
+		query.setParameter("istarUser",istarUserId);
 		query.setParameter("itemType", itemType);
 		
 		List<UserGamification> allUserGamifications = query.list();

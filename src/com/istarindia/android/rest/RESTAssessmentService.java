@@ -223,20 +223,9 @@ public class RESTAssessmentService {
 	public Response getAllAssessmentReportOfUser(@PathParam("userId") int userId){
 		
 		try{
-			List<AssessmentReportPOJO> allAssessmentReport = new ArrayList<AssessmentReportPOJO>();
-			
-			StudentAssessmentServices studentAssessmentServices= new StudentAssessmentServices();
-			List<Integer> allAssessmentIds = studentAssessmentServices.getAllAssessmentsAttemptedByUser(userId);
-			
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
+			List<AssessmentReportPOJO> allAssessmentReport = appAssessmentServices.getAllAssessmentReportsOfUser(userId);
 			
-			for(Integer assessmentId : allAssessmentIds){
-				AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReport(userId, assessmentId);
-				if(assessmentReportPOJO!=null){
-					allAssessmentReport.add(assessmentReportPOJO);	
-				}
-			}
-
 		Gson gson = new Gson();
 		String result = gson.toJson(allAssessmentReport);
 

@@ -4,17 +4,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 
 import com.istarindia.android.pojo.CmsessionPOJO;
-import com.istarindia.android.pojo.CmsessionSkillObjectivePOJO;
 import com.istarindia.android.pojo.CoursePOJO;
 import com.istarindia.android.pojo.LessonPOJO;
 import com.istarindia.android.pojo.ModulePOJO;
@@ -27,14 +24,12 @@ import com.viksitpro.core.dao.entities.Cmsession;
 import com.viksitpro.core.dao.entities.CmsessionDAO;
 import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.CourseDAO;
-import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Module;
 import com.viksitpro.core.dao.entities.ModuleDAO;
 import com.viksitpro.core.dao.entities.SkillObjective;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
-import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
 public class AppCourseServices {
 
@@ -45,6 +40,7 @@ public class AppCourseServices {
 	
 	
 	public CoursePOJO getCourseOfUser(int istarUserId, int courseId){
+	//	long previousTime = System.currentTimeMillis();
 		CoursePOJO coursePOJO = null;
 		StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 		AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
@@ -52,17 +48,20 @@ public class AppCourseServices {
 		if(course!=null){
 			coursePOJO = new CoursePOJO();
 			
-			List<Integer> lessonsForUser = studentPlaylistServices.getLessonsOfUserForCourse(istarUserId, courseId);
-			
+			HashMap<Integer, Integer> lessonsPlaylistForUser = studentPlaylistServices.getLessonsOfUserForCourse(istarUserId, courseId);
+		//	System.err.println("1->" + "Time->"+(System.currentTimeMillis()-previousTime));
+
 			coursePOJO.setId(course.getId());
 			coursePOJO.setCategory(course.getCategory());
 			coursePOJO.setDescription(course.getCourseDescription());
 			coursePOJO.setImageURL(course.getImage_url());
 			coursePOJO.setName(course.getCourseName());				
-			coursePOJO.setTotalPoints(getTotalPointsOfCourseForUser(istarUserId, courseId));
+			coursePOJO.setTotalPoints(getTotalPointsOfCourseForUser(istarUserId, courseId, lessonsPlaylistForUser.size()));
+		//	System.err.println("2->" + "Time->"+(System.currentTimeMillis()-previousTime));
 			coursePOJO.setProgress(getProgressOfUserForCourse(istarUserId, courseId));
+		//	System.err.println("3->" + "Time->"+(System.currentTimeMillis()-previousTime));
 			StudentRankPOJO studentRankPOJO = appUserRankUtility.getStudentRankPOJOForCourseOfAUser(istarUserId, coursePOJO.getId());
-			
+		//	System.err.println("4->" + "Time->"+(System.currentTimeMillis()-previousTime));
 			if(studentRankPOJO!=null){
 				coursePOJO.setUserPoints(studentRankPOJO.getPoints()*1.0);
 				coursePOJO.setRank(studentRankPOJO.getBatchRank());
@@ -79,11 +78,12 @@ public class AppCourseServices {
 				modulePOJO.setOrderId(module.getOrderId());
 				
 				List<CmsessionPOJO> allLessons = new ArrayList<CmsessionPOJO>();
-				for(Cmsession cmsession : getCmsessionsOfCourse(module.getId())){
+				for(Cmsession cmsession : getCmsessionsOfModule(module.getId())){
 					
 					for(Lesson lesson : getLessonsOfCmsession(cmsession.getId())){						
-						StudentPlaylist studentPlaylist = studentPlaylistServices.getStudentPlaylistOfUserForLessonOfCourse(istarUserId, course.getId(), lesson.getId());						
-						if(lessonsForUser.contains(lesson.getId()) && studentPlaylist!=null){
+						if(lessonsPlaylistForUser.containsKey(lesson.getId())){
+							StudentPlaylist studentPlaylist = studentPlaylistServices.getStudentPlaylist(lessonsPlaylistForUser.get(lesson.getId()));
+							
 							CmsessionPOJO cmsessionPOJO = new CmsessionPOJO();
 							LessonPOJO lessonPOJO = new LessonPOJO();
 							lessonPOJO.setId(lesson.getId());
@@ -117,14 +117,16 @@ public class AppCourseServices {
 				allModules.add(modulePOJO);
 			}
 			coursePOJO.setModules(allModules);
+		//	System.err.println("4000 END->" + "Time->"+(System.currentTimeMillis()-previousTime));
 		}
 		return coursePOJO;
 	}
 	
 	public List<SkillReportPOJO> getSkillsReportForCourseOfUser(int istarUserId, int courseId){
-		
+		//long previousTime = System.currentTimeMillis();
+		//System.err.println("500000000->" + "Time->"+(System.currentTimeMillis()-previousTime));
 		List<SkillReportPOJO> allSkillsReport = new ArrayList<SkillReportPOJO>();
-		
+		HashMap<Integer, HashMap<String, Object>> skillsMap = getPointsAndCoinsOfCmsessionSkillsOfCourseForUser(istarUserId, courseId);
 		Course course = getCourse(courseId);
 		
 		for(Module module : course.getModules()){			
@@ -149,12 +151,11 @@ public class AppCourseServices {
 							
 							cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
 							cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
+							//System.err.println("5->" + "Time->"+(System.currentTimeMillis()-previousTime));
 							cmsessionSkillReportPOJO.setTotalPoints(getMaxPointsOfCmsessionSkill(cmsessionSkillObjective.getId()));
-							
-							HashMap<String, Object> map = getPointsAndCoinsOfUserForCmsessionSkillOfCourse(istarUserId, cmsessionSkillObjective.getId(), course.getId());
-					          
-					          if(map.containsKey("points")){
-					            cmsessionSkillReportPOJO.setUserPoints((Double) map.get("points"));
+							//System.err.println("6->" + "Time->"+(System.currentTimeMillis()-previousTime));
+					          if(skillsMap.containsKey(cmsessionSkillObjective.getId())){
+					            cmsessionSkillReportPOJO.setUserPoints((Double) skillsMap.get(cmsessionSkillObjective.getId()).get("points"));
 					          }else{
 					            cmsessionSkillReportPOJO.setUserPoints(0.0);
 					          }					          
@@ -172,10 +173,8 @@ public class AppCourseServices {
 		return allSkillsReport;
 	}
 	
-	public Double getTotalPointsOfCourseForUser(int istarUserId, int courseId){
-		
-		StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
-		List<Integer> lessonsForUser = studentPlaylistServices.getLessonsOfUserForCourse(istarUserId, courseId);
+	public Double getTotalPointsOfCourseForUser(int istarUserId, int courseId, int numberOfLessons){
+
 		Integer benchmark= 0;
 				try{
 					Properties properties = new Properties();
@@ -190,7 +189,7 @@ public class AppCourseServices {
 						e.printStackTrace();
 					}
 		
-		Double totalPoints = getMaxPointsOfCourseFromAssessment(courseId) + lessonsForUser.size()*benchmark;
+		Double totalPoints = getMaxPointsOfCourseFromAssessment(courseId) + numberOfLessons*benchmark;
 		return totalPoints;
 	}
 	
@@ -221,6 +220,33 @@ public class AppCourseServices {
 			map.put("coins", coins);
 		}		
 		return map;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public HashMap<Integer, HashMap<String, Object>> getPointsAndCoinsOfCmsessionSkillsOfCourseForUser(int istarUserId, int courseId){
+		
+		HashMap<Integer, HashMap<String, Object>> skillsMap = new HashMap<Integer, HashMap<String, Object>>();
+
+		String sql = "select COALESCE(sum(points),0) as points, COALESCE(cast(sum(coins) as integer),0) as coins, skill_objective from user_gamification where istar_user= :istarUserId and item_id in (select id from assessment where course_id= :courseId) group by skill_objective";
+
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		SQLQuery query = session.createSQLQuery(sql);
+		query.setParameter("istarUserId", istarUserId);
+		query.setParameter("courseId", courseId);
+		
+		List<Object[]> result = query.list();
+		
+		for(Object[] obj : result){
+			HashMap<String, Object> map = new HashMap<String, Object>();
+
+			map.put("points", (Double) obj[0]);
+			map.put("coins", (Integer) obj[1]);
+			
+			skillsMap.put((Integer)obj[2], map);
+		}
+		return skillsMap;
 	}
 /*	
 	public Double calculateMaxPointsForCmsession(int cmsessionSkillObjectiveId){
@@ -346,7 +372,7 @@ public class AppCourseServices {
 	
 	
 	@SuppressWarnings("unchecked")
-	public List<Cmsession> getCmsessionsOfCourse(int moduleId){
+	public List<Cmsession> getCmsessionsOfModule(int moduleId){
 		
 		List<Cmsession> allCmsessions = new ArrayList<Cmsession>();
 		

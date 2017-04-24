@@ -1,5 +1,6 @@
 package com.istarindia.apps.services;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -40,7 +41,7 @@ public class StudentPlaylistServices {
 	
 	@SuppressWarnings("unchecked")
 	public StudentPlaylist getStudentPlaylistOfUserForLessonOfCourse(int istarUserId, int courseId, int lessonId){
-		
+		long previousTime = System.currentTimeMillis();
 		String hql = "from StudentPlaylist studentPlaylist where istarUser.id= :istarUserId and course.id= :courseId and lesson.id= :lessonId";
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
@@ -54,6 +55,7 @@ public class StudentPlaylistServices {
 		List<StudentPlaylist> allStudentPlaylist = query.list();
 
 		if(allStudentPlaylist.size()>0){
+			System.err.println("getStudentPlaylistOfUserForLessonOfCourse->" + "Time->"+(System.currentTimeMillis()-previousTime));
 			return allStudentPlaylist.get(0);
 		}else{
 			return null;
@@ -77,9 +79,11 @@ public class StudentPlaylistServices {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Integer> getLessonsOfUserForCourse(int istarUserId, int courseId){
+	public HashMap<Integer, Integer> getLessonsOfUserForCourse(int istarUserId, int courseId){
 		
-		String sql = "select distinct lesson_id from student_playlist where student_id= :istarUserId and course_id= :courseId";
+		HashMap<Integer, Integer> lessonPlaylists = new HashMap<Integer, Integer>();
+		
+		String sql = "select distinct lesson_id, id from student_playlist where student_id= :istarUserId and course_id= :courseId";
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
@@ -88,9 +92,12 @@ public class StudentPlaylistServices {
 		query.setParameter("istarUserId",istarUserId);
 		query.setParameter("courseId",courseId);
 		
-		List<Integer> allLessons = query.list();
+		List<Object[]> result = query.list();
 		
-		return allLessons;		
+		for(Object[] obj : result){
+			lessonPlaylists.put((Integer)obj[0], (Integer)obj[1]); 
+		}		
+		return lessonPlaylists;		
 	}
 	
 	@SuppressWarnings("unchecked")
