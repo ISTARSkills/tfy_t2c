@@ -12,6 +12,7 @@ import com.istarindia.android.pojo.ComplexObject;
 import com.istarindia.android.pojo.CoursePOJO;
 import com.istarindia.android.pojo.CourseRankPOJO;
 import com.istarindia.android.pojo.DailyTaskPOJO;
+import com.istarindia.android.pojo.NotificationPOJO;
 import com.istarindia.android.pojo.SkillReportPOJO;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.pojo.TaskSummaryPOJO;
@@ -142,6 +143,11 @@ public class AppComplexObjectServices {
 			List<DailyTaskPOJO> allTaskEvents = appCalendarServices.getAllTask(userId);
 			complexObject.setEvents(allTaskEvents);		
 			System.err.println("complexObject allTaskEvents->" + allTaskEvents.size() + "Time->" + (System.currentTimeMillis()-previousTime));
+			
+			AppNotificationServices appNotificationServices = new AppNotificationServices();
+			List<NotificationPOJO> allNotifications = appNotificationServices.getNotificationsForUser(userId);
+			complexObject.setNotifications(allNotifications);
+			System.err.println("complexObject allNotifications->" + allNotifications.size() + "Time->" + (System.currentTimeMillis()-previousTime));
 		}
 		return complexObject;
 	}	

@@ -19,6 +19,7 @@ public class ComplexObject {
 	private List<CoursePOJO> courses;
 	private List<CourseRankPOJO> leaderboards;
 	private List<DailyTaskPOJO> events;
+	private List<NotificationPOJO> notifications;
 	
 	public ComplexObject(){
 		
@@ -112,5 +113,14 @@ public class ComplexObject {
 
 	public void setEvents(List<DailyTaskPOJO> events) {
 		this.events = events;
+	}
+
+	@XmlElement(name = "notifications", required = false)
+	public List<NotificationPOJO> getNotifications() {
+		return notifications;
+	}
+
+	public void setNotifications(List<NotificationPOJO> notifications) {
+		this.notifications = notifications;
 	}
 }
