@@ -1,10 +1,16 @@
 package com.istarindia.android.utility;
 
+import java.util.List;
+
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+
 import com.istarindia.android.pojo.AssessmentPOJO;
 import com.istarindia.android.pojo.TaskSummaryPOJO;
 import com.istarindia.apps.services.AppAssessmentServices;
 import com.istarindia.apps.services.AppCourseServices;
 import com.viksitpro.core.dao.entities.Assessment;
+import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Task;
 
@@ -80,15 +86,22 @@ public class AppDashboardUtility {
 		return assessmentPOJO;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public String getLessonForTask(Task task) {
 
-		int itemId = task.getItemId();
-		AppCourseServices appCourseServices = new AppCourseServices();
-		Lesson lesson = appCourseServices.getLesson(itemId);
-
 		String lessonXML = null;
-		if (lesson != null) {
-			lessonXML = lesson.getLessonXml();
+		
+		String sql = "select cast(lesson_xml as varchar) from lesson where id= :itemId";
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+
+		SQLQuery query = session.createSQLQuery(sql);
+		query.setParameter("itemId", task.getItemId());
+
+		List<String> results = query.list();
+		
+		if(results.size()>0){
+			lessonXML = results.get(0);
 		}
 		return lessonXML;
 	}
