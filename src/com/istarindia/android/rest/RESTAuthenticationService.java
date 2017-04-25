@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppPOJOUtility;
+import com.istarindia.apps.services.AppEncryptionService;
 import com.istarindia.apps.services.AppServices;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Role;
@@ -41,18 +42,16 @@ public class RESTAuthenticationService {
 			AppServices appServices = new AppServices();
 			istarUser = appServices.assignToken(istarUser);
 
-			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+/*			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
-			System.out.println("Returing system profile");
-
-			//Gson gson = new Gson();
 			
-
 			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(studentProfile);
 
-			return Response.ok(result).build();
+			return Response.ok(result).build();*/
+			AppEncryptionService appEncryptionService = new AppEncryptionService();
+			return Response.ok(appEncryptionService.encrypt(istarUser.getAuthToken())).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -93,14 +92,16 @@ public class RESTAuthenticationService {
 			AppServices appServices = new AppServices();
 			istarUser = appServices.assignToken(istarUser);
 
-			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+/*			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 			System.out.println("Returing system profile");
 
 			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(studentProfile);
 
-			return Response.ok(result).build();
+			return Response.ok(result).build();*/
+			AppEncryptionService appEncryptionService = new AppEncryptionService();
+			return Response.ok(appEncryptionService.encrypt(istarUser.getAuthToken())).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.UNAUTHORIZED).build();

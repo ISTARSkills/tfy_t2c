@@ -75,6 +75,7 @@ public class RESTIstarUserService {
 		}
 	}
 
+	@AppSecured
 	@GET
 	@Path("{userId}")
 	@Produces(MediaType.APPLICATION_JSON)

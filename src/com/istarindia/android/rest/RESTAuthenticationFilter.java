@@ -10,10 +10,11 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
+import com.istarindia.apps.services.AppEncryptionService;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
-@RESTSecured
+@AppSecured
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class RESTAuthenticationFilter implements ContainerRequestFilter{
@@ -24,15 +25,22 @@ public class RESTAuthenticationFilter implements ContainerRequestFilter{
 		String httpAuthorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 		System.out.println(httpAuthorizationHeader);
 		try{
-		if(httpAuthorizationHeader==null || !httpAuthorizationHeader.startsWith("oxygen")){
-			System.out.println("Invalid Header");
-			throw new Exception();
-		}
-		
-		String authenticationToken = httpAuthorizationHeader.substring("oxygen".length()).trim();
-		System.out.println(authenticationToken);
-		validateToken(4013, authenticationToken);
-		
+			if(httpAuthorizationHeader==null){
+				throw new Exception();
+			}
+				AppEncryptionService appEncryptionService = new AppEncryptionService();
+				String decryptedValue = appEncryptionService.decrypt(httpAuthorizationHeader);
+				
+				String token = decryptedValue.substring(0, 20); //authorizationToken
+				String istarUserIdAsString = decryptedValue.substring(20); //IStarUserId
+				Integer istarUserId = Integer.parseInt(istarUserIdAsString);
+				
+				boolean isAuthorized = validateToken(istarUserId, token);
+				
+				if(!isAuthorized){
+					throw new Exception();
+				}				
+	
 		}catch(Exception e){
 			e.printStackTrace();
 			requestContext.abortWith(
@@ -47,12 +55,12 @@ public class RESTAuthenticationFilter implements ContainerRequestFilter{
 		IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
 
 		System.out.println(istarUser.getEmail());
-		System.out.println("DB Token: "+istarUser.getAuthToken());
+		System.out.println("DB Token: "+istarUser.getAuthToken() + "REQUEST Token->" + authenticationToken);
 		if (istarUser == null || !istarUser.getAuthToken().equals(authenticationToken)) {
 			throw new Exception();
 		}
 		
-		System.out.println("Validated");
+		System.out.println("Request Validated");
 		return isValid;
 	}
 }
