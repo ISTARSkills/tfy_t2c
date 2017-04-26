@@ -23,7 +23,6 @@ import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.dao.utils.user.RoleServices;
 import com.viksitpro.core.dao.utils.user.UserRoleServices;
 
-@AppSecured
 @Path("auth")
 public class RESTAuthenticationService {
 

@@ -18,7 +18,6 @@ import com.istarindia.apps.services.AppEncryptionService;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
-
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class RESTRequestFilter implements ContainerRequestFilter{
@@ -44,7 +43,7 @@ public class RESTRequestFilter implements ContainerRequestFilter{
 	
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {		
-        
+        System.out.println("Request Recieved-> Decrypting");
 		long previousTime = System.currentTimeMillis();
 		String httpAuthorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 		System.out.println(httpAuthorizationHeader);
@@ -84,6 +83,8 @@ public class RESTRequestFilter implements ContainerRequestFilter{
 				requestContext.abortWith(
 		                Response.status(Response.Status.UNAUTHORIZED).build());
 			}
+		}else{
+			System.out.println("Server is DEv");
 		}
 		System.err.println("REST REQUEST FILTER FOR ENCRYPTION " + "Time->"+(System.currentTimeMillis()-previousTime));
 	}
