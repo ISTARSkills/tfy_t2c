@@ -102,6 +102,7 @@ public class RESTAssessmentService {
 			@PathParam("assessmentId") int assessmentId, @PathParam("taskId") int taskId,
 			List<QuestionResponsePOJO> questionResponses) {
 		try {
+			System.out.println("questionResponses size->"+questionResponses.size());
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
 
