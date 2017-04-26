@@ -32,6 +32,7 @@ import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
+@AppSecured
 @Path("assessments/user/{userId}")
 public class RESTAssessmentService {
 

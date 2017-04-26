@@ -23,6 +23,7 @@ import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.dao.utils.user.RoleServices;
 import com.viksitpro.core.dao.utils.user.UserRoleServices;
 
+@AppSecured
 @Path("auth")
 public class RESTAuthenticationService {
 
@@ -35,10 +36,7 @@ public class RESTAuthenticationService {
 		IstarUser istarUser = istarUserServices.getIstarUserByEmail(email);
 
 		try {
-			AppEncryptionService appEncryptionService = new AppEncryptionService();
-			String decryptedPassword = appEncryptionService.decrypt(password);
-
-			if (istarUser == null || !istarUser.getPassword().equals(decryptedPassword)) {
+			if (istarUser == null || !istarUser.getPassword().equals(password)) {
 				System.out.println("user is null or password does not match");
 				throw new Exception();
 			}

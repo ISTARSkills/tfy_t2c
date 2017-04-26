@@ -20,6 +20,7 @@ import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.StudentPlaylistServices;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 
+@AppSecured
 @Path("courses/user/{userId}")
 public class RESTCourseService {
 

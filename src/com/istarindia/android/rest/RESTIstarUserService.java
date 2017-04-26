@@ -32,6 +32,7 @@ import com.viksitpro.core.dao.utils.user.RoleServices;
 import com.viksitpro.core.dao.utils.user.UserRoleServices;
 import com.viksitpro.core.pojo.recruiter.IstarUserPOJO;
 
+@AppSecured
 @Path("user")
 public class RESTIstarUserService {
 

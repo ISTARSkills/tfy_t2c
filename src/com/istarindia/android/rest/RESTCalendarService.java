@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.istarindia.android.pojo.DailyTaskPOJO;
 import com.istarindia.apps.services.AppCalendarServices;
 
+@AppSecured
 @Path("calendar/user/{userId}")
 public class RESTCalendarService {
 

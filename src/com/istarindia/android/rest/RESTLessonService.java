@@ -14,6 +14,7 @@ import com.istarindia.apps.services.StudentPlaylistServices;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 
+@AppSecured
 @Path("lessons/user/{userId}")
 public class RESTLessonService {
 

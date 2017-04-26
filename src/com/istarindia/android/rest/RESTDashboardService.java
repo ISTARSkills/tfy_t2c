@@ -22,6 +22,7 @@ import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.utilities.TaskCategory;
 
+@AppSecured
 @Path("tasks/user/{userId}")
 public class RESTDashboardService {
 

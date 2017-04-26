@@ -17,6 +17,7 @@ import com.istarindia.android.pojo.NotificationPOJO;
 import com.istarindia.apps.services.AppNotificationServices;
 import com.viksitpro.core.notification.IstarNotificationServices;
 
+@AppSecured
 @Path("notifications/user/{userId}")
 public class RESTNotificationService {
 

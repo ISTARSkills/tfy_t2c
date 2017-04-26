@@ -23,8 +23,8 @@ import com.viksitpro.core.dao.utils.user.IstarUserServices;
 @Priority(Priorities.AUTHENTICATION)
 public class RESTRequestFilter implements ContainerRequestFilter{
 
-	String serverConfig;
-	
+	private String serverConfig;
+	private static final String LOGIN_AUTHORIZATION_HEADER = "TALENTIFY ROCKS";
 	public RESTRequestFilter(){
 		try{
 			Properties properties = new Properties();
@@ -55,16 +55,19 @@ public class RESTRequestFilter implements ContainerRequestFilter{
 				}
 					AppEncryptionService appEncryptionService = new AppEncryptionService();
 					String decryptedValue = appEncryptionService.decrypt(httpAuthorizationHeader);
-					
-					String token = decryptedValue.substring(0, 20); //authorizationToken
-					String istarUserIdAsString = decryptedValue.substring(20); //IStarUserId
-					Integer istarUserId = Integer.parseInt(istarUserIdAsString);
-					
-					boolean isAuthorized = validateToken(istarUserId, token);
-					
-					if(!isAuthorized){
-						throw new Exception();
+										
+					if(!LOGIN_AUTHORIZATION_HEADER.equals(decryptedValue)){
+						String token = decryptedValue.substring(0, 20); //authorizationToken
+						String istarUserIdAsString = decryptedValue.substring(20); //IStarUserId
+						Integer istarUserId = Integer.parseInt(istarUserIdAsString);
+						
+						boolean isAuthorized = validateToken(istarUserId, token);
+						
+						if(!isAuthorized){
+							throw new Exception();
+						}
 					}
+										
 					System.err.println("REST REQUEST FILTER FOR AUTHORIZATION " + "Time->"+(System.currentTimeMillis()-previousTime));	
 					Scanner encryptedStream = new Scanner(requestContext.getEntityStream());
 					String encryptedString = encryptedStream.hasNext() ? encryptedStream.next() : null;
@@ -74,8 +77,7 @@ public class RESTRequestFilter implements ContainerRequestFilter{
 					System.out.println("decryptedString->"+decryptedString);
 					
 					InputStream decryptedStream = new ByteArrayInputStream(decryptedString.getBytes());
-					requestContext.setEntityStream(decryptedStream);
-	
+					requestContext.setEntityStream(decryptedStream);	
 		
 			}catch(Exception e){
 				e.printStackTrace();
