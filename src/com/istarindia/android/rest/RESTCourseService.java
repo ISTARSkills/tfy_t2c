@@ -23,50 +23,6 @@ import com.viksitpro.core.dao.entities.StudentPlaylist;
 @Path("courses/user/{userId}")
 public class RESTCourseService {
 
-/*	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllCourseOfUser(@PathParam("userId") int istarUserId) {
-
-		try {
-			AppCourseServices appCourseServices = new AppCourseServices();
-			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
-
-			List<CoursePOJO> coursesWithoutModuleStatus = appCourseServices.getCoursesOfUser(istarUserId);
-			List<CoursePOJO> courses = new ArrayList<CoursePOJO>();
-			for(CoursePOJO coursePOJO : coursesWithoutModuleStatus){
-				coursePOJO = coursePOJO.sortModulesAndAssignStatus();
-				
-				coursePOJO.setProgress(appCourseServices.getProgressOfUserForCourse(istarUserId, coursePOJO.getId()));
-				coursePOJO.setTotalPoints(appCourseServices.getMaxPointsOfCourse(coursePOJO.getId()));
-								
-				StudentRankPOJO studentRankPOJO = appUserRankUtility.getStudentRankPOJOForCourseOfAUser(istarUserId, coursePOJO.getId());
-				
-				if(studentRankPOJO!=null){
-					coursePOJO.setUserPoints(studentRankPOJO.getPoints()*1.0);
-					coursePOJO.setRank(studentRankPOJO.getBatchRank());
-				}
-				
-				//coursePOJO.setSkillObjectives(appCourseServices.getSkillsReportForCourseOfUser(istarUserId, coursePOJO.getId()));
-				
-				for(SkillReportPOJO skillReport : coursePOJO.getSkillObjectives()){
-					skillReport.calculateUserPoints();
-					skillReport.calculateTotalPoints();
-					skillReport.calculatePercentage();
-				}				
-				courses.add(coursePOJO);
-			}
-			
-			Gson gson = new Gson();
-			String result = gson.toJson(courses);
-
-			return Response.ok(result).build();
-		}catch(Exception e){
-			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-		}
-	}*/
-	
-	
 	@GET
 	@Path("{courseId}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -75,86 +31,132 @@ public class RESTCourseService {
 			AppCourseServices appCourseServices = new AppCourseServices();
 			CoursePOJO coursePOJO = appCourseServices.getCourseOfUser(istarUserId, courseId);
 			coursePOJO.setSkillObjectives(appCourseServices.getSkillsReportForCourseOfUser(istarUserId, courseId));
-						
+
 			Gson gson = new Gson();
 			String result = gson.toJson(coursePOJO);
 
-			return Response.ok(result).build();
-		}catch(Exception e){
+			return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM).build();
+		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-	
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllCoursesOfUser(@PathParam("userId") int istarUserId) {
 
 		try {
 			List<CoursePOJO> allCoursePOJO = new ArrayList<CoursePOJO>();
-			StudentPlaylistServices studentPlaylistServices= new StudentPlaylistServices();
+			StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 			List<Integer> allCourseId = studentPlaylistServices.getCoursesforUser(istarUserId);
 			AppCourseServices appCourseServices = new AppCourseServices();
-			for(Integer courseId : allCourseId){
+			for (Integer courseId : allCourseId) {
 				CoursePOJO coursePOJO = appCourseServices.getCourseOfUser(istarUserId, courseId);
 				coursePOJO.setSkillObjectives(appCourseServices.getSkillsReportForCourseOfUser(istarUserId, courseId));
 				allCoursePOJO.add(coursePOJO);
 			}
-			
+
 			Gson gson = new Gson();
 			String result = gson.toJson(allCoursePOJO);
 
-			return Response.ok(result).build();
-		}catch(Exception e){
+			return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM).build();
+		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-	
+
 	@GET
 	@Path("leaderboard")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getLeaderboardOfAllCoursesOfUser(@PathParam("userId") int userId){
-		
-		try{			
+	public Response getLeaderboardOfAllCoursesOfUser(@PathParam("userId") int userId) {
+
+		try {
 			StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 			List<StudentPlaylist> allStudentPlaylist = studentPlaylistServices.getStudentPlaylistOfUser(userId);
-			
+
 			Set<Integer> allCourseId = new HashSet<Integer>();
-			
-			for(StudentPlaylist StudentPlaylist : allStudentPlaylist){
+
+			for (StudentPlaylist StudentPlaylist : allStudentPlaylist) {
 				allCourseId.add(StudentPlaylist.getCourse().getId());
 			}
-			
+
 			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
-			List<CourseRankPOJO> allCourseRanks = appUserRankUtility.getCourseRankPOJOForCoursesOfUsersBatch(userId, allCourseId);
-			
+			List<CourseRankPOJO> allCourseRanks = appUserRankUtility.getCourseRankPOJOForCoursesOfUsersBatch(userId,
+					allCourseId);
+
 			Gson gson = new Gson();
 			String result = gson.toJson(allCourseRanks);
-			
-			return Response.ok(result).build();
-		}catch(Exception e){
+
+			return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM).build();
+		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-		}		
+		}
 	}
-	
+
 	@GET
 	@Path("{courseId}/leaderboard")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getLeaderboardOfCoursesOfUser(@PathParam("userId") int userId, @PathParam("courseId") int courseId){
-		
-		try{			
+	public Response getLeaderboardOfCoursesOfUser(@PathParam("userId") int userId,
+			@PathParam("courseId") int courseId) {
+
+		try {
 			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
-			CourseRankPOJO courseRankPOJO = appUserRankUtility.getCourseRankPOJOForCoursesOfUsersBatch(userId, courseId);
-			
+			CourseRankPOJO courseRankPOJO = appUserRankUtility.getCourseRankPOJOForCoursesOfUsersBatch(userId,
+					courseId);
+
 			Gson gson = new Gson();
 			String result = gson.toJson(courseRankPOJO);
-			
-			return Response.ok(result).build();
-		}catch(Exception e){
+
+			return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM).build();
+		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-		}		
+		}
 	}
+
+	/*
+	 * @GET
+	 * 
+	 * @Produces(MediaType.APPLICATION_JSON) public Response
+	 * getAllCourseOfUser(@PathParam("userId") int istarUserId) {
+	 * 
+	 * try { AppCourseServices appCourseServices = new AppCourseServices();
+	 * AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
+	 * 
+	 * List<CoursePOJO> coursesWithoutModuleStatus =
+	 * appCourseServices.getCoursesOfUser(istarUserId); List<CoursePOJO> courses
+	 * = new ArrayList<CoursePOJO>(); for(CoursePOJO coursePOJO :
+	 * coursesWithoutModuleStatus){ coursePOJO =
+	 * coursePOJO.sortModulesAndAssignStatus();
+	 * 
+	 * coursePOJO.setProgress(appCourseServices.getProgressOfUserForCourse(
+	 * istarUserId, coursePOJO.getId()));
+	 * coursePOJO.setTotalPoints(appCourseServices.getMaxPointsOfCourse(
+	 * coursePOJO.getId()));
+	 * 
+	 * StudentRankPOJO studentRankPOJO =
+	 * appUserRankUtility.getStudentRankPOJOForCourseOfAUser(istarUserId,
+	 * coursePOJO.getId());
+	 * 
+	 * if(studentRankPOJO!=null){
+	 * coursePOJO.setUserPoints(studentRankPOJO.getPoints()*1.0);
+	 * coursePOJO.setRank(studentRankPOJO.getBatchRank()); }
+	 * 
+	 * //coursePOJO.setSkillObjectives(appCourseServices.
+	 * getSkillsReportForCourseOfUser(istarUserId, coursePOJO.getId()));
+	 * 
+	 * for(SkillReportPOJO skillReport : coursePOJO.getSkillObjectives()){
+	 * skillReport.calculateUserPoints(); skillReport.calculateTotalPoints();
+	 * skillReport.calculatePercentage(); } courses.add(coursePOJO); }
+	 * 
+	 * Gson gson = new Gson(); String result = gson.toJson(courses);
+	 * 
+	 * return Response.ok(result).build(); }catch(Exception e){
+	 * e.printStackTrace(); return
+	 * Response.status(Response.Status.INTERNAL_SERVER_ERROR).build(); } }
+	 */
+
 }

@@ -9,6 +9,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.istarindia.android.pojo.StudentProfile;
+import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.apps.services.AppEncryptionService;
 import com.istarindia.apps.services.AppServices;
 import com.viksitpro.core.dao.entities.IstarUser;
@@ -31,23 +35,23 @@ public class RESTAuthenticationService {
 		IstarUser istarUser = istarUserServices.getIstarUserByEmail(email);
 
 		try {
-			if (istarUser == null || !istarUser.getPassword().equals(password)) {
+			AppEncryptionService appEncryptionService = new AppEncryptionService();
+			String decryptedPassword = appEncryptionService.decrypt(password);
+
+			if (istarUser == null || !istarUser.getPassword().equals(decryptedPassword)) {
 				System.out.println("user is null or password does not match");
 				throw new Exception();
 			}
 			AppServices appServices = new AppServices();
 			istarUser = appServices.assignToken(istarUser);
 
-/*			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-
+			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
-			
+
 			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(studentProfile);
 
-			return Response.ok(result).build();*/
-			AppEncryptionService appEncryptionService = new AppEncryptionService();
-			return Response.ok(appEncryptionService.encrypt(istarUser.getAuthToken())).build();
+			return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -88,16 +92,14 @@ public class RESTAuthenticationService {
 			AppServices appServices = new AppServices();
 			istarUser = appServices.assignToken(istarUser);
 
-/*			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+
+			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
-			System.out.println("Returing system profile");
 
 			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(studentProfile);
 
-			return Response.ok(result).build();*/
-			AppEncryptionService appEncryptionService = new AppEncryptionService();
-			return Response.ok(appEncryptionService.encrypt(istarUser.getAuthToken())).build();
+			return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.UNAUTHORIZED).build();

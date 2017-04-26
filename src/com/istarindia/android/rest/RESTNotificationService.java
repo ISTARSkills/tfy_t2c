@@ -30,7 +30,7 @@ public class RESTNotificationService {
 			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(allNotificationPOJOs);
 
-			return Response.ok(result).build();
+			return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM).build();
 		}catch(Exception e){
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();

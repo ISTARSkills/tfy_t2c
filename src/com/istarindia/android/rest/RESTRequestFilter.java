@@ -17,7 +17,7 @@ import com.viksitpro.core.dao.utils.user.IstarUserServices;
 @AppSecured
 @Provider
 @Priority(Priorities.AUTHENTICATION)
-public class RESTAuthenticationFilter implements ContainerRequestFilter{
+public class RESTRequestFilter implements ContainerRequestFilter{
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {		
