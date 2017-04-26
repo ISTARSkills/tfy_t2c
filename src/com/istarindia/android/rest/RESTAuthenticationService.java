@@ -9,10 +9,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.istarindia.android.pojo.StudentProfile;
-import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.apps.services.AppEncryptionService;
 import com.istarindia.apps.services.AppServices;
 import com.viksitpro.core.dao.entities.IstarUser;
