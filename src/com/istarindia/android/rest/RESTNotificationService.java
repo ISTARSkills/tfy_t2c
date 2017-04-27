@@ -40,13 +40,13 @@ public class RESTNotificationService {
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response markNotificationAsRead(@PathParam("userId") int userId, List<NotificationPOJO> notifications){		
+	public Response markNotificationAsRead(@PathParam("userId") int userId, List<Integer> notifications){		
 		try{
 			System.out.println("MArk notifications as read");
 			IstarNotificationServices istarNotificationServices = new IstarNotificationServices();
 			
-			for(NotificationPOJO notificationPOJO : notifications){
-				istarNotificationServices.updateNotificationStatus(notificationPOJO.getId(), "READ");
+			for(Integer notificationId : notifications){
+				istarNotificationServices.updateNotificationStatus(notificationId, "READ");
 			}
 			
 			return Response.ok().build();
