@@ -214,10 +214,11 @@ public class RESTIstarUserService {
 	@PUT
 	@Path("{userId}/verify/{isVerified}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response isVerified(@PathParam("userId") int userId, @PathParam("isVerified") boolean isVerified) {
+	public Response isVerified(@PathParam("userId") int userId, @PathParam("isVerified") String isVerified) {
 		try {
+			boolean verifiedUser = Boolean.parseBoolean(isVerified);
 			IstarUserServices istarUserServices = new IstarUserServices();
-			IstarUser istarUser = istarUserServices.updateIsVerified(userId, isVerified);
+			IstarUser istarUser = istarUserServices.updateIsVerified(userId, verifiedUser);
 
 			if(istarUser!=null){
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
