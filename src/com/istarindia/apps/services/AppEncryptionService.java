@@ -12,8 +12,8 @@ public class AppEncryptionService {
     private static final byte[] PRIVATE_KEY = "OXY IS IN ISTAR ".getBytes();
     
     
-    public String encrypt(String valueToEnc){      
-        try{
+    public String encrypt(String valueToEnc) throws Exception {
+
         Key key = generateKey();
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -22,14 +22,9 @@ public class AppEncryptionService {
         byte[] encryptedBytes = Base64.getEncoder().encode(encValue);
         String encryptedValue = new String(encryptedBytes);
         return encryptedValue;
-        }catch(Exception e){
-        	e.printStackTrace();
-        	return null;
-        }
     }
     
-    public String decrypt(String encryptedValue){
-    	try{
+    public String decrypt(String encryptedValue) throws Exception {
         Key key = generateKey();
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, key);
@@ -38,10 +33,6 @@ public class AppEncryptionService {
         byte[] decryptedBytes = cipher.doFinal(decodedBytes);
         String decryptedValue = new String(decryptedBytes);
         return decryptedValue;
-    	}catch(Exception e){
-    		e.printStackTrace();
-    		return null;
-    	}
     }
 
     

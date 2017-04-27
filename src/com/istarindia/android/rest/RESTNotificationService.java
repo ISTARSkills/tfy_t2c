@@ -17,7 +17,6 @@ import com.istarindia.android.pojo.NotificationPOJO;
 import com.istarindia.apps.services.AppNotificationServices;
 import com.viksitpro.core.notification.IstarNotificationServices;
 
-@AppSecured
 @Path("notifications/user/{userId}")
 public class RESTNotificationService {
 
@@ -31,7 +30,7 @@ public class RESTNotificationService {
 			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(allNotificationPOJOs);
 
-			return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM).build();
+			return Response.ok(result).build();
 		}catch(Exception e){
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -41,15 +40,10 @@ public class RESTNotificationService {
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response markNotificationAsRead(@PathParam("userId") int userId, List<NotificationPOJO> notifications){		
-		try{
-			System.out.println("MArk notifications as read");
+	public Response markNotificationAsRead(@PathParam("userId") int userId, List<Integer> notifications){		
+		try{			
 			IstarNotificationServices istarNotificationServices = new IstarNotificationServices();
-			
-			for(NotificationPOJO notificationPOJO : notifications){
-				istarNotificationServices.updateNotificationStatus(notificationPOJO.getId(), "READ");
-			}
-			
+			istarNotificationServices.updateNotificationStatus(notifications, "READ");
 			return Response.ok().build();
 		}catch(Exception e){
 			e.printStackTrace();

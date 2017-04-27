@@ -5,8 +5,6 @@ import java.sql.Timestamp;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.sun.xml.internal.txw2.annotation.XmlCDATA;
-
 @XmlRootElement(name = "notification")
 public class NotificationPOJO {
 
@@ -29,7 +27,7 @@ public class NotificationPOJO {
 		this.id = id;
 	}
 
-	@XmlCDATA
+	@XmlAttribute(name = "message", required = false)
 	public String getMessage() {
 		return message;
 	}

@@ -14,31 +14,30 @@ import com.istarindia.apps.services.StudentPlaylistServices;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 
-@AppSecured
 @Path("lessons/user/{userId}")
 public class RESTLessonService {
 
 	@GET
 	@Path("{lessonId}")
 	@Produces(MediaType.APPLICATION_XML)
-	public Response getLesson(@PathParam("lessonId") int lessonId) {
-
-		try {
-			String result = null;
+	public Response getLesson(@PathParam("lessonId") int lessonId){
+	
+		try{
+			String lessonXML = null;
 			AppCourseServices appCourseServices = new AppCourseServices();
 			Lesson lesson = appCourseServices.getLesson(lessonId);
-
-			if (lesson != null) {
-				result = lesson.getLessonXml();
+			
+			if(lesson!=null){
+				lessonXML = lesson.getLessonXml();
 			}
 
-			return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM).build();
-		} catch (Exception e) {
+			return Response.ok(lessonXML).build();
+		}catch(Exception e){
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-
+	
 	@PUT
 	@Path("{playlistId}/status")
 	@Produces(MediaType.APPLICATION_JSON)
