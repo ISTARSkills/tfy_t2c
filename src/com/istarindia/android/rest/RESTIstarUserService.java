@@ -178,21 +178,23 @@ public class RESTIstarUserService {
 		}
 	}
 
-	@GET
+	@PUT
 	@Path("{userId}/mobile")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateAndVerifyMobileNumber(@PathParam("userId") int userId, @QueryParam("mobile") Long mobile) {
+	public Response updateAndVerifyMobileNumber(@PathParam("userId") int userId, @QueryParam("mobile") String mobile) {
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
-			IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobile);
+			Long mobileNumber = Long.parseLong(mobile);
+			
+			IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobileNumber);
 
 			if (istarUser == null && mobileIstarUser != null) {
 				return Response.status(Response.Status.BAD_REQUEST).build();
 			} else {
 				Integer otp = null;
-				istarUserServices.updateMobile(istarUser.getId(), mobile);
+				istarUserServices.updateMobile(istarUser.getId(), mobileNumber);
 
 				try {
 					AppServices appServices = new AppServices();
