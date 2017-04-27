@@ -33,7 +33,6 @@ import com.viksitpro.core.dao.entities.UserRole;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.dao.utils.user.RoleServices;
 import com.viksitpro.core.dao.utils.user.UserRoleServices;
-import com.viksitpro.core.pojo.recruiter.IstarUserPOJO;
 
 @Path("user")
 public class RESTIstarUserService {
@@ -138,10 +137,10 @@ public class RESTIstarUserService {
 				return Response.status(404).build();
 			} else {
 				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-				IstarUserPOJO istarUserPOJO = appPOJOUtility.getIstarUserPOJO(istarUser);
+				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
-				Gson gson = new Gson();
-				String result = gson.toJson(istarUserPOJO);
+				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+				String result = gson.toJson(studentProfile);
 
 				return Response.ok(result).build();
 			}
@@ -224,13 +223,13 @@ public class RESTIstarUserService {
 			IstarUser istarUser = istarUserServices.updateIsVerified(userId, verifiedUser);
 
 			if(istarUser!=null){
-			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-			IstarUserPOJO istarUserPOJO = appPOJOUtility.getIstarUserPOJO(istarUser);
+				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
-			Gson gson = new Gson();
-			String result = gson.toJson(istarUserPOJO);
+				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+				String result = gson.toJson(studentProfile);
 
-			return Response.ok(result).build();
+				return Response.ok(result).build();
 			}else{
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 			}
