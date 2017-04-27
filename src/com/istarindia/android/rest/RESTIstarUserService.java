@@ -178,10 +178,10 @@ public class RESTIstarUserService {
 		}
 	}
 
-	@PUT
+	@GET
 	@Path("{userId}/mobile")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateAndVerifyMobileNumber(@PathParam("userId") int userId, @FormParam("mobile") Long mobile) {
+	public Response updateAndVerifyMobileNumber(@PathParam("userId") int userId, @QueryParam("mobile") Long mobile) {
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
