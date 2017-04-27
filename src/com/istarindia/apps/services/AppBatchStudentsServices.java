@@ -54,6 +54,18 @@ public class AppBatchStudentsServices {
 		return batchStudents;
 	}
 	
+	public BatchStudents createBatchStudents(IstarUser istarUser, BatchGroup batchGroup, String type){
+		
+		BatchStudents batchStudents = new BatchStudents();
+		
+		batchStudents.setIstarUser(istarUser);
+		batchStudents.setBatchGroup(batchGroup);
+		batchStudents.setUserType(type);
+		batchStudents = saveBatchStudentsToDAO(batchStudents);
+		
+		return batchStudents;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public BatchGroup getBatchGroupOfStudent(int istarUserId){
 	

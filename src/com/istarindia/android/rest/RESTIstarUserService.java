@@ -21,9 +21,12 @@ import com.istarindia.android.pojo.SkillReportPOJO;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.android.utility.AppUtility;
+import com.istarindia.apps.services.AppBatchGroupServices;
 import com.istarindia.apps.services.AppBatchStudentsServices;
 import com.istarindia.apps.services.AppComplexObjectServices;
 import com.istarindia.apps.services.AppServices;
+import com.viksitpro.core.dao.entities.BatchGroup;
+import com.viksitpro.core.dao.entities.BatchStudents;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Role;
 import com.viksitpro.core.dao.entities.UserRole;
@@ -243,8 +246,18 @@ public class RESTIstarUserService {
 	public Response assignBatchCode(@PathParam("userId") int istarUserId, @FormParam("batchCode") String batchCode) {
 
 		try {
+			
+			AppBatchGroupServices batchGroupServices = new AppBatchGroupServices();
+			BatchGroup batchGroup = batchGroupServices.getBatchGroupByBatchCode(batchCode);
+			
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
+			
+			if(batchGroup==null || istarUser==null){
+				throw new Exception();
+			}
 			AppBatchStudentsServices batchStudentServices = new AppBatchStudentsServices();
-			batchStudentServices.createBatchStudents(istarUserId, batchCode);
+			batchStudentServices.createBatchStudents(istarUser, batchGroup, "STUDENT");					
 
 			return Response.status(Response.Status.CREATED).build();
 		} catch (Exception e) {
