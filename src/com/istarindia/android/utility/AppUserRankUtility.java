@@ -135,6 +135,72 @@ public class AppUserRankUtility {
 		return allCourseRanks;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public CourseRankPOJO getCourseRankPOJOForCoursesOfUsersBatch(Integer istarUserId, Integer courseId){
+		
+		CourseRankPOJO courseRankPOJO = null;
+		
+		AppCourseServices appCourseServices = new AppCourseServices();
+		IstarUserServices istarUserServices = new IstarUserServices();
+
+			Course course = appCourseServices.getCourse(courseId);			
+			if(course!=null){
+				courseRankPOJO = new CourseRankPOJO();
+				
+				courseRankPOJO.setId(course.getId());
+				courseRankPOJO.setName(course.getCourseName());
+				courseRankPOJO.setImageURL(course.getImage_url());
+				courseRankPOJO.setDescription(course.getCourseDescription());
+				
+			List<StudentRankPOJO> allStudentRanksOfABatch = new ArrayList<StudentRankPOJO>();
+			
+			String sql = "select *, cast(rank() over (order by total_points desc) as integer) from "
+					+ "(select user_gamification.istar_user, cast(sum(user_gamification.points) as integer)as total_points, cast(sum(user_gamification.coins) as integer) as total_coins "
+					+ "from assessment,user_gamification where user_gamification.item_id=assessment.id and course_id= :courseId  and user_gamification.istar_user in "
+					+ "(select student_id from batch_students where batch_group_id in "
+					+ "(select batch_group_id from batch_students where batch_students.student_id= :istarUserId)) "
+					+ "group by user_gamification.istar_user order by total_points desc) as batch_ranks";
+			
+			BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+			Session session = baseHibernateDAO.getSession();
+			
+			SQLQuery query = session.createSQLQuery(sql);
+			query.setParameter("istarUserId",istarUserId);
+			query.setParameter("courseId",course.getId());
+			
+			List<Object[]> allStudentsWithPoints = query.list();
+						
+			for(Object[] studentData : allStudentsWithPoints){
+				
+				Integer istarUserInBatchId = (Integer) studentData[0];
+				Integer points = (Integer) studentData[1];
+				Integer coins = (Integer) studentData[2];
+				Integer rank = (Integer) studentData[3];
+				
+				IstarUser istarUserInBatch = istarUserServices.getIstarUser(istarUserInBatchId);
+				
+				StudentRankPOJO studentRankPOJO = new StudentRankPOJO();
+
+				studentRankPOJO.setId(istarUserInBatch.getId());
+				if(istarUserInBatch.getUserProfile()!=null){
+				studentRankPOJO.setName(istarUserInBatch.getUserProfile().getFirstName());
+				studentRankPOJO.setImageURL(istarUserInBatch.getUserProfile().getProfileImage());
+				}else{
+				studentRankPOJO.setName(istarUserInBatch.getEmail());
+				studentRankPOJO.setImageURL("http://api.talentify.in/video/android_images/" + istarUserInBatch.getEmail().substring(0, 1).toUpperCase() + ".png");
+				}
+				studentRankPOJO.setPoints(points);
+				studentRankPOJO.setCoins(coins);
+				studentRankPOJO.setBatchRank(rank);
+
+				allStudentRanksOfABatch.add(studentRankPOJO);
+			}
+			Collections.sort(allStudentRanksOfABatch);
+			courseRankPOJO.setAllStudentRanks(allStudentRanksOfABatch);
+			}
+		return courseRankPOJO;
+	}
+	
 	
 	@SuppressWarnings("rawtypes")
 	public StudentRankPOJO getStudentRankPOJOForCourseOfAUser(Integer istarUserId, Integer courseId){

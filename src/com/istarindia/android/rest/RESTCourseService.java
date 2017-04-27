@@ -138,4 +138,23 @@ public class RESTCourseService {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}		
 	}
+	
+	@GET
+	@Path("{courseId}/leaderboard")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getLeaderboardOfCoursesOfUser(@PathParam("userId") int userId, @PathParam("courseId") int courseId){
+		
+		try{			
+			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
+			CourseRankPOJO courseRankPOJO = appUserRankUtility.getCourseRankPOJOForCoursesOfUsersBatch(userId, courseId);
+			
+			Gson gson = new Gson();
+			String result = gson.toJson(courseRankPOJO);
+			
+			return Response.ok(result).build();
+		}catch(Exception e){
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}		
+	}
 }

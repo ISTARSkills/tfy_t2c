@@ -217,9 +217,19 @@ public class RESTIstarUserService {
 	public Response isVerified(@PathParam("userId") int userId, @PathParam("isVerified") boolean isVerified) {
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
-			istarUserServices.updateIsVerified(userId, isVerified);
+			IstarUser istarUser = istarUserServices.updateIsVerified(userId, isVerified);
 
-			return Response.status(Response.Status.CREATED).build();
+			if(istarUser!=null){
+			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+			IstarUserPOJO istarUserPOJO = appPOJOUtility.getIstarUserPOJO(istarUser);
+
+			Gson gson = new Gson();
+			String result = gson.toJson(istarUserPOJO);
+
+			return Response.ok(result).build();
+			}else{
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
