@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.istarindia.android.pojo.DailyTaskPOJO;
 import com.istarindia.apps.services.AppCalendarServices;
 
@@ -25,7 +26,7 @@ public class RESTCalendarService {
 			AppCalendarServices appCalendarServices = new AppCalendarServices();
 			List<DailyTaskPOJO> allTask = appCalendarServices.getDailyTask(userId, day, month, year);
 			
-			Gson gson = new Gson();
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(allTask);
 			
 			return Response.ok(result).build();
@@ -44,7 +45,7 @@ public class RESTCalendarService {
 			AppCalendarServices appCalendarServices = new AppCalendarServices();
 			List<DailyTaskPOJO> allTask = appCalendarServices.getMonthlyTask(userId, month, year);
 			
-			Gson gson = new Gson();
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(allTask);
 			
 			return Response.ok(result).build();
@@ -63,7 +64,7 @@ public class RESTCalendarService {
 			AppCalendarServices appCalendarServices = new AppCalendarServices();
 			List<DailyTaskPOJO> allTask = appCalendarServices.getYearlyTask(userId, year);
 			
-			Gson gson = new Gson();
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(allTask);
 			
 			return Response.ok(result).build();
@@ -81,7 +82,7 @@ public class RESTCalendarService {
 			AppCalendarServices appCalendarServices = new AppCalendarServices();
 			List<DailyTaskPOJO> allTask = appCalendarServices.getAllTask(userId);
 			
-			Gson gson = new Gson();
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(allTask);
 			
 			return Response.ok(result).build();
