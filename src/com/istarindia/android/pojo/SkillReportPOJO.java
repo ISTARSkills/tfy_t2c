@@ -14,6 +14,7 @@ public class SkillReportPOJO{
 	private String description;
 	private String itemType;
 	private Integer itemId;
+	private String imageURL;
 	private Double totalPoints = 0.0;
 	private Double userPoints = 0.0;
 	private Double percentage = 0.0;
@@ -84,6 +85,21 @@ public class SkillReportPOJO{
 		return percentage;
 	}
 	
+	public void setPercentage(Double percentage) {
+		this.percentage = percentage;
+	}
+	
+	@XmlAttribute(name = "imageURL", required = false)	
+	public String getImageURL() {
+		return imageURL;
+	}
+
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
+	}
+
+
+
 	@XmlElement(name = "skills", required = false)
 	public List<SkillReportPOJO> getSkills() {
 		return skills;

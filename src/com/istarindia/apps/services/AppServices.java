@@ -16,6 +16,7 @@ import org.hibernate.Session;
 import com.istarindia.android.pojo.SkillReportPOJO;
 import com.istarindia.android.utility.AppUtility;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
+import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
@@ -27,7 +28,7 @@ public class AppServices {
 		
 		List<SkillReportPOJO> allSkills = new ArrayList<SkillReportPOJO>();
 		
-		String sql = "select COALESCE(sum(user_gamification.points),0) as total_points, COALESCE(cast(sum(user_gamification.coins) as integer),0) as total_coins, so_session.name as session, so_session.id as session_id, so_module.name as module, so_module.id as module_id,  so_course.name as course, so_course.id as course_id  from user_gamification, skill_objective so_session, skill_objective so_module, skill_objective so_course where user_gamification.skill_objective=so_session.id and so_module.id=so_session.parent_skill and so_module.parent_skill=so_course.id and istar_user= :istarUserId group by session_id,session, module_id, module, course_id, course order by course_id,module_id,session_id";
+		String sql = "select COALESCE(sum(user_gamification.points),0) as total_points, COALESCE(cast(sum(user_gamification.coins) as integer),0) as total_coins, so_session.name as session_so_name, so_session.id as session_so_id, so_module.name as module_so_name, so_module.id as module_so_id,  so_course.name as course_so_name, so_course.id as course_so_id, course_skill_objective.course_id as course_id from user_gamification, skill_objective so_session, skill_objective so_module, skill_objective so_course, course_skill_objective where user_gamification.skill_objective=so_session.id and so_module.id=so_session.parent_skill and so_module.parent_skill=so_course.id and so_course.id=course_skill_objective.skill_objective_id and istar_user= :istarUserId group by session_so_id,session_so_name, module_so_id, module_so_name, course_so_id, course_id, course_skill_objective.course_id order by course_so_id,module_so_id,session_so_id";
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
 		
@@ -36,16 +37,19 @@ public class AppServices {
 		
 		List<Object[]> results = query.list();
 		
+		AppCourseServices appCourseServices = new AppCourseServices();
+		
 		if(results.size()>0){
 			for(Object[] element : results){
 				Double userPoints = (Double) element[0];
 				//Integer totalCoins = (Integer) element[1];
-				String cmsession = (String) element[2];
+				String cmsessionSkillObjectiveName = (String) element[2];
 				Integer cmsessionSkillObjectiveId = (Integer) element[3];
-				String module = (String) element[4];
+				String moduleSkillObjectiveName = (String) element[4];
 				Integer moduleSkillObjectiveId = (Integer) element[5];
-				String course = (String) element[6];
+				String courseSkillObjectiveName = (String) element[6];
 				Integer courseSkillObjectiveId = (Integer) element[7];
+				Integer courseId = (Integer) element[8];
 				
 				SkillReportPOJO courseSkillPOJO = null;
 				SkillReportPOJO moduleSkillPOJO = null;
@@ -61,18 +65,23 @@ public class AppServices {
 				if(courseSkillPOJO==null){					
 					courseSkillPOJO = new SkillReportPOJO();
 					courseSkillPOJO.setId(courseSkillObjectiveId);
-					courseSkillPOJO.setName(course);
+					courseSkillPOJO.setName(courseSkillObjectiveName);
+					Course course =appCourseServices.getCourse(courseId);
+					if(course!=null){
+					String imageURL = course.getImage_url();
+					courseSkillPOJO.setImageURL(imageURL);
+					}					
 					
 					List<SkillReportPOJO> allModuleSkillReportPOJO = new ArrayList<SkillReportPOJO>();
 					moduleSkillPOJO = new SkillReportPOJO();
 					moduleSkillPOJO.setId(moduleSkillObjectiveId);
-					moduleSkillPOJO.setName(module);
+					moduleSkillPOJO.setName(moduleSkillObjectiveName);
 					
 					List<SkillReportPOJO> allCmsessionSkillReportPOJO = new ArrayList<SkillReportPOJO>();
 					cmsessionSkillPOJO = new SkillReportPOJO();
 								
 					cmsessionSkillPOJO.setId(cmsessionSkillObjectiveId);
-					cmsessionSkillPOJO.setName(cmsession);
+					cmsessionSkillPOJO.setName(cmsessionSkillObjectiveName);
 					cmsessionSkillPOJO.setUserPoints(userPoints);
 					cmsessionSkillPOJO.setTotalPoints(getMaxPointsOfCmsessionSkill(cmsessionSkillObjectiveId));
 					allCmsessionSkillReportPOJO.add(cmsessionSkillPOJO);
@@ -92,13 +101,13 @@ public class AppServices {
 					if(moduleSkillPOJO==null){
 						moduleSkillPOJO = new SkillReportPOJO();
 						moduleSkillPOJO.setId(moduleSkillObjectiveId);
-						moduleSkillPOJO.setName(module);
+						moduleSkillPOJO.setName(moduleSkillObjectiveName);
 						
 						List<SkillReportPOJO> allCmsessionSkillReportPOJO = new ArrayList<SkillReportPOJO>();
 						cmsessionSkillPOJO = new SkillReportPOJO();
 						
 						cmsessionSkillPOJO.setId(cmsessionSkillObjectiveId);
-						cmsessionSkillPOJO.setName(cmsession);
+						cmsessionSkillPOJO.setName(cmsessionSkillObjectiveName);
 						cmsessionSkillPOJO.setUserPoints(userPoints);
 						cmsessionSkillPOJO.setTotalPoints(getMaxPointsOfCmsessionSkill(cmsessionSkillObjectiveId));
 						allCmsessionSkillReportPOJO.add(cmsessionSkillPOJO);
@@ -108,7 +117,7 @@ public class AppServices {
 						cmsessionSkillPOJO = new SkillReportPOJO();
 						
 						cmsessionSkillPOJO.setId(cmsessionSkillObjectiveId);
-						cmsessionSkillPOJO.setName(cmsession);
+						cmsessionSkillPOJO.setName(cmsessionSkillObjectiveName);
 						cmsessionSkillPOJO.setUserPoints(userPoints);
 						cmsessionSkillPOJO.setTotalPoints(getMaxPointsOfCmsessionSkill(cmsessionSkillObjectiveId));
 						moduleSkillPOJO.getSkills().add(cmsessionSkillPOJO);
