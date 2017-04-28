@@ -26,7 +26,6 @@ import com.istarindia.apps.services.AppBatchStudentsServices;
 import com.istarindia.apps.services.AppComplexObjectServices;
 import com.istarindia.apps.services.AppServices;
 import com.viksitpro.core.dao.entities.BatchGroup;
-import com.viksitpro.core.dao.entities.BatchStudents;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Role;
 import com.viksitpro.core.dao.entities.UserRole;

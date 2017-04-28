@@ -6,8 +6,6 @@ import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import com.viksitpro.core.dao.entities.IstarUser;
@@ -40,7 +38,7 @@ public class RESTAuthenticationFilter implements ContainerRequestFilter{
 		}*/
 	}
 
-	private boolean validateToken(int istarUserId, String authenticationToken) throws Exception {
+	public boolean validateToken(int istarUserId, String authenticationToken) throws Exception {
 
 		boolean isValid = true;
 		IstarUserServices istarUserServices = new IstarUserServices();
