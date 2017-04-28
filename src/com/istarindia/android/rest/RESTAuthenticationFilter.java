@@ -21,7 +21,7 @@ public class RESTAuthenticationFilter implements ContainerRequestFilter{
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {		
         
-		String httpAuthorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+/*		String httpAuthorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 		System.out.println(httpAuthorizationHeader);
 		try{
 		if(httpAuthorizationHeader==null || !httpAuthorizationHeader.startsWith("oxygen")){
@@ -37,7 +37,7 @@ public class RESTAuthenticationFilter implements ContainerRequestFilter{
 			e.printStackTrace();
 			requestContext.abortWith(
 	                Response.status(Response.Status.UNAUTHORIZED).build());
-		}
+		}*/
 	}
 
 	private boolean validateToken(int istarUserId, String authenticationToken) throws Exception {

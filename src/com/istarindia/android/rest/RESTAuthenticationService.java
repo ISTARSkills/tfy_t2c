@@ -46,9 +46,6 @@ public class RESTAuthenticationService {
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 			System.out.println("Returing system profile");
 
-			//Gson gson = new Gson();
-			
-
 			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(studentProfile);
 

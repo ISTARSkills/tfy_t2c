@@ -143,7 +143,7 @@ public class RESTAssessmentService {
 			TaskServices taskServices = new TaskServices();
 			taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
 			
-			return Response.status(Response.Status.CREATED).build();
+			return Response.ok("DONE").build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
