@@ -40,84 +40,92 @@ public class AppCourseServices {
 	
 	
 	public CoursePOJO getCourseOfUser(int istarUserId, int courseId){
-	//	long previousTime = System.currentTimeMillis();
 		CoursePOJO coursePOJO = null;
 		StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 		AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
 		Course course = getCourse(courseId);
-		if(course!=null){
-			coursePOJO = new CoursePOJO();
+		
+		List<StudentPlaylist> allStudentPlaylist = studentPlaylistServices.getStudentPlaylistOfUserForCourse(istarUserId, courseId);
+		if(course!=null && allStudentPlaylist.size() > 0){
 			
-			HashMap<Integer, Integer> lessonsPlaylistForUser = studentPlaylistServices.getLessonsOfUserForCourse(istarUserId, courseId);
-		//	System.err.println("1->" + "Time->"+(System.currentTimeMillis()-previousTime));
+			coursePOJO = new CoursePOJO();
 
 			coursePOJO.setId(course.getId());
 			coursePOJO.setCategory(course.getCategory());
 			coursePOJO.setDescription(course.getCourseDescription());
 			coursePOJO.setImageURL(course.getImage_url());
 			coursePOJO.setName(course.getCourseName());				
-			coursePOJO.setTotalPoints(getTotalPointsOfCourseForUser(istarUserId, courseId, lessonsPlaylistForUser.size()));
-		//	System.err.println("2->" + "Time->"+(System.currentTimeMillis()-previousTime));
+			coursePOJO.setTotalPoints(getTotalPointsOfCourseForUser(istarUserId, courseId, allStudentPlaylist.size()));
+
 			coursePOJO.setProgress(getProgressOfUserForCourse(istarUserId, courseId));
-		//	System.err.println("3->" + "Time->"+(System.currentTimeMillis()-previousTime));
 			StudentRankPOJO studentRankPOJO = appUserRankUtility.getStudentRankPOJOForCourseOfAUser(istarUserId, coursePOJO.getId());
-		//	System.err.println("4->" + "Time->"+(System.currentTimeMillis()-previousTime));
 			if(studentRankPOJO!=null){
 				coursePOJO.setUserPoints(studentRankPOJO.getPoints()*1.0);
 				coursePOJO.setRank(studentRankPOJO.getBatchRank());
 			}
 			
-			List<ModulePOJO> allModules = new ArrayList<ModulePOJO>();
-			for(Module module : course.getModules()){
-				ModulePOJO modulePOJO = new ModulePOJO();
+			for(StudentPlaylist studentPlaylist : allStudentPlaylist){
+				ModulePOJO modulePOJO = null;
+				Module module = studentPlaylist.getModule();
+				Cmsession cmsession = studentPlaylist.getCmsession();
+				Lesson lesson = studentPlaylist.getLesson();
 				
-				modulePOJO.setId(module.getId());
-				modulePOJO.setName(module.getModuleName());
-				modulePOJO.setImageURL(module.getImage_url());
-				modulePOJO.setDescription(module.getModule_description());
-				modulePOJO.setOrderId(module.getOrderId());
+				for(ModulePOJO tempModulePOJO : coursePOJO.getModules()){
+					if(tempModulePOJO.getId()== module.getId()){
+						modulePOJO = tempModulePOJO;
+					}
+				}
 				
-				List<CmsessionPOJO> allLessons = new ArrayList<CmsessionPOJO>();
-				for(Cmsession cmsession : getCmsessionsOfModule(module.getId())){
+				if(modulePOJO==null){
+					modulePOJO = new ModulePOJO();
+					modulePOJO.setId(module.getId());
+					modulePOJO.setName(module.getModuleName());
+					modulePOJO.setImageURL(module.getImage_url());
+					modulePOJO.setDescription(module.getModule_description());
+					modulePOJO.setOrderId(module.getOrderId());
 					
-					for(Lesson lesson : getLessonsOfCmsession(cmsession.getId())){						
-						if(lessonsPlaylistForUser.containsKey(lesson.getId())){
-							StudentPlaylist studentPlaylist = studentPlaylistServices.getStudentPlaylist(lessonsPlaylistForUser.get(lesson.getId()));
-							
-							CmsessionPOJO cmsessionPOJO = new CmsessionPOJO();
-							LessonPOJO lessonPOJO = new LessonPOJO();
-							lessonPOJO.setId(lesson.getId());
-							lessonPOJO.setTitle(lesson.getTitle());
-							lessonPOJO.setDescription(lesson.getDescription());
-							lessonPOJO.setDuration(lesson.getDuration());
-							lessonPOJO.setPlaylistId(studentPlaylist.getId());
-							lessonPOJO.setStatus(studentPlaylist.getStatus());
-							lessonPOJO.setSubject(lesson.getSubject());
-							lessonPOJO.setType(lesson.getType());
-							lessonPOJO.setOrderId(lesson.getOrderId());
-							
-							cmsessionPOJO.setId(lesson.getId());
-							cmsessionPOJO.setType("LESSON_"+lesson.getType());
-							cmsessionPOJO.setItem(lessonPOJO);
-							cmsessionPOJO.setOrderId(studentPlaylist.getId());
-							cmsessionPOJO.setStatus(studentPlaylist.getStatus());
-							allLessons.add(cmsessionPOJO);
-						}
-					}					
-					//assessments
+					CmsessionPOJO cmsessionPOJO = new CmsessionPOJO();
+					LessonPOJO lessonPOJO = new LessonPOJO();
+					lessonPOJO.setId(lesson.getId());
+					lessonPOJO.setTitle(lesson.getTitle());
+					lessonPOJO.setDescription(lesson.getDescription());
+					lessonPOJO.setDuration(lesson.getDuration());
+					lessonPOJO.setPlaylistId(studentPlaylist.getId());
+					lessonPOJO.setStatus(studentPlaylist.getStatus());
+					lessonPOJO.setSubject(lesson.getSubject());
+					lessonPOJO.setType(lesson.getType());
+					lessonPOJO.setOrderId(lesson.getOrderId());
+					
+					cmsessionPOJO.setId(lesson.getId());
+					cmsessionPOJO.setType("LESSON_"+lesson.getType());
+					cmsessionPOJO.setItem(lessonPOJO);
+					cmsessionPOJO.setOrderId(studentPlaylist.getId());
+					cmsessionPOJO.setStatus(studentPlaylist.getStatus());
+					
+					modulePOJO.getLessons().add(cmsessionPOJO);
+					coursePOJO.getModules().add(modulePOJO);
+				}else{
+					CmsessionPOJO cmsessionPOJO = new CmsessionPOJO();
+					LessonPOJO lessonPOJO = new LessonPOJO();
+					lessonPOJO.setId(lesson.getId());
+					lessonPOJO.setTitle(lesson.getTitle());
+					lessonPOJO.setDescription(lesson.getDescription());
+					lessonPOJO.setDuration(lesson.getDuration());
+					lessonPOJO.setPlaylistId(studentPlaylist.getId());
+					lessonPOJO.setStatus(studentPlaylist.getStatus());
+					lessonPOJO.setSubject(lesson.getSubject());
+					lessonPOJO.setType(lesson.getType());
+					lessonPOJO.setOrderId(lesson.getOrderId());
+					
+					cmsessionPOJO.setId(lesson.getId());
+					cmsessionPOJO.setType("LESSON_"+lesson.getType());
+					cmsessionPOJO.setItem(lessonPOJO);
+					cmsessionPOJO.setOrderId(studentPlaylist.getId());
+					cmsessionPOJO.setStatus(studentPlaylist.getStatus());
+					
+					modulePOJO.getLessons().add(cmsessionPOJO);
 				}
-				modulePOJO.setLessons(allLessons);	
-				modulePOJO.sortLessonsAndAssignStatus();
-				List<String> moduleSkillObjectives = new ArrayList<String>();
-				
-				for(SkillObjective skillObjective : module.getSkillObjectives()){
-					moduleSkillObjectives.add(skillObjective.getName());
-				}
-				modulePOJO.setSkillObjectives(moduleSkillObjectives);
-				allModules.add(modulePOJO);
 			}
-			coursePOJO.setModules(allModules);
-		//	System.err.println("4000 END->" + "Time->"+(System.currentTimeMillis()-previousTime));
 		}
 		return coursePOJO;
 	}

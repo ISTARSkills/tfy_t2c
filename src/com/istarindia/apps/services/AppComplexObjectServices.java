@@ -124,9 +124,11 @@ public class AppComplexObjectServices {
 			for(Integer courseId : allCourseId){
 				CoursePOJO coursePOJO = appCourseServices.getCourseOfUser(userId, courseId);
 				System.err.println("complexObject allCoursePOJO->coursePOJO-->" + allCoursePOJO.size() + "Time->" + (System.currentTimeMillis()-previousTime));
-				coursePOJO.setSkillObjectives(appCourseServices.getSkillsReportForCourseOfUser(userId, courseId));
-				System.err.println("complexObject allCoursePOJO->SKILLREPORTcoursePOJO-->" + allCoursePOJO.size() + "Time->" + (System.currentTimeMillis()-previousTime) + "milliseconds");
-				allCoursePOJO.add(coursePOJO);
+				if(coursePOJO!=null){
+					coursePOJO.setSkillObjectives(appCourseServices.getSkillsReportForCourseOfUser(userId, courseId));
+					System.err.println("complexObject allCoursePOJO->SKILLREPORTcoursePOJO-->" + allCoursePOJO.size() + "Time->" + (System.currentTimeMillis()-previousTime) + "milliseconds");
+					allCoursePOJO.add(coursePOJO);
+				}
 			}
 			complexObject.setCourses(allCoursePOJO);
 			System.err.println("complexObject allCoursePOJO->" + allCoursePOJO.size() + "Time->" + (System.currentTimeMillis()-previousTime));

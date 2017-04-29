@@ -14,6 +14,8 @@ public class DailyTaskPOJO {
 	private Timestamp startDate;
 	private Timestamp endDate;
 	private Timestamp completedAt;
+	private String itemType;
+	private Integer itemId;
 	
 	public DailyTaskPOJO(){
 		
@@ -72,6 +74,22 @@ public class DailyTaskPOJO {
 	public void setCompletedAt(Timestamp completedAt) {
 		this.completedAt = completedAt;
 	}
-	
-	
+
+	@XmlAttribute(name = "itemType", required = false)
+	public String getItemType() {
+		return itemType;
+	}
+
+	public void setItemType(String itemType) {
+		this.itemType = itemType;
+	}
+
+	@XmlAttribute(name = "itemId", required = false)
+	public Integer getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(Integer itemId) {
+		this.itemId = itemId;
+	}
 }

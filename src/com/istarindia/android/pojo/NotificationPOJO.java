@@ -1,6 +1,7 @@
 package com.istarindia.android.pojo;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -15,6 +16,9 @@ public class NotificationPOJO {
 	private String status;
 	private String imageURL;
 	private Timestamp time;
+	private String itemType;
+	private Integer itemId;
+	private HashMap<String, Object> item = new HashMap<String, Object>();
 	
 	public NotificationPOJO(){
 		
@@ -56,6 +60,24 @@ public class NotificationPOJO {
 		this.imageURL = imageURL;
 	}
 
+	@XmlAttribute(name = "itemType", required = false)
+	public String getItemType() {
+		return itemType;
+	}
+
+	public void setItemType(String itemType) {
+		this.itemType = itemType;
+	}
+
+	@XmlAttribute(name = "itemId", required = false)
+	public Integer getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(Integer itemId) {
+		this.itemId = itemId;
+	}
+
 	@XmlAttribute(name = "time", required = false)
 	public Timestamp getTime() {
 		return time;
@@ -63,5 +85,14 @@ public class NotificationPOJO {
 
 	public void setTime(Timestamp time) {
 		this.time = time;
+	}
+
+	@XmlAttribute(name = "item", required = false)
+	public HashMap<String, Object> getItem() {
+		return item;
+	}
+
+	public void setItem(HashMap<String, Object> item) {
+		this.item = item;
 	}
 }

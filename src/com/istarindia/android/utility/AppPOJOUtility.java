@@ -247,26 +247,4 @@ public class AppPOJOUtility {
 
 		return optionPOJO;
 	}
-	
-	public NotificationPOJO getNotificationPOJO(IstarNotification istarNotification){
-		
-		NotificationPOJO notificationPOJO = new NotificationPOJO();
-		
-		notificationPOJO.setId(istarNotification.getId());
-		notificationPOJO.setMessage(istarNotification.getDetails());
-		notificationPOJO.setStatus(istarNotification.getStatus());
-		notificationPOJO.setTime(istarNotification.getCreatedAt());
-		
-		TaskServices taskServices= new TaskServices();
-		Task task = taskServices.getTask(istarNotification.getTaskId());
-		
-		switch(task.getItemType()){
-		case TaskCategory.LESSON:
-			AppCourseServices appCourseServices = new AppCourseServices();
-			Lesson lesson = appCourseServices.getLesson(task.getItemId());
-			notificationPOJO.setImageURL(lesson.getImage_url());
-			break;
-		}		
-		return notificationPOJO;
-	}
 }

@@ -63,6 +63,45 @@ public class StudentPlaylistServices {
 	}
 	
 	@SuppressWarnings("unchecked")
+	public List<StudentPlaylist> getStudentPlaylistOfUserForCourse(int istarUserId, int courseId){
+		long previousTime = System.currentTimeMillis();
+		String hql = "from StudentPlaylist studentPlaylist where istarUser.id= :istarUserId and course.id= :courseId";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		Query query = session.createQuery(hql);
+		query.setParameter("istarUserId",istarUserId);
+		query.setParameter("courseId",courseId);
+		
+		List<StudentPlaylist> allStudentPlaylist = query.list();
+
+		return allStudentPlaylist;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public StudentPlaylist getStudentPlaylistOfUserForLesson(int istarUserId, int lessonId){
+		long previousTime = System.currentTimeMillis();
+		String hql = "from StudentPlaylist studentPlaylist where istarUser.id= :istarUserId and lesson.id= :lessonId";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		Query query = session.createQuery(hql);
+		query.setParameter("istarUserId",istarUserId);
+		query.setParameter("lessonId",lessonId);
+		
+		List<StudentPlaylist> allStudentPlaylist = query.list();
+
+		if(allStudentPlaylist.size()>0){
+			System.err.println("getStudentPlaylistOfUserForLesson->" + "Time->"+(System.currentTimeMillis()-previousTime));
+			return allStudentPlaylist.get(0);
+		}else{
+			return null;
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
 	public List<Integer> getCoursesforUser(int istarUserId){
 
 		String sql = "select distinct course_id from student_playlist where student_id= :istarUser";

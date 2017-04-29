@@ -18,7 +18,7 @@ public class AppCalendarServices {
 		
 		List<DailyTaskPOJO> allTasks = new ArrayList<DailyTaskPOJO>();
 	
-		String sql = "select * from (select id, case when task.is_active then 'INCOMPLETE' else 'COMPLETE' END as status, case when task.is_active then null else task.updated_at END as completed_at, name, task.start_date,task.end_date, extract(day from task.start_date) as day, extract(month from task.start_date) as month, extract(year from task.start_date) as year from task where actor= :istarUserId) as all_tasks where year= :year and month= :month and day= :day";
+		String sql = "select * from (select id, case when task.is_active then 'INCOMPLETE' else 'COMPLETE' END as status, case when task.is_active then null else task.updated_at END as completed_at, name, task.start_date,task.end_date, extract(day from task.start_date) as day, extract(month from task.start_date) as month, extract(year from task.start_date) as year, item_id, item_type from task where actor= :istarUserId) as all_tasks where year= :year and month= :month and day= :day";
 
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
@@ -38,6 +38,8 @@ public class AppCalendarServices {
 			String name = (String) dailyTask[3];
 			Timestamp startDate = (Timestamp) dailyTask[4];
 			Timestamp endDate = (Timestamp) dailyTask[5];
+			Integer itemId = (Integer) dailyTask[6];
+			String itemType = (String) dailyTask[7];
 			
 			DailyTaskPOJO dailyTaskPOJO = new DailyTaskPOJO();
 			
@@ -46,6 +48,9 @@ public class AppCalendarServices {
 			dailyTaskPOJO.setStatus(status);
 			dailyTaskPOJO.setStartDate(startDate);
 			dailyTaskPOJO.setEndDate(endDate);
+			dailyTaskPOJO.setItemId(itemId);
+			dailyTaskPOJO.setItemType(itemType);
+			
 			
 			if(status.equals("COMPLETE")){
 				dailyTaskPOJO.setCompletedAt(completedAt);
@@ -60,7 +65,7 @@ public class AppCalendarServices {
 		
 		List<DailyTaskPOJO> allTasks = new ArrayList<DailyTaskPOJO>();
 	
-		String sql = "select * from (select id, case when task.is_active then 'INCOMPLETE' else 'COMPLETE' END as status, case when task.is_active then null else task.updated_at END as completed_at, name, task.start_date,task.end_date, extract(day from task.start_date) as day, extract(month from task.start_date) as month, extract(year from task.start_date) as year from task where actor= :istarUserId) as all_tasks where year= :year and month= :month";
+		String sql = "select * from (select id, case when task.is_active then 'INCOMPLETE' else 'COMPLETE' END as status, case when task.is_active then null else task.updated_at END as completed_at, name, task.start_date,task.end_date, extract(day from task.start_date) as day, extract(month from task.start_date) as month, extract(year from task.start_date) as year, item_id, item_type from task where actor= :istarUserId) as all_tasks where year= :year and month= :month";
 
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
@@ -79,6 +84,8 @@ public class AppCalendarServices {
 			String name = (String) dailyTask[3];
 			Timestamp startDate = (Timestamp) dailyTask[4];
 			Timestamp endDate = (Timestamp) dailyTask[5];
+			Integer itemId = (Integer) dailyTask[6];
+			String itemType = (String) dailyTask[7];
 			
 			DailyTaskPOJO dailyTaskPOJO = new DailyTaskPOJO();
 			
@@ -87,6 +94,8 @@ public class AppCalendarServices {
 			dailyTaskPOJO.setStatus(status);
 			dailyTaskPOJO.setStartDate(startDate);
 			dailyTaskPOJO.setEndDate(endDate);
+			dailyTaskPOJO.setItemId(itemId);
+			dailyTaskPOJO.setItemType(itemType);
 			
 			if(status.equals("COMPLETE")){
 				dailyTaskPOJO.setCompletedAt(completedAt);
@@ -101,7 +110,7 @@ public class AppCalendarServices {
 		
 		List<DailyTaskPOJO> allTasks = new ArrayList<DailyTaskPOJO>();
 	
-		String sql = "select * from (select id, case when task.is_active then 'INCOMPLETE' else 'COMPLETE' END as status, case when task.is_active then null else task.updated_at END as completed_at, name, task.start_date,task.end_date, extract(day from task.start_date) as day, extract(month from task.start_date) as month, extract(year from task.start_date) as year from task where actor= :istarUserId) as all_tasks where year= :year";
+		String sql = "select * from (select id, case when task.is_active then 'INCOMPLETE' else 'COMPLETE' END as status, case when task.is_active then null else task.updated_at END as completed_at, name, task.start_date,task.end_date, extract(day from task.start_date) as day, extract(month from task.start_date) as month, extract(year from task.start_date) as year, item_id, item_type from task where actor= :istarUserId) as all_tasks where year= :year";
 
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
@@ -119,6 +128,8 @@ public class AppCalendarServices {
 			String name = (String) dailyTask[3];
 			Timestamp startDate = (Timestamp) dailyTask[4];
 			Timestamp endDate = (Timestamp) dailyTask[5];
+			Integer itemId = (Integer) dailyTask[6];
+			String itemType = (String) dailyTask[7];
 			
 			DailyTaskPOJO dailyTaskPOJO = new DailyTaskPOJO();
 			
@@ -127,6 +138,8 @@ public class AppCalendarServices {
 			dailyTaskPOJO.setStatus(status);
 			dailyTaskPOJO.setStartDate(startDate);
 			dailyTaskPOJO.setEndDate(endDate);
+			dailyTaskPOJO.setItemId(itemId);
+			dailyTaskPOJO.setItemType(itemType);
 			
 			if(status.equals("COMPLETE")){
 				dailyTaskPOJO.setCompletedAt(completedAt);
@@ -141,7 +154,7 @@ public class AppCalendarServices {
 		
 		List<DailyTaskPOJO> allTasks = new ArrayList<DailyTaskPOJO>();
 	
-		String sql = "select * from (select id, case when task.is_active then 'INCOMPLETE' else 'COMPLETE' END as status, case when task.is_active then null else task.updated_at END as completed_at, name, task.start_date,task.end_date, extract(day from task.start_date) as day, extract(month from task.start_date) as month, extract(year from task.start_date) as year from task where actor= :istarUserId) as all_tasks";
+		String sql = "select * from (select id, case when task.is_active then 'INCOMPLETE' else 'COMPLETE' END as status, case when task.is_active then null else task.updated_at END as completed_at, name, task.start_date,task.end_date, extract(day from task.start_date) as day, extract(month from task.start_date) as month, extract(year from task.start_date) as year, item_id, item_type from task where actor= :istarUserId) as all_tasks";
 
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
@@ -158,6 +171,8 @@ public class AppCalendarServices {
 			String name = (String) dailyTask[3];
 			Timestamp startDate = (Timestamp) dailyTask[4];
 			Timestamp endDate = (Timestamp) dailyTask[5];
+			Integer itemId = (Integer) dailyTask[6];
+			String itemType = (String) dailyTask[7];
 			
 			DailyTaskPOJO dailyTaskPOJO = new DailyTaskPOJO();
 			
@@ -166,6 +181,8 @@ public class AppCalendarServices {
 			dailyTaskPOJO.setStatus(status);
 			dailyTaskPOJO.setStartDate(startDate);
 			dailyTaskPOJO.setEndDate(endDate);
+			dailyTaskPOJO.setItemId(itemId);
+			dailyTaskPOJO.setItemType(itemType);
 			
 			if(status.equals("COMPLETE")){
 				dailyTaskPOJO.setCompletedAt(completedAt);
