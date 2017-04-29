@@ -38,8 +38,8 @@ public class AppCalendarServices {
 			String name = (String) dailyTask[3];
 			Timestamp startDate = (Timestamp) dailyTask[4];
 			Timestamp endDate = (Timestamp) dailyTask[5];
-			Integer itemId = (Integer) dailyTask[6];
-			String itemType = (String) dailyTask[7];
+			Integer itemId = (Integer) dailyTask[9];
+			String itemType = (String) dailyTask[10];
 			
 			DailyTaskPOJO dailyTaskPOJO = new DailyTaskPOJO();
 			
@@ -84,8 +84,8 @@ public class AppCalendarServices {
 			String name = (String) dailyTask[3];
 			Timestamp startDate = (Timestamp) dailyTask[4];
 			Timestamp endDate = (Timestamp) dailyTask[5];
-			Integer itemId = (Integer) dailyTask[6];
-			String itemType = (String) dailyTask[7];
+			Integer itemId = (Integer) dailyTask[9];
+			String itemType = (String) dailyTask[10];
 			
 			DailyTaskPOJO dailyTaskPOJO = new DailyTaskPOJO();
 			
@@ -128,8 +128,8 @@ public class AppCalendarServices {
 			String name = (String) dailyTask[3];
 			Timestamp startDate = (Timestamp) dailyTask[4];
 			Timestamp endDate = (Timestamp) dailyTask[5];
-			Integer itemId = (Integer) dailyTask[6];
-			String itemType = (String) dailyTask[7];
+			Integer itemId = (Integer) dailyTask[9];
+			String itemType = (String) dailyTask[10];
 			
 			DailyTaskPOJO dailyTaskPOJO = new DailyTaskPOJO();
 			
@@ -171,8 +171,8 @@ public class AppCalendarServices {
 			String name = (String) dailyTask[3];
 			Timestamp startDate = (Timestamp) dailyTask[4];
 			Timestamp endDate = (Timestamp) dailyTask[5];
-			Integer itemId = (Integer) dailyTask[6];
-			String itemType = (String) dailyTask[7];
+			Integer itemId = (Integer) dailyTask[9];
+			String itemType = (String) dailyTask[10];
 			
 			DailyTaskPOJO dailyTaskPOJO = new DailyTaskPOJO();
 			
