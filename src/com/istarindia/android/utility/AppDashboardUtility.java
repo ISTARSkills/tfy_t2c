@@ -31,6 +31,7 @@ public class AppDashboardUtility {
 			taskSummaryPOJO.setItemType(task.getItemType());
 			if(task.getIsActive()){
 				taskSummaryPOJO.setStatus("INCOMPLETE");
+				taskSummaryPOJO.setDate(task.getEndDate());
 			}else{
 				taskSummaryPOJO.setStatus("COMPLETE");
 				taskSummaryPOJO.setDate(task.getUpdatedAt());
@@ -65,6 +66,7 @@ public class AppDashboardUtility {
 			taskSummaryPOJO.setItemType(task.getItemType()+"_"+lesson.getType());
 			if(task.getIsActive()){
 				taskSummaryPOJO.setStatus("INCOMPLETE");
+				taskSummaryPOJO.setDate(task.getEndDate());
 			}else{
 				taskSummaryPOJO.setStatus("COMPLETE");
 				taskSummaryPOJO.setDate(task.getUpdatedAt());
