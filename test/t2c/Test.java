@@ -1,10 +1,17 @@
 package t2c;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.istarindia.android.utility.AppUtility;
+import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.AppServices;
+import com.istarindia.apps.services.StudentPlaylistServices;
+import com.viksitpro.core.dao.entities.Cmsession;
 import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.entities.Module;
+import com.viksitpro.core.dao.entities.StudentPlaylist;
+import com.viksitpro.core.dao.entities.StudentPlaylistDAO;
 import com.viksitpro.core.dao.entities.UserProfile;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
@@ -13,46 +20,31 @@ public class Test {
 	public static void main(String[] args) {
 	
 		try {
-			new AppServices().sendOTP("9591940080");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			test();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 	}
 	
-	public static void istarUserTest(){
+	public static void test(){
 		
-		String email = "aeewwbc_11112311@istar.com";
-		String socialMedia = "GOOGLE";
-		String name = "TEST ISTAR";
-		String profileImage = "student.png";		
-		
-		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUser = istarUserServices.getIstarUserByEmail(email);
-		
-		if (istarUser == null) {
-
-			istarUser = istarUserServices.createIstarUser(email, "test123", null, null, socialMedia);
-			UserProfile userProfile = istarUserServices.createUserProfile(istarUser.getId(), null, name, null, null,
-					null, profileImage, null);
-
-			istarUser = userProfile.getIstarUser();
-
-			if (istarUser.getUserProfile() == null) {
-				System.out.println("User profile is null");
-			} else {
-				System.out.println("User profile is NOT null");
+		AppCourseServices appCourseServices = new AppCourseServices();
+		StudentPlaylistServices StudentPlaylistServices= new StudentPlaylistServices();
+		for(StudentPlaylist sp : (new StudentPlaylistDAO()).findAll()){
+			System.out.println("Updating--->"+ sp.getId());
+			Module module = appCourseServices.getModuleOfLesson(sp.getLesson().getId());
+			if(module!=null){
+				List<Cmsession> allCmsessions =  appCourseServices.getCmsessionsOfModule(module.getId());
+				if(allCmsessions.size()>0){
+					sp.setModule(module);
+					sp.setCmsession(allCmsessions.get(0));
+					StudentPlaylistServices.updateStudentPlaylistToDAO(sp);
+					System.out.println("Updated--->"+ sp.getId());
+				}
 			}
-		
-		} else{
-			System.out.println("User exists");
-			System.out.println("UserProfile ID is "+ istarUser.getUserProfile().getId());
-		}
-		
-		System.exit(0);
-	}
-	
-	
 
+		}
+		System.out.println("Finished");
+	}
 }
