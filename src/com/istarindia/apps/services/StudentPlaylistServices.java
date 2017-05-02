@@ -64,7 +64,7 @@ public class StudentPlaylistServices {
 	
 	@SuppressWarnings("unchecked")
 	public List<StudentPlaylist> getStudentPlaylistOfUserForCourse(int istarUserId, int courseId){
-		long previousTime = System.currentTimeMillis();
+		//long previousTime = System.currentTimeMillis();
 		String hql = "from StudentPlaylist studentPlaylist where istarUser.id= :istarUserId and course.id= :courseId";
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();

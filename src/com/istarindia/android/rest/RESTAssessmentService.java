@@ -97,8 +97,8 @@ public class RESTAssessmentService {
 
 	@POST
 	@Path("{assessmentId}/{taskId}")
-	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
 	public Response submitUserAssessmentResponse(@PathParam("userId") int istarUserId,
 			@PathParam("assessmentId") int assessmentId, @PathParam("taskId") int taskId, List<QuestionResponsePOJO> questionResponses) {
 		try {

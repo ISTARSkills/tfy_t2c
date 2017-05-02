@@ -9,27 +9,21 @@ import com.istarindia.android.pojo.AssessmentPOJO;
 import com.istarindia.android.pojo.CoursePOJO;
 import com.istarindia.android.pojo.LessonPOJO;
 import com.istarindia.android.pojo.ModulePOJO;
-import com.istarindia.android.pojo.NotificationPOJO;
 import com.istarindia.android.pojo.OptionPOJO;
 import com.istarindia.android.pojo.QuestionPOJO;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.apps.services.AppAssessmentServices;
-import com.istarindia.apps.services.AppCourseServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.AssessmentOption;
 import com.viksitpro.core.dao.entities.AssessmentQuestion;
 import com.viksitpro.core.dao.entities.Cmsession;
 import com.viksitpro.core.dao.entities.Course;
-import com.viksitpro.core.dao.entities.IstarNotification;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Module;
 import com.viksitpro.core.dao.entities.Question;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
-import com.viksitpro.core.dao.entities.Task;
-import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.pojo.recruiter.IstarUserPOJO;
-import com.viksitpro.core.utilities.TaskCategory;
 
 public class AppPOJOUtility {
 
