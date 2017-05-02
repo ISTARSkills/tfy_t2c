@@ -558,7 +558,6 @@ public class AppAssessmentServices {
 
 		HashMap<Integer, HashMap<Integer, Double>> skillsBenchmark = new HashMap<Integer, HashMap<Integer, Double>>();
 		
-
 		String sql = "select COALESCE(sum(max_points),0), skill_objective_id, assessment_id from assessment_benchmark group by assessment_id, skill_objective_id order by assessment_id, skill_objective_id";
 
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
@@ -568,11 +567,14 @@ public class AppAssessmentServices {
 
 		List<Object[]> result = query.list();
 
-		for (Object[] obj : result) {
-			HashMap<Integer, Double> benchmarks = new HashMap<Integer, Double>();
-			
-			benchmarks.put((Integer) obj[1], (Double) obj[0]);
-			skillsBenchmark.put((Integer)obj[2], benchmarks); 			
+		for (Object[] obj : result) {			
+			if(skillsBenchmark.containsKey((Integer)obj[2])){
+				skillsBenchmark.get((Integer)obj[2]).put((Integer) obj[1], (Double) obj[0]);
+			}else{
+				HashMap<Integer, Double> benchmarks = new HashMap<Integer, Double>();
+				benchmarks.put((Integer) obj[1], (Double) obj[0]);
+				skillsBenchmark.put((Integer)obj[2], benchmarks); 	
+			}		
 		}
 		return skillsBenchmark;
 	}

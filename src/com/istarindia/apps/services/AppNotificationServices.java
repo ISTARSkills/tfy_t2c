@@ -85,7 +85,12 @@ public class AppNotificationServices {
 				e.printStackTrace();
 			}
 		}
+		
 		if (lesson != null) {
+			StudentPlaylistServices studentPlaylistServices=new StudentPlaylistServices();
+			StudentPlaylist studentPlaylist = studentPlaylistServices.getStudentPlaylistOfUserForLesson(istarNotification.getReceiverId(), lesson.getId());
+
+			if(studentPlaylist!=null){
 			notificationPOJO = new NotificationPOJO();
 			notificationPOJO.setId(istarNotification.getId());
 			notificationPOJO.setMessage(istarNotification.getDetails());
@@ -95,13 +100,11 @@ public class AppNotificationServices {
 			notificationPOJO.setItemType("LESSON_" + lesson.getType());
 			notificationPOJO.setItemId(lesson.getId());
 			
-			StudentPlaylistServices studentPlaylistServices=new StudentPlaylistServices();
-			StudentPlaylist studentPlaylist = studentPlaylistServices.getStudentPlaylistOfUserForLesson(istarNotification.getReceiverId(), lesson.getId());
-			
 			notificationPOJO.getItem().put("id", lesson.getId());
 			notificationPOJO.getItem().put("moduleId", studentPlaylist.getModule().getId());
 			notificationPOJO.getItem().put("courseId", studentPlaylist.getCourse().getId());
-			notificationPOJO.getItem().put("cmsessionId", studentPlaylist.getCmsession().getId());			
+			notificationPOJO.getItem().put("cmsessionId", studentPlaylist.getCmsession().getId());
+			}
 		}
 		return notificationPOJO;
 	}

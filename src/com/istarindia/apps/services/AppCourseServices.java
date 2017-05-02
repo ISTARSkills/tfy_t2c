@@ -125,6 +125,7 @@ public class AppCourseServices {
 					
 					modulePOJO.getLessons().add(cmsessionPOJO);
 				}
+				modulePOJO.sortLessonsAndAssignStatus();
 			}
 		}
 		return coursePOJO;

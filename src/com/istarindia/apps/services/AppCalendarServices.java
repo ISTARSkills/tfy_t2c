@@ -50,8 +50,7 @@ public class AppCalendarServices {
 			dailyTaskPOJO.setEndDate(endDate);
 			dailyTaskPOJO.setItemId(itemId);
 			dailyTaskPOJO.setItemType(itemType);
-			
-			
+						
 			if(status.equals("COMPLETE")){
 				dailyTaskPOJO.setCompletedAt(completedAt);
 			}
