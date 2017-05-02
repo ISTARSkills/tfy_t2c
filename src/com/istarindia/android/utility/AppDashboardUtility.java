@@ -11,6 +11,7 @@ import com.istarindia.apps.services.AppAssessmentServices;
 import com.istarindia.apps.services.AppCourseServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
+import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Task;
 
@@ -22,7 +23,8 @@ public class AppDashboardUtility {
 		
 		AppAssessmentServices appAssessmentServices= new AppAssessmentServices();
 		Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());
-		
+		AppCourseServices appCourseServices = new AppCourseServices();
+		Course course = appCourseServices.getCourse(assessment.getCourse());
 		if(assessment!=null && assessment.getAssessmentQuestions().size()>0){
 			taskSummaryPOJO = new TaskSummaryPOJO();
 			
@@ -42,11 +44,11 @@ public class AppDashboardUtility {
 			taskSummaryPOJO.setItemPoints(appAssessmentServices.getMaxPointsOfAssessment(assessment.getId()).intValue());
 			taskSummaryPOJO.setNumberOfQuestions(assessment.getAssessmentQuestions().size());
 			taskSummaryPOJO.setDuration(assessment.getAssessmentdurationminutes());
-			taskSummaryPOJO.setDescription("Lorem Ipsum is simply dummy text of the printing and typesetting industry. "
-					+ "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, "
-					+ "when an unknown printer took a galley of type and scrambled it to make a type specimen book. "
-					+ "It has survived not only five centuries, but also the leap into electronic typesetting, "
-					+ "remaining essentially unchanged");
+			if(assessment.getDescription()==null){
+				taskSummaryPOJO.setDescription(course.getCourseDescription());
+			}else{
+				taskSummaryPOJO.setDescription(assessment.getDescription());
+			}
 		}
 		return taskSummaryPOJO;
 	}

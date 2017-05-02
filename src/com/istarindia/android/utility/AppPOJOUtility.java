@@ -179,8 +179,9 @@ public class AppPOJOUtility {
 		assessmentPOJO.setType(assessment.getAssessmentType());
 		assessmentPOJO.setName(assessment.getAssessmenttitle());
 		assessmentPOJO.setCategory(assessment.getCategory());
+		assessmentPOJO.setDescription(assessment.getDescription());
 		assessmentPOJO.setDurationInMinutes(assessment.getAssessmentdurationminutes());
-		
+
 		Double maxPoints = 0.0;
 		AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
 		maxPoints = appAssessmentServices.getMaxPointsOfAssessment(assessment.getId());

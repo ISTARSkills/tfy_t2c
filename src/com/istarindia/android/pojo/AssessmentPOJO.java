@@ -14,6 +14,7 @@ public class AssessmentPOJO {
 	private String type;
 	private String name;
 	private String category;
+	private String description;
 	private Integer durationInMinutes;
 	private Double points;
 	private List<QuestionPOJO> questions = new ArrayList<QuestionPOJO>();
@@ -54,6 +55,15 @@ public class AssessmentPOJO {
 		this.category = category;
 	}
 	
+	@XmlAttribute(name = "description", required = false)
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	@XmlAttribute(name = "durationInMinutes", required = false)
 	public Integer getDurationInMinutes() {
 		return durationInMinutes;

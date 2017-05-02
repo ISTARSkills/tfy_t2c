@@ -3,6 +3,7 @@ package com.istarindia.android.rest;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -103,6 +104,30 @@ public class RESTIstarUserService {
 		}
 	}
 
+	@PUT
+	@Path("{userId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateUserProfile(@PathParam("userId") int userId, StudentProfile studentProfile) {
+
+		try {
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+
+			if (istarUser == null) {
+				// User does not exists
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			} else {
+				
+				return null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	
 	@PUT
 	@Path("password/reset")
 	@Produces(MediaType.APPLICATION_JSON)
