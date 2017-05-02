@@ -22,11 +22,13 @@ import com.istarindia.android.utility.AppContentServiceUtility;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.apps.services.AppAssessmentServices;
 import com.istarindia.apps.services.AppBatchStudentsServices;
+import com.istarindia.apps.services.ReportServices;
 import com.istarindia.apps.services.StudentAssessmentServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.BatchGroup;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Question;
+import com.viksitpro.core.dao.entities.Report;
 import com.viksitpro.core.dao.entities.StudentAssessment;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
@@ -119,13 +121,15 @@ public class RESTAssessmentService {
 			
 			AppContentServiceUtility appContentServiceUtility = new AppContentServiceUtility();
 			
+			int correctAnswersCount = 0;
+			int assessmentDuration = 0;
 			for (QuestionResponsePOJO questionResponsePOJO : questionResponses) {
 				Question question = appContentServiceUtility.getQuestion(questionResponsePOJO.getQuestionId());
 
 				HashMap<String, Boolean> optionsMap = appContentServiceUtility.getAnsweredOptionsMap(question,
 						questionResponsePOJO.getOptions());
 
-				StudentAssessment studentAssessment = studentAssessmentServices.getStudentAssessmentOfQuestionForUser(istarUserId, assessmentId, question.getId());
+				StudentAssessment studentAssessment = studentAssessmentServices.getStudentAssessmentOfQuestionForUser(istarUserId, assessmentId, question.getId());				
 
 				if(studentAssessment!=null){
 					studentAssessment = studentAssessmentServices.updateStudentAssessment(studentAssessment,
@@ -138,6 +142,22 @@ public class RESTAssessmentService {
 							optionsMap.get("option2"), optionsMap.get("option3"), optionsMap.get("option4"), null, null,
 							batchGroupId, questionResponsePOJO.getDuration());
 				}
+				
+				if(optionsMap.get("isCorrect")){
+					correctAnswersCount++;
+				}
+				assessmentDuration = assessmentDuration + questionResponsePOJO.getDuration();
+			}
+			
+			Double maxPoints = appAssessmentServices.getMaxPointsOfAssessment(assessment.getId());
+			
+			ReportServices reportServices = new ReportServices();
+			Report report = reportServices.getAssessmentReportForUser(istarUserId, assessmentId);
+			
+			if(report==null){
+				reportServices.createReport(istarUser, assessment, correctAnswersCount, assessmentDuration, maxPoints.intValue());
+			}else{
+				reportServices.updateReport(report, istarUser, assessment, correctAnswersCount, assessmentDuration, maxPoints.intValue());
 			}
 			
 			TaskServices taskServices = new TaskServices();

@@ -214,6 +214,7 @@ public class AppUserRankUtility {
 				+ "(select batch_group_id from batch_students where batch_students.student_id= :istarUserId)) "
 				+ "group by user_gamification.istar_user order by total_points desc) as batch_ranks) as user_rank where istar_user=:istarUserId";
 		
+		System.out.println("Student Rank pojo "+sql);
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();

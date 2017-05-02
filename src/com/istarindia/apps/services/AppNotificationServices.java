@@ -12,6 +12,7 @@ import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.notification.IstarNotificationServices;
+import com.viksitpro.core.utilities.NotificationType;
 import com.viksitpro.core.utilities.TaskCategory;
 
 public class AppNotificationServices {
@@ -64,6 +65,7 @@ public class AppNotificationServices {
 			notificationPOJO.setMessage(istarNotification.getDetails());
 			notificationPOJO.setStatus(istarNotification.getStatus());
 			notificationPOJO.setTime(istarNotification.getCreatedAt());
+			notificationPOJO.setItemType(NotificationType.MESSAGE);
 		}
 		return notificationPOJO;
 	}
@@ -97,7 +99,7 @@ public class AppNotificationServices {
 			notificationPOJO.setStatus(istarNotification.getStatus());
 			notificationPOJO.setTime(istarNotification.getCreatedAt());
 			notificationPOJO.setImageURL(lesson.getImage_url());
-			notificationPOJO.setItemType("LESSON_" + lesson.getType());
+			notificationPOJO.setItemType(NotificationType.LESSON+"_" + lesson.getType());
 			notificationPOJO.setItemId(lesson.getId());
 			
 			notificationPOJO.getItem().put("id", lesson.getId());
@@ -135,7 +137,7 @@ public class AppNotificationServices {
 			notificationPOJO.setTime(istarNotification.getCreatedAt());
 			Course course = appCourseServices.getCourse(assessment.getCourse());
 			notificationPOJO.setImageURL(course.getImage_url());
-			notificationPOJO.setItemType("ASSESSMENT");
+			notificationPOJO.setItemType(NotificationType.ASSESSMENT);
 			notificationPOJO.setItemId(assessment.getId());
 			
 			notificationPOJO.getItem().put("id", assessment.getId());

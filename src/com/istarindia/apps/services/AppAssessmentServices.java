@@ -1,5 +1,6 @@
 package com.istarindia.apps.services;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -122,8 +123,7 @@ public class AppAssessmentServices {
 				int totalNumberOfQuestions = allStudentAssessment.size();
 				Integer totalNumberOfCorrectlyAnsweredQuestions = getNumberOfCorrectlyAnsweredQuestions(istarUserId,
 						assessment.getId());
-				Integer numberOfUsersAttemptedTheAssessment = getNumberOfUsersAttemptedTheAssessment(istarUserId,
-						assessment.getId());
+
 				assessmentReportPOJO = new AssessmentReportPOJO();
 				assessmentReportPOJO.setId(assessment.getId());
 				assessmentReportPOJO.setName(assessment.getAssessmenttitle());
@@ -135,8 +135,9 @@ public class AppAssessmentServices {
 				HashMap<String, Object> batchAverageMap = calculateBatchAverageOfAssessment(assessment, istarUserId);
 
 				assessmentReportPOJO.setBatchAverage((Double) batchAverageMap.get("batchAverage"));
-				assessmentReportPOJO.setTotalNumberOfUsersInBatch((Integer) batchAverageMap.get("totalStudents"));
-				assessmentReportPOJO.setUsersAttemptedCount(numberOfUsersAttemptedTheAssessment);
+				assessmentReportPOJO.setTotalNumberOfUsersInBatch((Integer) batchAverageMap.get("totalStudentsInBatch"));
+				
+				assessmentReportPOJO.setUsersAttemptedCount((Integer) batchAverageMap.get("numberOfStudentsAttemptedAssessment") );
 				assessmentReportPOJO.calculateTotalScore();
 				assessmentReportPOJO.calculateUserScore();
 				assessmentReportPOJO.calculateAccuracy();
@@ -200,11 +201,11 @@ public class AppAssessmentServices {
 
 		HashMap<Integer, Integer> numberOfCorrectlyAnsweredQuestions = getNumberOfCorrectlyAnsweredQuestionsOfAllAssessments(
 				istarUserId);
-		HashMap<Integer, Integer> numberOfUsersAttemptedAssessments = getNumberOfUsersAttemptedTheAssessmentOfUser(
-				istarUserId);
+/*		HashMap<Integer, Integer> numberOfUsersAttemptedAssessments = getNumberOfUsersAttemptedTheAssessmentOfUser(
+				istarUserId);*/
 		HashMap<Integer, HashMap<String, Object>> batchAverageOfAssessments = calculateBatchAverageOfAllAssessments(
 				istarUserId);
-		HashMap<Integer, HashMap<Integer, Double>> skillsBenchmarkForAssessments = getMaxPointsForSkillObjectiveOfAllAssessment();
+		HashMap<Integer, HashMap<Integer, Double>> skillsBenchmarkForAssessments = getMaxPointsForSkillObjectiveOfAllAssessment(istarUserId);
 
 		for (Integer assessmentId : numberOfCorrectlyAnsweredQuestions.keySet()) {
 
@@ -298,7 +299,6 @@ public class AppAssessmentServices {
 				int totalNumberOfQuestions = assessment.getAssessmentQuestions().size();
 				Integer totalNumberOfCorrectlyAnsweredQuestions = numberOfCorrectlyAnsweredQuestions
 						.get(assessment.getId());
-				Integer numberOfUsersAttemptedTheAssessment = numberOfUsersAttemptedAssessments.get(assessment.getId());
 
 				assessmentReportPOJO = new AssessmentReportPOJO();
 				assessmentReportPOJO.setId(assessment.getId());
@@ -311,9 +311,10 @@ public class AppAssessmentServices {
 				HashMap<String, Object> batchAverageMap = batchAverageOfAssessments.get(assessment.getId());
 				if(batchAverageMap!=null){
 					assessmentReportPOJO.setBatchAverage((Double) batchAverageMap.get("batchAverage"));
-					assessmentReportPOJO.setTotalNumberOfUsersInBatch((Integer) batchAverageMap.get("totalStudents"));
+					assessmentReportPOJO.setTotalNumberOfUsersInBatch((Integer) batchAverageMap.get("totalStudentsInBatch"));
+					assessmentReportPOJO.setUsersAttemptedCount((Integer) batchAverageMap.get("numberOfStudentsAttemptedAssessment"));
 				}
-				assessmentReportPOJO.setUsersAttemptedCount(numberOfUsersAttemptedTheAssessment);
+				
 				assessmentReportPOJO.calculateTotalScore();
 				assessmentReportPOJO.calculateUserScore();
 				assessmentReportPOJO.calculateAccuracy();
@@ -359,7 +360,7 @@ public class AppAssessmentServices {
 	 * return batchMap; }
 	 */
 
-	@SuppressWarnings("rawtypes")
+/*	@SuppressWarnings("rawtypes")
 	public HashMap<String, Object> calculateBatchAverageOfAssessment(Assessment assessment, Integer istarUserId) {
 
 		Double batchAverage = 0.0;
@@ -388,9 +389,45 @@ public class AppAssessmentServices {
 		batchMap.put("totalStudents", totalStudentsInBatch);
 
 		return batchMap;
+	}*/
+	
+	@SuppressWarnings("rawtypes")
+	public HashMap<String, Object> calculateBatchAverageOfAssessment(Assessment assessment, Integer istarUserId) {
+
+		Double batchAverage = 0.0;
+		Integer totalStudentsInBatch = 0;
+		Integer numberOfStudentsAttemptedAssessment = 0;
+		HashMap<String, Object> batchMap = new HashMap<String, Object>();
+
+		String sql = "with temp as (select student_id from batch_students where batch_group_id in (select batch_group_id from batch_students where student_id= :istarUserId)) select COALESCE((sum(points_earned)*1.0/count(user_id)),0) as batch_average, total_points, cast (count(user_id) as integer) as attempted_count, cast((select count(*) from temp) as integer) as total_students, assessment_id from report where assessment_id= :assessmentId and user_id in (select * from temp) group by assessment_id, total_points";
+		System.out.println(sql);
+
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+
+		SQLQuery query = session.createSQLQuery(sql);
+		query.setParameter("istarUserId", istarUserId);
+		query.setParameter("assessmentId", assessment.getId());
+
+		List results = query.list();
+
+		if (results.size() > 0) {
+			Object[] batchData = (Object[]) results.get(0);
+
+			batchAverage = ((BigDecimal) batchData[0]).doubleValue();
+			totalStudentsInBatch = (Integer) batchData[3];
+			numberOfStudentsAttemptedAssessment = (Integer) batchData[2];
+
+		}
+		
+		batchMap.put("batchAverage", batchAverage);
+		batchMap.put("numberOfStudentsAttemptedAssessment", numberOfStudentsAttemptedAssessment);
+		batchMap.put("totalStudentsInBatch", totalStudentsInBatch);
+
+		return batchMap;
 	}
 
-	@SuppressWarnings("unchecked")
+/*	@SuppressWarnings("unchecked")
 	public HashMap<Integer, HashMap<String, Object>> calculateBatchAverageOfAllAssessments(Integer istarUserId) {
 
 		HashMap<Integer, HashMap<String, Object>> allAssessmentsMap = new HashMap<Integer, HashMap<String, Object>>();
@@ -414,8 +451,35 @@ public class AppAssessmentServices {
 			allAssessmentsMap.put((Integer) batchData[2], batchMap);
 		}
 		return allAssessmentsMap;
-	}
+	}*/
 
+	@SuppressWarnings("unchecked")
+	public HashMap<Integer, HashMap<String, Object>> calculateBatchAverageOfAllAssessments(Integer istarUserId) {
+
+		HashMap<Integer, HashMap<String, Object>> allAssessmentsMap = new HashMap<Integer, HashMap<String, Object>>();
+
+		String sql = "with temp as (select student_id from batch_students where batch_group_id in (select batch_group_id from batch_students where student_id= :istarUserId)) select COALESCE((sum(points_earned)*1.0/count(user_id)),0) as batch_average, total_points, cast (count(user_id) as integer) as attempted_count, cast((select count(*) from temp) as integer) as total_students, assessment_id from report where user_id in (select * from temp) group by assessment_id, total_points";
+		System.out.println(sql);
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+
+		SQLQuery query = session.createSQLQuery(sql);
+		query.setParameter("istarUserId", istarUserId);
+
+		List<Object[]> results = query.list();
+
+		for (Object[] batchData : results) {
+			HashMap<String, Object> batchMap = new HashMap<String, Object>();
+
+			batchMap.put("batchAverage", ((BigDecimal) batchData[0]).doubleValue());
+			batchMap.put("numberOfStudentsAttemptedAssessment", (Integer) batchData[2]);
+			batchMap.put("totalStudentsInBatch", (Integer) batchData[3]);
+
+			allAssessmentsMap.put((Integer) batchData[4], batchMap);
+		}
+		return allAssessmentsMap;
+	}
+	
 	public Integer getNumberOfUsersAttemptedTheAssessment(int istarUserId, int assessmentId) {
 
 		String sql = "select COALESCE(cast (count(DISTINCT istar_user)  as integer),0) from user_gamification where istar_user in "
@@ -554,7 +618,7 @@ public class AppAssessmentServices {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public HashMap<Integer, HashMap<Integer, Double>> getMaxPointsForSkillObjectiveOfAllAssessment() {
+	public HashMap<Integer, HashMap<Integer, Double>> getMaxPointsForSkillObjectiveOfAllAssessment(int istarUserId) {
 
 		HashMap<Integer, HashMap<Integer, Double>> skillsBenchmark = new HashMap<Integer, HashMap<Integer, Double>>();
 		

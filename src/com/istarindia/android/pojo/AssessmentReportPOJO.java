@@ -71,7 +71,7 @@ public class AssessmentReportPOJO {
 		return batchAverage;
 	}
 	public void setBatchAverage(Double batchAverage) {
-		this.batchAverage = Math.round(batchAverage*100.0*100.0)/100.0;
+		this.batchAverage = Math.round(batchAverage*100.0)/100.0;
 	}
 	
 	@XmlAttribute(name = "usersAttemptedCount", required = false)
