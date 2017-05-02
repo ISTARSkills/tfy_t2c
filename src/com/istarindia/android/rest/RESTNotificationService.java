@@ -39,7 +39,7 @@ public class RESTNotificationService {
 	
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.TEXT_PLAIN)
 	public Response markNotificationAsRead(@PathParam("userId") int userId, List<Integer> notifications){		
 		try{
 			System.out.println("MArk notifications as read");
@@ -49,7 +49,7 @@ public class RESTNotificationService {
 				istarNotificationServices.updateNotificationStatus(notificationId, "READ");
 			}
 			
-			return Response.ok().build();
+			return Response.ok("DONE").build();
 		}catch(Exception e){
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();

@@ -104,7 +104,7 @@ public class RESTDashboardService {
 	
 	@PUT
 	@Path("{taskId}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
 	public Response completeTask(@PathParam("userId") int userId, @PathParam("taskId") int taskId){
 		try{
 			IstarUserServices istarUserServices = new IstarUserServices();

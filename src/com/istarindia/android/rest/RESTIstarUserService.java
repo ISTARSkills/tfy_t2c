@@ -265,7 +265,7 @@ public class RESTIstarUserService {
 
 	@POST
 	@Path("{userId}/batch")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
 	public Response assignBatchCode(@PathParam("userId") int istarUserId, @FormParam("batchCode") String batchCode) {
 
 		try {
