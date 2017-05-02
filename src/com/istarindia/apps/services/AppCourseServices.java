@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -67,7 +69,7 @@ public class AppCourseServices {
 			for(StudentPlaylist studentPlaylist : allStudentPlaylist){
 				ModulePOJO modulePOJO = null;
 				Module module = studentPlaylist.getModule();
-				Cmsession cmsession = studentPlaylist.getCmsession();
+				//Cmsession cmsession = studentPlaylist.getCmsession();
 				Lesson lesson = studentPlaylist.getLesson();
 				
 				for(ModulePOJO tempModulePOJO : coursePOJO.getModules()){
@@ -83,6 +85,12 @@ public class AppCourseServices {
 					modulePOJO.setImageURL(module.getImage_url());
 					modulePOJO.setDescription(module.getModule_description());
 					modulePOJO.setOrderId(module.getOrderId());
+					
+					Set<String> allSkillObjectivesOfModule = new HashSet<String>();
+					for (SkillObjective skillObjective : module.getSkillObjectives()) {
+						allSkillObjectivesOfModule.add(skillObjective.getName());
+					}
+					modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
 					
 					CmsessionPOJO cmsessionPOJO = new CmsessionPOJO();
 					LessonPOJO lessonPOJO = new LessonPOJO();
@@ -166,6 +174,7 @@ public class AppCourseServices {
 					          if(skillsMap.containsKey(cmsessionSkillObjective.getId())){
 					            cmsessionSkillReportPOJO.setUserPoints((Double) skillsMap.get(cmsessionSkillObjective.getId()).get("points"));
 					          }else{
+					        	  System.out.println("CMSESSION SKILL NOT PRESENT->" + cmsessionSkillObjective.getId());
 					            cmsessionSkillReportPOJO.setUserPoints(0.0);
 					          }					          
 							allCmsessionSkills.add(cmsessionSkillReportPOJO);
