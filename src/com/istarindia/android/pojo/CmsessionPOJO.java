@@ -8,7 +8,8 @@ public class CmsessionPOJO implements Comparable<CmsessionPOJO>{
 
 	private Integer id;
 	private String type;
-	private Object item;
+	private LessonPOJO lesson;
+	private AssessmentPOJO assessment;
 	private String status;
 	private Integer orderId = 0;
 	
@@ -34,13 +35,22 @@ public class CmsessionPOJO implements Comparable<CmsessionPOJO>{
 		this.type = type;
 	}
 
-	@XmlAttribute(name = "item", required = false)
-	public Object getItem() {
-		return item;
+	@XmlAttribute(name = "lesson", required = false)
+	public LessonPOJO getLesson() {
+		return lesson;
 	}
 
-	public void setItem(Object item) {
-		this.item = item;
+	public void setLesson(LessonPOJO lesson) {
+		this.lesson = lesson;
+	}
+
+	@XmlAttribute(name = "assessment", required = false)
+	public AssessmentPOJO getAssessment() {
+		return assessment;
+	}
+
+	public void setAssessment(AssessmentPOJO assessment) {
+		this.assessment = assessment;
 	}
 
 	@XmlAttribute(name = "item", required = false)
@@ -48,7 +58,6 @@ public class CmsessionPOJO implements Comparable<CmsessionPOJO>{
 		return orderId;
 	}
 
-	
 	public void setOrderId(Integer orderId) {
 		this.orderId = orderId;
 	}

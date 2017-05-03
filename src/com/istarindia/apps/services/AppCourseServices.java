@@ -106,7 +106,7 @@ public class AppCourseServices {
 					
 					cmsessionPOJO.setId(lesson.getId());
 					cmsessionPOJO.setType("LESSON_"+lesson.getType());
-					cmsessionPOJO.setItem(lessonPOJO);
+					cmsessionPOJO.setLesson(lessonPOJO);
 					cmsessionPOJO.setOrderId(studentPlaylist.getId());
 					cmsessionPOJO.setStatus(studentPlaylist.getStatus());
 					
@@ -127,7 +127,7 @@ public class AppCourseServices {
 					
 					cmsessionPOJO.setId(lesson.getId());
 					cmsessionPOJO.setType("LESSON_"+lesson.getType());
-					cmsessionPOJO.setItem(lessonPOJO);
+					cmsessionPOJO.setLesson(lessonPOJO);
 					cmsessionPOJO.setOrderId(studentPlaylist.getId());
 					cmsessionPOJO.setStatus(studentPlaylist.getStatus());
 					
