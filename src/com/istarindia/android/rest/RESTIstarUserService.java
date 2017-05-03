@@ -270,7 +270,7 @@ public class RESTIstarUserService {
 
 	@POST
 	@Path("{userId}/batch")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response assignBatchCode(@PathParam("userId") int istarUserId, @FormParam("batchCode") String batchCode) {
 
 		try {
@@ -287,7 +287,17 @@ public class RESTIstarUserService {
 			AppBatchStudentsServices batchStudentServices = new AppBatchStudentsServices();
 			batchStudentServices.createBatchStudents(istarUser, batchGroup, "STUDENT");					
 
-			return Response.ok("DONE").build();
+			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
+			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(istarUserId);
+						
+			if(complexObject!=null){				
+				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+				String result = gson.toJson(complexObject);
+
+				return Response.ok(result).build();
+			}else{
+				throw new Exception();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();

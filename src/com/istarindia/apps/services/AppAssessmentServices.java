@@ -485,7 +485,7 @@ public class AppAssessmentServices {
 		String sql = "select COALESCE(cast (count(DISTINCT istar_user)  as integer),0) from user_gamification where istar_user in "
 				+ "(select student_id from batch_students where batch_group_id in "
 				+ "(select batch_group_id from batch_students where student_id=" + istarUserId
-				+ " limit 1)) and item_id=" + assessmentId;
+				+ " )) and item_id=" + assessmentId;
 
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
@@ -505,7 +505,7 @@ public class AppAssessmentServices {
 		String sql = "select COALESCE(cast (count(DISTINCT istar_user)  as integer),0), item_id from user_gamification where istar_user in "
 				+ "(select student_id from batch_students where batch_group_id in "
 				+ "(select batch_group_id from batch_students where student_id=" + istarUserId
-				+ " limit 1)) and item_type='ASSESSMENT' group by item_id";
+				+ " )) and item_type='ASSESSMENT' group by item_id";
 
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
