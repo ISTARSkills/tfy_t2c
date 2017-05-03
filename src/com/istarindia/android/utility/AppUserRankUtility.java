@@ -86,7 +86,7 @@ public class AppUserRankUtility {
 				
 			List<StudentRankPOJO> allStudentRanksOfABatch = new ArrayList<StudentRankPOJO>();
 			
-			String sql = "select *, cast(rank() over (order by total_points desc) as integer) from "
+			String sql = "select *, COALESCE(cast(rank() over (order by total_points desc) as integer),0) from "
 					+ "(select user_gamification.istar_user, cast(sum(user_gamification.points) as integer)as total_points, cast(sum(user_gamification.coins) as integer) as total_coins "
 					+ "from assessment,user_gamification where user_gamification.item_id=assessment.id and course_id= :courseId  and user_gamification.istar_user in "
 					+ "(select student_id from batch_students where batch_group_id in "
@@ -154,7 +154,7 @@ public class AppUserRankUtility {
 				
 			List<StudentRankPOJO> allStudentRanksOfABatch = new ArrayList<StudentRankPOJO>();
 			
-			String sql = "select *, cast(rank() over (order by total_points desc) as integer) from "
+			String sql = "select *, COALESCE(cast(rank() over (order by total_points desc) as integer),0) from "
 					+ "(select user_gamification.istar_user, cast(sum(user_gamification.points) as integer)as total_points, cast(sum(user_gamification.coins) as integer) as total_coins "
 					+ "from assessment,user_gamification where user_gamification.item_id=assessment.id and course_id= :courseId  and user_gamification.istar_user in "
 					+ "(select student_id from batch_students where batch_group_id in "
@@ -207,7 +207,7 @@ public class AppUserRankUtility {
 		
 		StudentRankPOJO studentRankPOJO = null;
 		
-		String sql = "select * from (select *, cast(rank() over (order by total_points desc) as integer) from "
+		String sql = "select * from (select *, COALESCE(cast(rank() over (order by total_points desc) as integer),0) from "
 				+ "(select user_gamification.istar_user, cast(sum(user_gamification.points) as integer)as total_points, cast(sum(user_gamification.coins) as integer) as total_coins "
 				+ "from assessment,user_gamification where user_gamification.item_id=assessment.id and course_id= :courseId  and user_gamification.istar_user in "
 				+ "(select student_id from batch_students where batch_group_id in "
@@ -260,7 +260,7 @@ public class AppUserRankUtility {
 		
 		StudentRankPOJO studentRankPOJO = null;
 		
-		String sql = "select * from (select *, cast(rank() over (order by total_points desc) as integer) from "
+		String sql = "select * from (select *, COALESCE(cast(rank() over (order by total_points desc) as integer),0) from "
 				+ "(select user_gamification.istar_user, cast(sum(user_gamification.points) as integer)as total_points, cast(sum(user_gamification.coins) as integer) as total_coins "
 				+ "from assessment,user_gamification where user_gamification.item_id=assessment.id  and user_gamification.istar_user in "
 				+ "(select student_id from batch_students where batch_group_id in "
