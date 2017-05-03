@@ -170,9 +170,11 @@ public class RESTAssessmentService {
 			Report report = reportServices.getAssessmentReportForUser(istarUserId, assessmentId);
 
 			if (report == null) {
+				System.out.println("Report is null, creating new report");
 				reportServices.createReport(istarUser, assessment, correctAnswersCount, assessmentDuration,
 						maxPoints.intValue());
 			} else {
+				System.out.println("Report exists, updating report");
 				reportServices.updateReport(report, istarUser, assessment, correctAnswersCount, assessmentDuration,
 						maxPoints.intValue());
 			}

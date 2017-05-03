@@ -37,11 +37,15 @@ public class ReportServices {
 	
 	public Report updateReport(Report report, IstarUser istarUser, Assessment assessment, Integer score,  Integer timeTaken, Integer totalPoints){
 
+		java.util.Date date = new java.util.Date();
+		Timestamp current = new Timestamp(date.getTime());
+		
 		report.setIstarUser(istarUser);
 		report.setAssessment(assessment);
 		report.setTotalPoints(totalPoints);
 		report.setScore(score);
-		report.setTimeTaken(timeTaken);		
+		report.setTimeTaken(timeTaken);	
+		report.setCreatedAt(current);
 		
 		report = updateReportToDAO(report);
 		
