@@ -12,6 +12,7 @@ import com.istarindia.android.pojo.ModulePOJO;
 import com.istarindia.android.pojo.OptionPOJO;
 import com.istarindia.android.pojo.QuestionPOJO;
 import com.istarindia.android.pojo.StudentProfile;
+import com.istarindia.android.pojo.StudentRankPOJO;
 import com.istarindia.apps.services.AppAssessmentServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.AssessmentOption;
@@ -86,10 +87,10 @@ public class AppPOJOUtility {
 		}
 		
 		AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
-		HashMap<String, Integer> pointsAndCoins = appUserRankUtility.getPointsAndCoinsOfUser(student.getId());
-		studentProfile.setCoins(pointsAndCoins.get("coins"));
-		studentProfile.setExperiencePoints(pointsAndCoins.get("points"));
-		studentProfile.setBatchRank(2);
+		StudentRankPOJO studentRank= appUserRankUtility.getStudentRankPOJOOfAUser(student.getId());
+		studentProfile.setCoins(studentRank.getCoins());
+		studentProfile.setExperiencePoints(studentRank.getPoints());
+		studentProfile.setBatchRank(studentRank.getBatchRank());
 		return studentProfile;
 	}
 

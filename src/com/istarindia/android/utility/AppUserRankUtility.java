@@ -254,6 +254,58 @@ public class AppUserRankUtility {
 		return studentRankPOJO;
 	}
 	
+	
+	@SuppressWarnings("rawtypes")
+	public StudentRankPOJO getStudentRankPOJOOfAUser(Integer istarUserId){
+		
+		StudentRankPOJO studentRankPOJO = null;
+		
+		String sql = "select * from (select *, cast(rank() over (order by total_points desc) as integer) from "
+				+ "(select user_gamification.istar_user, cast(sum(user_gamification.points) as integer)as total_points, cast(sum(user_gamification.coins) as integer) as total_coins "
+				+ "from assessment,user_gamification where user_gamification.item_id=assessment.id  and user_gamification.istar_user in "
+				+ "(select student_id from batch_students where batch_group_id in "
+				+ "(select batch_group_id from batch_students where batch_students.student_id= :istarUserId)) "
+				+ "group by user_gamification.istar_user order by total_points desc) as batch_ranks) as user_rank where istar_user=:istarUserId";
+		
+		System.out.println("Student Rank pojo "+sql);
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		SQLQuery query = session.createSQLQuery(sql);
+		query.setParameter("istarUserId",istarUserId);
+		
+		List results = query.list();
+		
+		if(results.size() > 0){
+		Object[] studentData = (Object[]) results.get(0);
+		
+		Integer istarUserInBatchId = (Integer) studentData[0];
+		Integer points = (Integer) studentData[1];
+		Integer coins = (Integer) studentData[2];
+		Integer rank = (Integer) studentData[3];
+		
+		IstarUserServices istarUserServices = new IstarUserServices();
+		IstarUser istarUserInBatch = istarUserServices.getIstarUser(istarUserInBatchId);
+		
+		studentRankPOJO = new StudentRankPOJO();
+
+		studentRankPOJO.setId(istarUserInBatch.getId());
+		
+		if(istarUserInBatch.getUserProfile()!=null){
+			studentRankPOJO.setName(istarUserInBatch.getUserProfile().getFirstName());
+			studentRankPOJO.setImageURL(istarUserInBatch.getUserProfile().getProfileImage());
+		}else{
+			studentRankPOJO.setName(istarUserInBatch.getEmail());
+		}
+		
+		studentRankPOJO.setPoints(points);
+		studentRankPOJO.setCoins(coins);
+		studentRankPOJO.setBatchRank(rank);
+		}
+		return studentRankPOJO;
+	}
+	
 /*	public List<StudentRankPOJO> assignRankToUsersForACourseOfUsersBatch(Integer istarUserId, Integer courseId){
 		
 		List<StudentRankPOJO> allRankedStudentRankPOJOs = getStudentRankPOJOForACourseOfUsersBatch(istarUserId, courseId);
