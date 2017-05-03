@@ -1,6 +1,7 @@
 package com.istarindia.android.pojo;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -10,6 +11,7 @@ public class StudentProfile {
 
 	private Integer id;
 	private String authenticationToken;
+	private String password;
 	private String loginType;
 	private Boolean isVerified;
 	private String email;
@@ -26,9 +28,12 @@ public class StudentProfile {
 	private String underGraduationSpecializationName;
 	private String underGraduationDegree;
 	private String underGraduationCollege;
+	private Integer underGraduationYear;
 	private String postGraduationSpecializationName;
 	private String postGraduationDegree;
 	private String postGraduationCollege;
+	private Integer postGraduationYear;
+	private List<String> preferredLocations;
 	private String resumeURL;
 
 	public StudentProfile(){
@@ -53,6 +58,15 @@ public class StudentProfile {
 		this.authenticationToken = authenticationToken;
 	}
 	
+	@XmlAttribute(name = "password", required = false)
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
 	@XmlAttribute(name = "loginType", required = false)	
 	public String getLoginType() {
 		return loginType;
@@ -232,4 +246,32 @@ public class StudentProfile {
 	public void setResumeURL(String resumeURL) {
 		this.resumeURL = resumeURL;
 	}
+
+	@XmlAttribute(name = "underGraduationYear", required = false)
+	public Integer getUnderGraduationYear() {
+		return underGraduationYear;
+	}
+
+	public void setUnderGraduationYear(Integer underGraduationYear) {
+		this.underGraduationYear = underGraduationYear;
+	}
+
+	@XmlAttribute(name = "postGraduationYear", required = false)
+	public Integer getPostGraduationYear() {
+		return postGraduationYear;
+	}
+
+	public void setPostGraduationYear(Integer postGraduationYear) {
+		this.postGraduationYear = postGraduationYear;
+	}
+
+	public List<String> getPreferredLocations() {
+		return preferredLocations;
+	}
+
+	public void setPreferredLocations(List<String> preferredLocations) {
+		this.preferredLocations = preferredLocations;
+	}
+	
+	
 }

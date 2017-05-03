@@ -14,6 +14,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 
 import com.istarindia.android.pojo.SkillReportPOJO;
+import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppUtility;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Course;
@@ -22,6 +23,48 @@ import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
 public class AppServices {
 	
+	public void updateStudentProfile(StudentProfile studentProfile){
+		
+		IstarUserServices istarUserServices = new IstarUserServices();
+		IstarUser istarUser = istarUserServices.getIstarUser(studentProfile.getId());
+	
+		//System.out.println("studentProfile->"+studentProfile.getMobile());
+		//System.out.println("istarUser->"+istarUser.getMobile());
+		
+		if(!studentProfile.getMobile().equals(istarUser.getMobile())){
+			istarUserServices.updateIsVerified(istarUser.getId(), false);
+		}else{
+			System.out.println("User already verified with this number");
+		}
+		
+		//update istarUser and isVerified if mobile number is changed
+		istarUserServices.updateIstarUser(istarUser.getId(), studentProfile.getEmail(), studentProfile.getPassword(), studentProfile.getMobile());
+
+		
+		if(istarUser.getUserProfile()!=null){
+		istarUserServices.updateUserProfile(istarUser.getId(), null, studentProfile.getFirstName(), studentProfile.getLastName(), studentProfile.getDateOfBirth(), 
+				studentProfile.getGender(), studentProfile.getProfileImage(), null);
+		}else{
+			istarUserServices.createUserProfile(istarUser.getId(), null, studentProfile.getFirstName(), studentProfile.getLastName(), studentProfile.getDateOfBirth(), 
+					studentProfile.getGender(), studentProfile.getProfileImage(), null);
+		}
+		
+		if(istarUser.getProfessionalProfile()!=null){
+			istarUserServices.updateProfessionalProfile(istarUser.getId(), null, null, null, null, 
+					true, studentProfile.getUnderGraduationSpecializationName(), null, 
+					false, null, null, null, 
+					null, null, null, null, null, null, null, 
+					null, null, null, studentProfile.getUnderGraduationDegree(), null, null, 
+					studentProfile.getUnderGraduationYear(), null, studentProfile.getUnderGraduationCollege(), null);						
+		}else{
+			istarUserServices.createProfessionalProfile(istarUser.getId(), null, null, null, null, 
+					true, studentProfile.getUnderGraduationSpecializationName(), null, 
+					false, null, null, null, 
+					null, null, null, null, null, null, null, 
+					null, null, null, studentProfile.getUnderGraduationDegree(), null, null, 
+					studentProfile.getUnderGraduationYear(), null, studentProfile.getUnderGraduationCollege(), null);
+		}
+	}
 	
 	@SuppressWarnings("unchecked")
 	public List<SkillReportPOJO> getSkillsMapOfUser(int istarUserId){

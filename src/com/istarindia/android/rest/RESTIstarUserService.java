@@ -118,8 +118,13 @@ public class RESTIstarUserService {
 				// User does not exists
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 			} else {
+				AppServices appServices = new AppServices();
+				appServices.updateStudentProfile(studentProfile);
 				
-				return null;
+				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+				String result = gson.toJson(studentProfile);
+
+				return Response.ok(result).build();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

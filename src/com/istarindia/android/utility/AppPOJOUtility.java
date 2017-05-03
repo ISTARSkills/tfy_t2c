@@ -52,6 +52,7 @@ public class AppPOJOUtility {
 		StudentProfile studentProfile = new StudentProfile();
 
 		studentProfile.setId(student.getId());
+		//studentProfile.setPassword(student.getPassword());
 		studentProfile.setMobile(student.getMobile());
 		studentProfile.setEmail(student.getEmail());
 		studentProfile.setAuthenticationToken(student.getAuthToken());
@@ -81,6 +82,7 @@ public class AppPOJOUtility {
 			studentProfile.setPostGraduationSpecializationName(
 					student.getProfessionalProfile().getPostGraduationSpecializationName());
 			studentProfile.setResumeURL(student.getProfessionalProfile().getResumeUrl());
+			studentProfile.setUnderGraduationYear(student.getProfessionalProfile().getUnderGraduationYear());
 		}
 		
 		AppUserRankUtility appUserRankUtility = new AppUserRankUtility();

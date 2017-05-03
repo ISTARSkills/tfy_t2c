@@ -101,7 +101,7 @@ public class RESTAssessmentService {
 
 	@POST
 	@Path("{assessmentId}/{taskId}")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response submitUserAssessmentResponse(@PathParam("userId") int istarUserId,
 			@PathParam("assessmentId") int assessmentId, @PathParam("taskId") int taskId,
 			@FormParam("response") String questionResponsesString) {
@@ -159,7 +159,9 @@ public class RESTAssessmentService {
 				if (optionsMap.get("isCorrect")) {
 					correctAnswersCount++;
 				}
-				//assessmentDuration = assessmentDuration + questionResponsePOJO.getDuration();
+				if(questionResponsePOJO.getDuration()!=null){
+					assessmentDuration = assessmentDuration + questionResponsePOJO.getDuration();
+				}
 			}
 
 			Double maxPoints = appAssessmentServices.getMaxPointsOfAssessment(assessment.getId());
@@ -178,7 +180,11 @@ public class RESTAssessmentService {
 			TaskServices taskServices = new TaskServices();
 			taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
 
-			return Response.ok("DONE").build();
+			AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReport(istarUserId, assessment.getId());
+			Gson gsonResult = new Gson();
+			String result = gsonResult.toJson(assessmentReportPOJO);
+
+			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
