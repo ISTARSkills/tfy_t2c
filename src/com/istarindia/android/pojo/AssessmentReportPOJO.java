@@ -20,6 +20,8 @@ public class AssessmentReportPOJO {
 	private Integer totalNumberOfUsersInBatch;
 	private Integer totalNumberOfQuestions;
 	private Integer totalNumberOfCorrectlyAnsweredQuestions;
+	private String message;
+	private String messageDescription;
 	private List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();
 	
 	public AssessmentReportPOJO(){
@@ -113,6 +115,36 @@ public class AssessmentReportPOJO {
 	public void setTotalNumberOfCorrectlyAnsweredQuestions(Integer totalNumberOfCorrectlyAnsweredQuestions) {
 		this.totalNumberOfCorrectlyAnsweredQuestions = totalNumberOfCorrectlyAnsweredQuestions;
 	}		
+	
+	@XmlAttribute(name = "message", required = false)
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	@XmlAttribute(name = "messageDescription", required = false)
+	public String getMessageDescription() {
+		return messageDescription;
+	}
+
+	public void setMessageDescription(String messageDescription) {
+		this.messageDescription = messageDescription;
+	}
+
+	public void generateMessageAndDescription(Integer cutOffMarks){
+		
+		if(this.accuracy > cutOffMarks){
+		this.message = "You passed the assessment!" ;
+		this.messageDescription = "Make sure you check out the full report to find out where you went wrong.";
+		}else{
+		this.message = 	"Sorry! You failed the assessment.";
+		this.messageDescription = "You need atleast " + cutOffMarks + "% to pass. Brush up on the concepts and try again.";
+		}		
+	}
+	
 	
 	public void calculateUserScore() {
 		double userScore = 0.0;

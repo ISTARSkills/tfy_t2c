@@ -33,10 +33,14 @@ public class RESTAuthenticationService {
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.getIstarUserByEmail(email);
 
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
-			if (istarUser == null || !istarUser.getPassword().equals(password)) {
-				System.out.println("user is null or password does not match");
-				throw new Exception();
+			if (istarUser == null){
+				throw new Exception("Username does not exists");
+			}
+			
+			if(!istarUser.getPassword().equals(password)) {
+				throw new Exception("Password is incorrect");
 			}
 			AppServices appServices = new AppServices();
 			istarUser = appServices.assignToken(istarUser);
@@ -46,13 +50,12 @@ public class RESTAuthenticationService {
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 			System.out.println("Returing system profile");
 
-			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(studentProfile);
-
 			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.UNAUTHORIZED).build();
+			String result = gson.toJson(e.getMessage());
+			return Response.status(Response.Status.UNAUTHORIZED).entity(result).build();
 		}
 	}
 
@@ -66,6 +69,8 @@ public class RESTAuthenticationService {
 
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.getIstarUserByEmail(email);
+
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 
 		try {
 			if (istarUser == null) {
@@ -94,13 +99,13 @@ public class RESTAuthenticationService {
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 			System.out.println("Returing system profile");
 
-			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(studentProfile);
 
 			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.UNAUTHORIZED).build();
+			String result = gson.toJson(e.getMessage());
+			return Response.status(Response.Status.UNAUTHORIZED).entity(result).build();
 		}
 	}
 }

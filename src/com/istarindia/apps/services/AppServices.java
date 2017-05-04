@@ -166,12 +166,14 @@ public class AppServices {
 						moduleSkillPOJO.getSkills().add(cmsessionSkillPOJO);
 					}
 				}					
+				moduleSkillPOJO.calculateUserPoints();
+				moduleSkillPOJO.calculateTotalPoints();
+				moduleSkillPOJO.calculatePercentage();	
+				courseSkillPOJO.generateMessage();
 				courseSkillPOJO.calculateUserPoints();
 				courseSkillPOJO.calculateTotalPoints();
 				courseSkillPOJO.calculatePercentage();
-				moduleSkillPOJO.calculateUserPoints();
-				moduleSkillPOJO.calculateTotalPoints();
-				moduleSkillPOJO.calculatePercentage();				
+				courseSkillPOJO.generateMessage();		
 			}			
 		}
 		return allSkills;

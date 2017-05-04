@@ -21,7 +21,8 @@ public class TaskSummaryPOJO {
 	private String imageURL;
 	private String status;
 	private Timestamp date;
-
+	private String messageForCompletedTasks;
+	private String messageForIncompleteTasks;
 	
 	public TaskSummaryPOJO(){
 		
@@ -156,7 +157,22 @@ public class TaskSummaryPOJO {
 	public void setDate(Timestamp date) {
 		this.date = date;
 	}
-	
-	
 
+	@XmlAttribute(name = "messageForCompletedTasks", required = false)
+	public String getMessageForCompletedTasks() {
+		return messageForCompletedTasks;
+	}
+
+	public void setMessageForCompletedTasks(String messageForCompletedTasks) {
+		this.messageForCompletedTasks = messageForCompletedTasks;
+	}
+
+	@XmlAttribute(name = "messageForIncompleteTasks", required = false)
+	public String getMessageForIncompleteTasks() {
+		return messageForIncompleteTasks;
+	}
+
+	public void setMessageForIncompleteTasks(String messageForIncompleteTasks) {
+		this.messageForIncompleteTasks = messageForIncompleteTasks;
+	}
 }

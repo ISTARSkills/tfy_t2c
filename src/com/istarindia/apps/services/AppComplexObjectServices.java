@@ -67,7 +67,7 @@ public class AppComplexObjectServices {
 			//Tasks		
 			List<Task> allTaskOfUser = taskServices.getAllTaskOfActorForToday(istarUser);
 			List<TaskSummaryPOJO> allTaskSummary = new ArrayList<TaskSummaryPOJO>();
-			
+			int completedTasks = 0;
 			for(Task task : allTaskOfUser){
 				TaskSummaryPOJO taskSummaryPOJO = null;
 				String itemType = task.getItemType();
@@ -81,7 +81,21 @@ public class AppComplexObjectServices {
 					break;
 				}				
 				if(taskSummaryPOJO!=null){
+					if (taskSummaryPOJO.getStatus().equals("COMPLETE")) {
+						completedTasks++;
+					}
 					allTaskSummary.add(taskSummaryPOJO);
+				}
+			}
+			
+			if (allTaskSummary.size() > 0) {
+				String messageForCompletedTasks = completedTasks + " Tasks Completed";
+				String messageForIncompleteTasks = (allTaskSummary.size() - completedTasks)
+						+ " tasks remaining for the day";
+
+				for (TaskSummaryPOJO taskSummaryPOJO : allTaskSummary) {
+					taskSummaryPOJO.setMessageForCompletedTasks(messageForCompletedTasks);
+					taskSummaryPOJO.setMessageForIncompleteTasks(messageForIncompleteTasks);
 				}
 			}
 			complexObject.setTasks(allTaskSummary);

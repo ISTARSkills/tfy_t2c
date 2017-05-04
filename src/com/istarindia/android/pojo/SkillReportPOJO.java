@@ -18,6 +18,7 @@ public class SkillReportPOJO{
 	private Double totalPoints = 0.0;
 	private Double userPoints = 0.0;
 	private Double percentage = 0.0;
+	private String message;
 	private List<SkillReportPOJO> skills;
 	
 	public SkillReportPOJO(){
@@ -99,13 +100,27 @@ public class SkillReportPOJO{
 	}
 
 
-
 	@XmlElement(name = "skills", required = false)
 	public List<SkillReportPOJO> getSkills() {
 		return skills;
 	}
 	public void setSkills(List<SkillReportPOJO> skills) {
 		this.skills = skills;
+	}
+	
+	@XmlElement(name = "message", required = false)
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public void generateMessage(){		
+		if(this.skills!=null){
+			this.message = this.userPoints+ "/" + this.totalPoints + " - " + this.skills.size() + " subskills";
+		}
 	}
 	
 	public void calculateTotalPoints() {

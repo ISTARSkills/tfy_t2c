@@ -46,7 +46,7 @@ public class AppCourseServices {
 		StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 		AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
 		Course course = getCourse(courseId);
-		
+
 		List<StudentPlaylist> allStudentPlaylist = studentPlaylistServices.getStudentPlaylistOfUserForCourse(istarUserId, courseId);
 		if(course!=null && allStudentPlaylist.size() > 0){
 			
@@ -184,6 +184,7 @@ public class AppCourseServices {
 					moduleSkillReportPOJO.calculateUserPoints();
 					moduleSkillReportPOJO.calculateTotalPoints();
 					moduleSkillReportPOJO.calculatePercentage();
+					moduleSkillReportPOJO.generateMessage();
 				}
 				allSkillsReport.add(moduleSkillReportPOJO);
 			}

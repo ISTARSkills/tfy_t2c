@@ -46,12 +46,22 @@ public class RESTIstarUserService {
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			String authenticationToken = AppUtility.getRandomString(20);
-			IstarUser istarUser = istarUserServices.createIstarUser(email, password, mobile, authenticationToken);
+			IstarUser istarUser = null;
+			IstarUser istarUserByMobile = null;
+			
+			istarUser = istarUserServices.getIstarUserByEmail(email);
+			istarUserByMobile = istarUserServices.getIstarUserByMobile(mobile);
 
-			if (istarUser == null) {
-				// User Email or Mobile already registered
-				return Response.status(Response.Status.CONFLICT).build();
+			if (istarUser != null){
+				// User with Email already registered
+				return Response.status(Response.Status.CONFLICT).entity("User already registered for this email.").build();
+			} else if (istarUserByMobile!=null) {
+				// User with Mobile already registered
+				return Response.status(Response.Status.CONFLICT).entity("User already registered with this mobile").build();
 			} else {
+				
+				istarUser= istarUserServices.createIstarUser(email, password, mobile, authenticationToken);
+				
 				RoleServices roleServices = new RoleServices();
 				Role role = roleServices.getRoleByName("STUDENT");
 
@@ -88,7 +98,9 @@ public class RESTIstarUserService {
 
 			if (istarUser == null) {
 				// User does not exists
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+				Gson gson = new Gson();
+				String result = gson.toJson("Bad request");
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result).build();
 			} else {
 				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
@@ -100,7 +112,8 @@ public class RESTIstarUserService {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("bad request").build();
 		}
 	}
 
@@ -183,15 +196,16 @@ public class RESTIstarUserService {
 	@Path("{userId}/mobile")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response verifyMobileNumber(@PathParam("userId") int userId, @QueryParam("mobile") Long mobile) {
+		Gson gson = new Gson();
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
 			IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobile);
-
-			if (istarUser == null && mobileIstarUser == null) {
-				return Response.status(Response.Status.BAD_REQUEST).build();
-			} else {
+			
+			if (istarUser == null || mobileIstarUser == null) {
+				throw new Exception("Oops! No account registered for this mobile number.");
+			}
 				Integer otp = null;
 
 				try {
@@ -199,13 +213,13 @@ public class RESTIstarUserService {
 					otp = appServices.sendOTP(mobile.toString());
 				} catch (Exception e) {
 					e.printStackTrace();
-					return Response.status(Response.Status.BAD_GATEWAY).build();
+					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 				}
 				return Response.ok(otp).build();
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = gson.toJson(e.getMessage());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result).build();
 		}
 	}
 
@@ -273,6 +287,7 @@ public class RESTIstarUserService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response assignBatchCode(@PathParam("userId") int istarUserId, @FormParam("batchCode") String batchCode) {
 
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			
 			AppBatchGroupServices batchGroupServices = new AppBatchGroupServices();
@@ -281,8 +296,8 @@ public class RESTIstarUserService {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
 			
-			if(batchGroup==null || istarUser==null){
-				throw new Exception();
+			if(batchGroup==null){
+				throw new Exception("Invalid batch code. Please contact your college administrator.");
 			}
 			AppBatchStudentsServices batchStudentServices = new AppBatchStudentsServices();
 			batchStudentServices.createBatchStudents(istarUser, batchGroup, "STUDENT");					
@@ -291,16 +306,16 @@ public class RESTIstarUserService {
 			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(istarUserId);
 						
 			if(complexObject!=null){				
-				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 				String result = gson.toJson(complexObject);
 
 				return Response.ok(result).build();
 			}else{
-				throw new Exception();
+				throw new Exception("Invalid user");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = gson.toJson(e.getMessage());
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result).build();
 		}
 	}
 	

@@ -90,6 +90,7 @@ public class AppAssessmentServices {
 					moduleSkillReportPOJO.calculateTotalPoints();
 					moduleSkillReportPOJO.calculateUserPoints();
 					moduleSkillReportPOJO.calculatePercentage();
+					moduleSkillReportPOJO.generateMessage();
 				} else {
 					moduleSkillReportPOJO = new SkillReportPOJO();
 
@@ -110,6 +111,7 @@ public class AppAssessmentServices {
 					moduleSkillReportPOJO.calculateTotalPoints();
 					moduleSkillReportPOJO.calculateUserPoints();
 					moduleSkillReportPOJO.calculatePercentage();
+					moduleSkillReportPOJO.generateMessage();
 
 					allSkillsReport.add(moduleSkillReportPOJO);
 				}
@@ -143,6 +145,7 @@ public class AppAssessmentServices {
 				assessmentReportPOJO.calculateAccuracy();
 			}
 		}
+		assessmentReportPOJO.generateMessageAndDescription(50); //50 is cut off marks
 		return assessmentReportPOJO;
 	}
 
@@ -270,6 +273,7 @@ public class AppAssessmentServices {
 						moduleSkillReportPOJO.calculateTotalPoints();
 						moduleSkillReportPOJO.calculateUserPoints();
 						moduleSkillReportPOJO.calculatePercentage();
+						moduleSkillReportPOJO.generateMessage();
 					} else {
 						moduleSkillReportPOJO = new SkillReportPOJO();
 
@@ -291,7 +295,9 @@ public class AppAssessmentServices {
 						moduleSkillReportPOJO.calculateTotalPoints();
 						moduleSkillReportPOJO.calculateUserPoints();
 						moduleSkillReportPOJO.calculatePercentage();
+						moduleSkillReportPOJO.generateMessage();
 
+						
 						allSkillsReport.add(moduleSkillReportPOJO);
 					}
 				}
@@ -318,6 +324,7 @@ public class AppAssessmentServices {
 				assessmentReportPOJO.calculateTotalScore();
 				assessmentReportPOJO.calculateUserScore();
 				assessmentReportPOJO.calculateAccuracy();
+				assessmentReportPOJO.generateMessageAndDescription(50); //50 is cut off marks
 
 				allReports.add(assessmentReportPOJO);
 			}

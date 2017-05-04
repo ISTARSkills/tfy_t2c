@@ -21,6 +21,7 @@ public class CoursePOJO {
 	private Double userPoints = 0.0;
 	private Double totalPoints = 0.0;	
 	private Double progress = 0.0;
+	private String message;
 	private List<ModulePOJO> modules = new ArrayList<ModulePOJO>();
 	private List<SkillReportPOJO> skillObjectives = new ArrayList<SkillReportPOJO>();
 	
@@ -115,8 +116,17 @@ public class CoursePOJO {
 	public void setProgress(Double progress) {
 		this.progress = Math.round(progress*100.0)/100.0;
 	}
-		
-	@XmlElement(name = "progress", required = false)
+	
+	@XmlAttribute(name = "message", required = false)
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	@XmlElement(name = "skillObjectives", required = false)
 	public List<SkillReportPOJO> getSkillObjectives() {
 		return skillObjectives;
 	}
@@ -129,13 +139,16 @@ public class CoursePOJO {
 		Collections.sort(coursePOJO.getModules());
 		
 		String courseStatus = "COMPLETE";
-		
+		int numberOfCompletedModules = 0;
 		for(ModulePOJO module: coursePOJO.getModules()){
 			if(module.getStatus().equals("INCOMPLETE")){
 				courseStatus = "INCOMPLETE";
+			}else{
+				numberOfCompletedModules++;
 			}
 		}
-		coursePOJO.setStatus(courseStatus);	
+		coursePOJO.setStatus(courseStatus);
+		coursePOJO.setMessage(numberOfCompletedModules + " of " + coursePOJO.getModules().size() + "modules completed");
 	return coursePOJO;
 	}
 	
