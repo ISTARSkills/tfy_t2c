@@ -88,9 +88,11 @@ public class AppPOJOUtility {
 		
 		AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
 		StudentRankPOJO studentRank= appUserRankUtility.getStudentRankPOJOOfAUser(student.getId());
-		studentProfile.setCoins(studentRank.getCoins());
-		studentProfile.setExperiencePoints(studentRank.getPoints());
-		studentProfile.setBatchRank(studentRank.getBatchRank());
+		if(studentRank!=null){
+			studentProfile.setCoins(studentRank.getCoins());
+			studentProfile.setExperiencePoints(studentRank.getPoints());
+			studentProfile.setBatchRank(studentRank.getBatchRank());
+		}
 		return studentProfile;
 	}
 

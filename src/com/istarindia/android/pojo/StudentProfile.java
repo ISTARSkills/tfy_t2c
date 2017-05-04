@@ -22,9 +22,9 @@ public class StudentProfile {
 	private Long mobile;
 	private String location;
 	private String profileImage;
-	private Integer coins;
-	private Integer experiencePoints;
-	private Integer batchRank;
+	private Integer coins = 0;
+	private Integer experiencePoints = 0;
+	private Integer batchRank = 0;
 	private String underGraduationSpecializationName;
 	private String underGraduationDegree;
 	private String underGraduationCollege;
