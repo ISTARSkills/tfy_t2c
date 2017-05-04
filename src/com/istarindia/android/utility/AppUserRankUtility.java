@@ -88,7 +88,7 @@ public class AppUserRankUtility {
 			
 			String sql = "select *, COALESCE(cast(rank() over (order by total_points desc) as integer),0) from "
 					+ "(select user_gamification.istar_user, cast(sum(user_gamification.points) as integer)as total_points, cast(sum(user_gamification.coins) as integer) as total_coins "
-					+ "from assessment,user_gamification where user_gamification.item_id=assessment.id and course_id= :courseId  and user_gamification.istar_user in "
+					+ "from assessment,user_gamification where user_gamification.item_id=assessment.id and assessment.course_id= :courseId  and user_gamification.istar_user in "
 					+ "(select student_id from batch_students where batch_group_id in "
 					+ "(select batch_group_id from batch_students where batch_students.student_id= :istarUserId)) "
 					+ "group by user_gamification.istar_user order by total_points desc) as batch_ranks";
@@ -209,7 +209,7 @@ public class AppUserRankUtility {
 		
 		String sql = "select * from (select *, COALESCE(cast(rank() over (order by total_points desc) as integer),0) from "
 				+ "(select user_gamification.istar_user, cast(sum(user_gamification.points) as integer)as total_points, cast(sum(user_gamification.coins) as integer) as total_coins "
-				+ "from assessment,user_gamification where user_gamification.item_id=assessment.id and course_id= :courseId  and user_gamification.istar_user in "
+				+ "from assessment,user_gamification where user_gamification.item_id=assessment.id and assessment.course_id= :courseId  and user_gamification.istar_user in "
 				+ "(select student_id from batch_students where batch_group_id in "
 				+ "(select batch_group_id from batch_students where batch_students.student_id= :istarUserId)) "
 				+ "group by user_gamification.istar_user order by total_points desc) as batch_ranks) as user_rank where istar_user=:istarUserId";
