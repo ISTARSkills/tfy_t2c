@@ -159,7 +159,7 @@ public class RESTIstarUserService {
 			} else {
 				istarUser = istarUserServices.updateIstarUser(istarUser.getId(), istarUser.getEmail(), password,
 						istarUser.getMobile());
-				return Response.status(Response.Status.CREATED).build();
+				return Response.ok("DONE").build();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
