@@ -24,8 +24,9 @@ public class AppDashboardUtility {
 		AppAssessmentServices appAssessmentServices= new AppAssessmentServices();
 		Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());
 		AppCourseServices appCourseServices = new AppCourseServices();
-		Course course = appCourseServices.getCourse(assessment.getCourse());
+
 		if(assessment!=null && assessment.getAssessmentQuestions().size()>0){
+			Course course = appCourseServices.getCourse(assessment.getCourse());
 			taskSummaryPOJO = new TaskSummaryPOJO();
 			
 			taskSummaryPOJO.setId(task.getId());
