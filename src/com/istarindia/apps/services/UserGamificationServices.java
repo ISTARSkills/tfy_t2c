@@ -17,7 +17,7 @@ import com.viksitpro.core.dao.entities.UserGamificationDAO;
 
 public class UserGamificationServices {
 	
-	public UserGamification createUserGamification(SkillObjective skillObjective, IstarUser istarUser, Double points, Integer coins, 
+/*	public UserGamification createUserGamification11(SkillObjective skillObjective, IstarUser istarUser, Double points, Integer coins, 
 			Integer itemId, String itemType){
 	
 		UserGamification userGamification = new UserGamification();
@@ -37,7 +37,7 @@ public class UserGamificationServices {
 		userGamification = saveUserGamificationToDAO(userGamification);
 		
 		return userGamification;
-	}
+	}*/
 	
 	@SuppressWarnings("unchecked")
 	public List<UserGamification> getUserGamificationsOfUserForItem(int istarUserId, int itemId, String itemType){

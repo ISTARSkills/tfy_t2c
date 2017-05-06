@@ -38,7 +38,11 @@ public class AppServices {
 		}
 		
 		//update istarUser and isVerified if mobile number is changed
+		if(studentProfile.getPassword()!=null){
 		istarUserServices.updateIstarUser(istarUser.getId(), studentProfile.getEmail(), studentProfile.getPassword(), studentProfile.getMobile());
+		}else{
+			istarUserServices.updateIstarUser(istarUser.getId(), studentProfile.getEmail(), istarUser.getPassword(), studentProfile.getMobile());	
+		}
 
 		
 		if(istarUser.getUserProfile()!=null){

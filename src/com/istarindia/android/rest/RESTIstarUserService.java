@@ -1,5 +1,6 @@
 package com.istarindia.android.rest;
 
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
 
@@ -17,7 +18,9 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.istarindia.android.pojo.ComplexObject;
+import com.istarindia.android.pojo.QuestionResponsePOJO;
 import com.istarindia.android.pojo.SkillReportPOJO;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppPOJOUtility;
@@ -29,6 +32,7 @@ import com.istarindia.apps.services.AppServices;
 import com.viksitpro.core.dao.entities.BatchGroup;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Role;
+import com.viksitpro.core.dao.entities.UserProfile;
 import com.viksitpro.core.dao.entities.UserRole;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.dao.utils.user.RoleServices;
@@ -117,28 +121,73 @@ public class RESTIstarUserService {
 		}
 	}
 
-	@PUT
+	@POST
 	@Path("{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateUserProfile(@PathParam("userId") int userId, StudentProfile studentProfile) {
+	public Response updateUserProfile(@PathParam("userId") int userId, @FormParam("profile") String profile) {
 
+		System.out.println("profile->" + profile);
+		
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+
+			Gson requestGson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();			
+			StudentProfile requestStudentProfile = requestGson.fromJson(profile, StudentProfile.class);
 
 			if (istarUser == null) {
 				// User does not exists
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 			} else {
 				AppServices appServices = new AppServices();
-				appServices.updateStudentProfile(studentProfile);
+				appServices.updateStudentProfile(requestStudentProfile);
 				
+				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
+
 				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 				String result = gson.toJson(studentProfile);
 
 				return Response.ok(result).build();
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@POST
+	@Path("{userId}/image")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateUserProfileImage(@PathParam("userId") int userId, @FormParam("profileImage") String profileImage, @FormParam("format") String format,
+			@FormParam("type") String type) {
+
+		try {
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+
+			if (istarUser == null || profileImage==null || format==null || type==null) {
+				// User does not exists or invalid input parameters
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			} else {
+				AppUtility appUtility = new AppUtility();
+				String fileName = appUtility.imageUpload(profileImage, format, type);
+
+				UserProfile userProfile = istarUserServices.updateProfileImage(istarUser, fileName);
+
+				if (userProfile != null) {
+					AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+					StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
+
+					Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+					String result = gson.toJson(studentProfile);
+
+					return Response.ok(result).build();
+				} else {
+					throw new Exception();
+				}
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();

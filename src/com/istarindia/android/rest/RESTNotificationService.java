@@ -39,7 +39,7 @@ public class RESTNotificationService {
 	
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.TEXT_PLAIN)
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Response markNotificationAsRead(@PathParam("userId") int userId, List<Integer> notifications){		
 		try{
 			System.out.println("MArk notifications as read");

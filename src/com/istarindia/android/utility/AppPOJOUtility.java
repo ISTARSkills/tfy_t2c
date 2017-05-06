@@ -195,6 +195,9 @@ public class AppPOJOUtility {
 		ArrayList<QuestionPOJO> questions = new ArrayList<QuestionPOJO>();
 
 		for (AssessmentQuestion assessmentQuestion : assessmentQuestions) {
+			if(assessmentQuestion.getQuestion().getContext_id()==assessment.getCourse()){
+				questions.add(getQuestionPOJO(assessmentQuestion));
+			}
 			questions.add(getQuestionPOJO(assessmentQuestion));
 		}
 		assessmentPOJO.setQuestions(questions);
