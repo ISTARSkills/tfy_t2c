@@ -96,14 +96,15 @@ public class AppComplexObjectServices {
 					taskSummaryPOJO.setMessageForIncompleteTasks(messageForIncompleteTasks);
 				}
 			}
+			complexObject.setTasks(allTaskSummary);
 			System.err.println("complexObject allTaskSummary->" + allTaskSummary.size() + "Time->" + (System.currentTimeMillis()-previousTime));
 			
 			//Assessments			
 			List<AssessmentPOJO> allAssessmentsOfUser = new ArrayList<AssessmentPOJO>();	
 			for (Task task : allTaskOfUser) {
-				if (task.getIsActive() && task.getItemType().equals("ASSESSMENT")) {
+				if (task.getItemType().equals("ASSESSMENT")) {
 					Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());
-					if (assessment != null && assessment.getAssessmentQuestions().size() > 0) {
+					if (assessment != null && assessment.getAssessmentQuestions()!=null && assessment.getAssessmentQuestions().size() > 0) {
 						AssessmentPOJO assessmentPOJO = appPOJOUtility.getAssessmentPOJO(assessment);
 						allAssessmentsOfUser.add(assessmentPOJO);
 					}
