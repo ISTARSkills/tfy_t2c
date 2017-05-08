@@ -141,18 +141,43 @@ public class AppCourseServices {
 		
 		String sql = "select skill_objective,cmsession_id,module_id,course_id, sum(points) as user_points, sum(max_points) as total_points from  (select user_gamification.skill_objective, user_gamification.cmsession_id, user_gamification.module_id, user_gamification.course_id, user_gamification.item_id, cast(user_gamification.points as numeric), cast(assessment_benchmark.max_points as numeric), count(student_playlist.lesson_id)  from user_gamification inner join student_playlist on user_gamification.cmsession_id=student_playlist.cmsession_id and user_gamification.module_id=student_playlist.module_id and user_gamification.course_id=student_playlist.course_id inner join assessment_benchmark on user_gamification.item_id=assessment_benchmark.assessment_id and user_gamification.item_type='ASSESSMENT' and user_gamification.skill_objective=assessment_benchmark.skill_objective_id where timestamp in (select max(timestamp) from user_gamification where istar_user="+istarUserId+" and course_id="+courseId+" and item_type='ASSESSMENT' group by item_id) group by user_gamification.skill_objective, user_gamification.cmsession_id, user_gamification.module_id, user_gamification.course_id, cast(user_gamification.points as numeric),cast(assessment_benchmark.max_points as numeric), user_gamification.item_id) as temptable group by skill_objective,cmsession_id,module_id,course_id";
 		
+		System.out.println("Course Skill Report->"+sql);
+		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
 		
 		SQLQuery query = session.createSQLQuery(sql);		
 		List<Object[]> result = query.list();
 		
-		if(result.size()>0){
+		String lessonsStatusSQL = "select cmsession_id,cast(count(case when status='COMPLETE' then 1 end) as integer) as completed_lessons, cast(count(*) as integer) as total_lessons from student_playlist where student_id="+istarUserId+" and course_id="+courseId+" group by cmsession_id";
+		
+		SQLQuery sessionQuery = session.createSQLQuery(lessonsStatusSQL);		
+		List<Object[]> sessionStatusResult = sessionQuery.list();
+		
+		if(result.size()>0 && sessionStatusResult.size()>0){
 			HashMap<Integer, Module> modulesOfAssessment = new HashMap<Integer, Module>();
+			
+			HashMap<Integer, HashMap<String, Integer>> courseStatus = new HashMap<Integer, HashMap<String, Integer>>();
+			Double benchmark = getBenchmark();
+			
+			System.out.println("benchmark->" + benchmark);
+			for(Object[] sessionRow: sessionStatusResult){
+				Integer cmsessionId = (Integer) sessionRow[0];
+				Integer completedLessons = (Integer) sessionRow[1];
+				Integer totalLessons = (Integer) sessionRow[2];
+				
+				HashMap<String, Integer> sessionStatus = new HashMap<String, Integer>();
+				sessionStatus.put("completedLessons", completedLessons);
+				sessionStatus.put("totalLessons", totalLessons);
+				
+				courseStatus.put(cmsessionId, sessionStatus);
+			}
+			
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
 			
 			for(Object[] row : result){
 				Integer cmsessionSkillObjectiveId = (Integer) row[0];
+				Integer cmsessionId = (Integer) row[1];
 				Integer moduleId = (Integer) row[2];				
 				Double userPoints = ((BigDecimal) row[4]).doubleValue();
 				Double totalPoints = ((BigDecimal) row[5]).doubleValue();
@@ -173,8 +198,15 @@ public class AppCourseServices {
 					cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
 					cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
 					cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
-					cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
-					cmsessionSkillReportPOJO.setUserPoints(userPoints);
+					
+					
+					if(courseStatus.containsKey(cmsessionId)){
+						cmsessionSkillReportPOJO.setTotalPoints(totalPoints + (benchmark*courseStatus.get(cmsessionId).get("totalLessons")));
+						cmsessionSkillReportPOJO.setUserPoints(userPoints + (benchmark*courseStatus.get(cmsessionId).get("completedLessons")));						
+					}else{
+						cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
+						cmsessionSkillReportPOJO.setUserPoints(userPoints);
+					}
 					
 					moduleSkillReportPOJO.getSkills().add(cmsessionSkillReportPOJO);
 					moduleSkillReportPOJO.calculateTotalPoints();
@@ -188,6 +220,7 @@ public class AppCourseServices {
 						modulesOfAssessment.put(moduleId, module);
 
 						moduleSkillReportPOJO = new SkillReportPOJO();
+						moduleSkillReportPOJO.setId(module.getId());
 						moduleSkillReportPOJO.setName(module.getModuleName());
 						moduleSkillReportPOJO.setDescription(module.getModule_description());
 						moduleSkillReportPOJO.setImageURL(module.getImage_url());
@@ -198,8 +231,14 @@ public class AppCourseServices {
 						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
 						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
 						cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
-						cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
-						cmsessionSkillReportPOJO.setUserPoints(userPoints);
+
+						if(courseStatus.containsKey(cmsessionId)){
+							cmsessionSkillReportPOJO.setTotalPoints(totalPoints + (benchmark*courseStatus.get(cmsessionId).get("totalLessons")));
+							cmsessionSkillReportPOJO.setUserPoints(userPoints + (benchmark*courseStatus.get(cmsessionId).get("completedLessons")));						
+						}else{
+							cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
+							cmsessionSkillReportPOJO.setUserPoints(userPoints);
+						}
 
 						cmsessionSkillsReport.add(cmsessionSkillReportPOJO);
 						moduleSkillReportPOJO.setSkills(cmsessionSkillsReport);
@@ -291,6 +330,25 @@ public class AppCourseServices {
 		Double totalPoints = getMaxPointsOfCourseFromAssessment(courseId) + numberOfLessons*benchmark;
 		return totalPoints;
 	}
+	
+	
+	public Double getBenchmark(){
+		Double benchmark= 1.0;
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					String pointsBenchmark = properties.getProperty("pointsBenchmark");				
+					benchmark = Double.parseDouble(pointsBenchmark);	
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		return benchmark;
+	}
+	
 	
 	@SuppressWarnings("unchecked")
 	public HashMap<String, Object> getPointsAndCoinsOfUserForCmsessionSkillOfCourse(int istarUserId, int cmsessionSkillObjectiveId, int courseId){
