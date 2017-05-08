@@ -284,7 +284,7 @@ public class RESTIstarUserService {
 
 			if (istarUser == null) {
 				throw new Exception();
-			} else if (mobileIstarUser != null) {
+			} else if (mobileIstarUser.getId()!=istarUser.getId() && mobileIstarUser != null) {
 				throw new Exception(
 						"istarViksitProComplexKeyA user already exits with this mobile. Please try with another mobile number or raise a ticket.");
 			}
