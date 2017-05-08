@@ -77,7 +77,6 @@ public class AppAssessmentServices {
 
 						cmsessionSkillReportPOJO = new SkillReportPOJO();
 						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
-						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
 						cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
 						cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
 						cmsessionSkillReportPOJO.setUserPoints(userPoints);
@@ -94,6 +93,7 @@ public class AppAssessmentServices {
 							modulesOfAssessment.put(moduleId, module);
 
 							moduleSkillReportPOJO = new SkillReportPOJO();
+							moduleSkillReportPOJO.setId(module.getId());
 							moduleSkillReportPOJO.setName(module.getModuleName());
 							moduleSkillReportPOJO.setDescription(module.getModule_description());
 							moduleSkillReportPOJO.setImageURL(module.getImage_url());
@@ -101,7 +101,6 @@ public class AppAssessmentServices {
 							List<SkillReportPOJO> cmsessionSkillsReport = new ArrayList<SkillReportPOJO>();
 
 							cmsessionSkillReportPOJO = new SkillReportPOJO();
-							cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
 							cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
 							cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
 							cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
