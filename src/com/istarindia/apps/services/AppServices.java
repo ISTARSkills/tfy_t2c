@@ -26,12 +26,12 @@ public class AppServices {
 	public void logEntryToLoginTable(IstarUser istarUser, String action){
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();			
-		//String sql = "INSERT INTO login (id, user_id, created_at, jsession_id, action) VALUES ((select max(id)+1 from login), "+istarUser.getId()+", now(), '"+istarUser.getAuthToken()+"', '"+action+"')";
-		//System.out.println(sql);
-		//SQLQuery query = session.createSQLQuery(sql);
-		//query.executeUpdate();
+		String sql = "INSERT INTO login (id, user_id, created_at, jsession_id, action) VALUES ((select max(id)+1 from login), "+istarUser.getId()+", now(), '"+istarUser.getAuthToken()+"', '"+action+"')";
+		System.out.println(sql);
+		SQLQuery query = session.createSQLQuery(sql);
+		query.executeUpdate();
+		session.close();
 	}
-	
 	
 	public void updateStudentProfile(StudentProfile studentProfile) throws Exception{
 		
@@ -65,10 +65,10 @@ public class AppServices {
 		
 		if(istarUser.getUserProfile()!=null){
 		istarUserServices.updateUserProfile(istarUser.getId(), null, studentProfile.getFirstName(), studentProfile.getLastName(), studentProfile.getDateOfBirth(), 
-				studentProfile.getGender(), studentProfile.getProfileImage(), null);
+				studentProfile.getGender(), istarUser.getUserProfile().getProfileImage(), null);
 		}else{
 			istarUserServices.createUserProfile(istarUser.getId(), null, studentProfile.getFirstName(), studentProfile.getLastName(), studentProfile.getDateOfBirth(), 
-					studentProfile.getGender(), studentProfile.getProfileImage(), null);
+					studentProfile.getGender(), null, null);
 		}
 		
 		if(istarUser.getProfessionalProfile()!=null){
