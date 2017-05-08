@@ -21,18 +21,19 @@ public class RESTCalendarService {
 	@Path("{year}/{month}/{day}")
 	@Produces(MediaType.APPLICATION_JSON)	
 	public Response getDailyTasksOfUser(@PathParam("userId") int userId, @PathParam("year") int year, @PathParam("month") int month, @PathParam("day") int day){
-		
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try{
 			AppCalendarServices appCalendarServices = new AppCalendarServices();
 			List<DailyTaskPOJO> allTask = appCalendarServices.getDailyTask(userId, day, month, year);
 			
-			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(allTask);
 			
 			return Response.ok(result).build();
 		}catch(Exception e){
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 	
@@ -40,18 +41,19 @@ public class RESTCalendarService {
 	@Path("{year}/{month}")
 	@Produces(MediaType.APPLICATION_JSON)	
 	public Response getMonthlyTasksOfUser(@PathParam("userId") int userId, @PathParam("year") int year, @PathParam("month") int month){
-		
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try{
 			AppCalendarServices appCalendarServices = new AppCalendarServices();
 			List<DailyTaskPOJO> allTask = appCalendarServices.getMonthlyTask(userId, month, year);
-			
-			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+						
 			String result = gson.toJson(allTask);
 			
 			return Response.ok(result).build();
 		}catch(Exception e){
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 	
@@ -59,36 +61,38 @@ public class RESTCalendarService {
 	@Path("{year}")
 	@Produces(MediaType.APPLICATION_JSON)	
 	public Response getYearlyTasksOfUser(@PathParam("userId") int userId, @PathParam("year") int year){
-		
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try{
 			AppCalendarServices appCalendarServices = new AppCalendarServices();
 			List<DailyTaskPOJO> allTask = appCalendarServices.getYearlyTask(userId, year);
 			
-			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(allTask);
 			
 			return Response.ok(result).build();
 		}catch(Exception e){
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)	
 	public Response getAllTasksOfUser(@PathParam("userId") int userId){
-		
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try{
 			AppCalendarServices appCalendarServices = new AppCalendarServices();
 			List<DailyTaskPOJO> allTask = appCalendarServices.getAllTask(userId);
 			
-			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			String result = gson.toJson(allTask);
 			
 			return Response.ok(result).build();
 		}catch(Exception e){
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 }

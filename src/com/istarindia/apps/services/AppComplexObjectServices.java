@@ -1,9 +1,7 @@
 package com.istarindia.apps.services;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.istarindia.android.pojo.AssessmentPOJO;
 import com.istarindia.android.pojo.AssessmentReportPOJO;

@@ -9,6 +9,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.StudentPlaylistServices;
 import com.viksitpro.core.dao.entities.Lesson;
@@ -21,7 +23,7 @@ public class RESTLessonService {
 	@Path("{lessonId}")
 	@Produces(MediaType.APPLICATION_XML)
 	public Response getLesson(@PathParam("lessonId") int lessonId){
-	
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try{
 			String lessonXML = null;
 			AppCourseServices appCourseServices = new AppCourseServices();
@@ -34,7 +36,9 @@ public class RESTLessonService {
 			return Response.ok(lessonXML).build();
 		}catch(Exception e){
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 	
@@ -42,7 +46,7 @@ public class RESTLessonService {
 	@Path("{playlistId}/status")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateLessonStatus(@PathParam("playlistId") int playlistId, @FormParam("status") String status) {
-
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 			StudentPlaylist studentPlaylist = studentPlaylistServices.getStudentPlaylist(playlistId);
@@ -52,10 +56,13 @@ public class RESTLessonService {
 			}
 
 			studentPlaylistServices.updateStatus(studentPlaylist, status);
-			return Response.status(Response.Status.CREATED).build();
+			String result = gson.toJson("DONE");
+			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 }

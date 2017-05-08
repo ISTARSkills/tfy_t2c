@@ -23,36 +23,42 @@ public class RESTNotificationService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllNotifications(@PathParam("userId") int userId){
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try{
 			AppNotificationServices appNotificationServices = new AppNotificationServices();
 			List<NotificationPOJO> allNotificationPOJOs = appNotificationServices.getNotificationsForUser(userId);
-			
-			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+
 			String result = gson.toJson(allNotificationPOJOs);
 
 			return Response.ok(result).build();
 		}catch(Exception e){
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 	
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response markNotificationAsRead(@PathParam("userId") int userId, List<Integer> notifications){		
+	public Response markNotificationAsRead(@PathParam("userId") int userId, List<Integer> notifications){	
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try{
-			System.out.println("MArk notifications as read");
+			System.out.println("Mark notifications as read");
 			IstarNotificationServices istarNotificationServices = new IstarNotificationServices();
 			
 			for(Integer notificationId : notifications){
 				istarNotificationServices.updateNotificationStatus(notificationId, "READ");
 			}
 			
-			return Response.ok("DONE").build();
+			String result = gson.toJson("DONE");
+			return Response.ok(result).build();
 		}catch(Exception e){
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 }

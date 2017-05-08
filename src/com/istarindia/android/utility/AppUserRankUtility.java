@@ -67,6 +67,7 @@ public class AppUserRankUtility {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	public List<CourseRankPOJO> getCourseRankPOJOForCoursesOfUsersBatch(Integer istarUserId) {
 
 		List<CourseRankPOJO> allCourseRanks = new ArrayList<CourseRankPOJO>();

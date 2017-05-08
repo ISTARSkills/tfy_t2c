@@ -135,6 +135,7 @@ public class AppCourseServices {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	public List<SkillReportPOJO> getSkillsReportForCourseOfUser(int istarUserId, int courseId){
 		
 		List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();

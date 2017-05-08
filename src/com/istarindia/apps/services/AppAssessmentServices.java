@@ -1,7 +1,6 @@
 package com.istarindia.apps.services;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +25,6 @@ import com.viksitpro.core.dao.entities.Question;
 import com.viksitpro.core.dao.entities.SkillObjective;
 import com.viksitpro.core.dao.entities.SkillObjectiveDAO;
 import com.viksitpro.core.dao.entities.StudentAssessment;
-import com.viksitpro.core.dao.entities.UserGamification;
 
 public class AppAssessmentServices {
 
@@ -61,7 +59,7 @@ public class AppAssessmentServices {
 
 					Double userPoints = ((BigDecimal) row[0]).doubleValue();
 					Double totalPoints = ((BigDecimal) row[1]).doubleValue();
-					Integer coins = (Integer) row[2];
+					//Integer coins = (Integer) row[2]; //not being used, but will need in future
 					Integer cmsessionSkillObjectiveId = (Integer) row[3];
 					Integer moduleId = (Integer) row[5];
 
@@ -135,7 +133,7 @@ public class AppAssessmentServices {
 				
 				if(resultBatch.size()>0){
 					
-					Integer batchRank =  ((BigInteger) resultBatch.get(0)[2]).intValue(); //not being used, but might need in future
+					//Integer batchRank =  ((BigInteger) resultBatch.get(0)[2]).intValue(); //not being used, but might need in future
 					Double batchAverage = ((BigDecimal) resultBatch.get(0)[3]).doubleValue();
 					Integer numberOfStudentsInBatchAttemptedAssessment = (Integer) resultBatch.get(0)[4];
 					Integer numberOfStudentsInBatch = (Integer) resultBatch.get(0)[5];
@@ -158,7 +156,7 @@ public class AppAssessmentServices {
 					if(resultQuestions.size()>0){
 						Integer correctQuestions = (Integer) resultQuestions.get(0)[0];
 						Integer totalQuestions = (Integer) resultQuestions.get(0)[1];
-						Integer duration = (Integer) resultQuestions.get(0)[2]; //not being used, but might need in future
+						//Integer duration = (Integer) resultQuestions.get(0)[2]; //not being used, but might need in future
 						
 						assessmentReportPOJO.setTotalNumberOfCorrectlyAnsweredQuestions(correctQuestions);
 						assessmentReportPOJO.setTotalNumberOfQuestions(totalQuestions);
@@ -296,6 +294,7 @@ public class AppAssessmentServices {
 	}*/
 
 	
+	@SuppressWarnings("unchecked")
 	public List<Integer> getAssessmentsOfUser(int istarUserId){
 		
 		String sql = "select distinct item_id from user_gamification where istar_user="+istarUserId+" and timestamp is not null";

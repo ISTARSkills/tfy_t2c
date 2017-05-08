@@ -43,7 +43,7 @@ public class RESTAssessmentService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllAssessments(@PathParam("userId") int userId) {
-
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			List<AssessmentPOJO> allAssessmentsOfUser = new ArrayList<AssessmentPOJO>();
 
@@ -65,12 +65,14 @@ public class RESTAssessmentService {
 					}
 				}
 			}
-			Gson gson = new Gson();
+
 			String result = gson.toJson(allAssessmentsOfUser);
 			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -78,7 +80,7 @@ public class RESTAssessmentService {
 	@Path("{assessmentId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAssessment(@PathParam("assessmentId") int assessmentId) {
-
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
 			Assessment assessment = appAssessmentServices.getAssessment(assessmentId);
@@ -87,32 +89,35 @@ public class RESTAssessmentService {
 			if (assessment != null && assessment.getAssessmentQuestions().size() > 0) {
 				assessmentPOJO = appPOJOUtility.getAssessmentPOJO(assessment);
 			}
-
-			Gson gson = new Gson();
 			String result = gson.toJson(assessmentPOJO);
 
 			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@POST
 	@Path("{assessmentId}/{taskId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response submitUserAssessmentResponse(@PathParam("userId") int istarUserId,
 			@PathParam("assessmentId") int assessmentId, @PathParam("taskId") int taskId,
 			@FormParam("response") String questionResponsesString) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
-					
-			System.out.println("questionResponsesString-->"+questionResponsesString);
-			
-			Type listType = new TypeToken<List<QuestionResponsePOJO>>() {}.getType();
-			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-			
-			List<QuestionResponsePOJO> questionResponses = (List<QuestionResponsePOJO>) gson.fromJson(questionResponsesString, listType);
-			
+			System.out.println("questionResponsesString-->" + questionResponsesString);
+
+			Type listType = new TypeToken<List<QuestionResponsePOJO>>() {
+			}.getType();
+			Gson gsonRequest = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+
+			List<QuestionResponsePOJO> questionResponses = (List<QuestionResponsePOJO>) gsonRequest
+					.fromJson(questionResponsesString, listType);
+
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
 
@@ -158,7 +163,7 @@ public class RESTAssessmentService {
 				if (optionsMap.get("isCorrect")) {
 					++correctAnswersCount;
 				}
-				if(questionResponsePOJO.getDuration()!=null){
+				if (questionResponsePOJO.getDuration() != null) {
 					assessmentDuration = assessmentDuration + questionResponsePOJO.getDuration();
 				}
 			}
@@ -181,14 +186,16 @@ public class RESTAssessmentService {
 			TaskServices taskServices = new TaskServices();
 			taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
 
-			AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReport(istarUserId, assessment.getId());
-			Gson gsonResult = new Gson();
-			String result = gsonResult.toJson(assessmentReportPOJO);
+			AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReport(istarUserId,
+					assessment.getId());
+			String result = gson.toJson(assessmentReportPOJO);
 
 			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -198,17 +205,19 @@ public class RESTAssessmentService {
 	public Response getUserResponseOfAssessment(@PathParam("userId") int userId,
 			@PathParam("assessmentId") int assessmentId) {
 
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
 			AssessmentResponsePOJO response = appAssessmentServices.getAssessmentResponseOfUser(assessmentId, userId);
 
-			Gson gson = new Gson();
 			String result = gson.toJson(response);
 
 			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -217,6 +226,7 @@ public class RESTAssessmentService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserResponseOfAllAssessment(@PathParam("userId") int userId) {
 
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			List<AssessmentResponsePOJO> allResponse = new ArrayList<AssessmentResponsePOJO>();
 
@@ -232,13 +242,14 @@ public class RESTAssessmentService {
 					allResponse.add(response);
 				}
 			}
-			Gson gson = new Gson();
 			String result = gson.toJson(allResponse);
 
 			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -248,16 +259,18 @@ public class RESTAssessmentService {
 	public Response getAssessmentReportOfUser(@PathParam("userId") int userId,
 			@PathParam("assessmentId") int assessmentId) {
 
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
 			AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReport(userId, assessmentId);
-			Gson gson = new Gson();
 			String result = gson.toJson(assessmentReportPOJO);
 
 			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -266,18 +279,20 @@ public class RESTAssessmentService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllAssessmentReportOfUser(@PathParam("userId") int userId) {
 
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
 			List<AssessmentReportPOJO> allAssessmentReport = appAssessmentServices
 					.getAllAssessmentReportsOfUser(userId);
 
-			Gson gson = new Gson();
 			String result = gson.toJson(allAssessmentReport);
 
 			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 }

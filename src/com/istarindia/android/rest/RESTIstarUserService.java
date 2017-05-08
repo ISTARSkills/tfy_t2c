@@ -43,6 +43,8 @@ public class RESTIstarUserService {
 	public Response createUser(@FormParam("email") String email, @FormParam("password") String password,
 			@FormParam("mobile") Long mobile) {
 
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			String authenticationToken = AppUtility.getRandomString(20);
@@ -54,13 +56,11 @@ public class RESTIstarUserService {
 
 			if (istarUser != null) {
 				// User with Email already registered
-				return Response.status(Response.Status.CONFLICT).entity("A user already registered with this email.")
-						.build();
+				throw new Exception("istarViksitProComplexKeyA user already registered with this email.");
 			} else if (istarUserByMobile != null) {
 				// User with Mobile already registered
-				return Response.status(Response.Status.CONFLICT).entity("A user already registered with this mobile")
-						.build();
-			} else {
+				throw new Exception("istarViksitProComplexKeyA user already registered with this mobile");
+			} 
 
 				istarUser = istarUserServices.createIstarUser(email, password, mobile, authenticationToken);
 
@@ -78,16 +78,16 @@ public class RESTIstarUserService {
 				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
-				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 				String result = gson.toJson(studentProfile);
 
 				AppServices appServices = new AppServices();
 				appServices.logEntryToLoginTable(istarUser, "LOGIN");
 				return Response.ok(result).build();
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -95,29 +95,25 @@ public class RESTIstarUserService {
 	@Path("{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserProfile(@PathParam("userId") int userId) {
-
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
 			if (istarUser == null) {
-				// User does not exists
-				Gson gson = new Gson();
-				String result = gson.toJson("Bad request");
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result).build();
-			} else {
+				throw new Exception("istarViksitProComplexKeyUser does not exists");
+			}
 				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
-				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 				String result = gson.toJson(studentProfile);
 
 				return Response.ok(result).build();
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
-
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("bad request").build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -126,7 +122,7 @@ public class RESTIstarUserService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateUserProfile(@PathParam("userId") int userId, @FormParam("profile") String profile) {
 
-		System.out.println("profile->" + profile);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
@@ -136,23 +132,22 @@ public class RESTIstarUserService {
 			StudentProfile requestStudentProfile = requestGson.fromJson(profile, StudentProfile.class);
 
 			if (istarUser == null) {
-				// User does not exists
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-			} else {
+				throw new Exception();
+			}
 				AppServices appServices = new AppServices();
 				appServices.updateStudentProfile(requestStudentProfile);
 
 				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
-				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 				String result = gson.toJson(studentProfile);
 
 				return Response.ok(result).build();
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -162,35 +157,33 @@ public class RESTIstarUserService {
 	public Response updateUserProfileImage(@PathParam("userId") int userId,
 			@FormParam("profileImage") String profileImage) {
 
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
-			if (istarUser == null || profileImage == null) {
-				// User does not exists or invalid input parameters
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-			} else {
-				AppUtility appUtility = new AppUtility();
-				String fileName = appUtility.imageUpload(profileImage, "jpg", "PROFILE_IMAGE");
-
-				UserProfile userProfile = istarUserServices.updateProfileImage(istarUser, fileName);
-
-				if (userProfile != null) {
-					AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-					StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
-
-					Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-					String result = gson.toJson(studentProfile);
-
-					return Response.ok(result).build();
-				} else {
-					throw new Exception();
-				}
+			if (istarUser == null) {
+				throw new Exception();
+			} else if (profileImage == null) {
+				throw new Exception("istarViksitProComplexKeyInvalid Image");
 			}
+			AppUtility appUtility = new AppUtility();
+			String fileName = appUtility.imageUpload(profileImage, "jpg", "PROFILE_IMAGE");
 
+			UserProfile userProfile = istarUserServices.updateProfileImage(istarUser, fileName);
+
+			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(userProfile.getIstarUser());
+
+			String result = gson.toJson(studentProfile);
+
+			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -198,20 +191,23 @@ public class RESTIstarUserService {
 	@Path("password/reset")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response resetPassword(@FormParam("userId") int userId, @FormParam("password") String password) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
 			if (istarUser == null) {
 				return Response.status(404).build();
-			} else {
+			}
 				istarUser = istarUserServices.updateIstarUser(istarUser.getId(), istarUser.getEmail(), password,
 						istarUser.getMobile());
-				return Response.ok("DONE").build();
-			}
+				String result = gson.toJson("DONE");
+				return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -219,6 +215,7 @@ public class RESTIstarUserService {
 	@Path("password/forgot")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response forgotPassword(@QueryParam("mobile") Long mobile) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUserByMobile(mobile);
@@ -229,14 +226,15 @@ public class RESTIstarUserService {
 				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
-				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 				String result = gson.toJson(studentProfile);
 
 				return Response.ok(result).build();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -244,7 +242,7 @@ public class RESTIstarUserService {
 	@Path("{userId}/mobile")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response verifyMobileNumber(@PathParam("userId") int userId, @QueryParam("mobile") Long mobile) {
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
@@ -252,7 +250,7 @@ public class RESTIstarUserService {
 			IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobile);
 
 			if (istarUser == null || mobileIstarUser == null) {
-				throw new Exception("Oops! No account registered for this mobile number.");
+				throw new Exception("istarViksitProComplexKeyOops! No account registered for this mobile number.");
 			}
 			Integer otp = null;
 
@@ -260,14 +258,14 @@ public class RESTIstarUserService {
 				AppServices appServices = new AppServices();
 				otp = appServices.sendOTP(mobile.toString());
 			} catch (Exception e) {
-				e.printStackTrace();
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+				throw new Exception("istarViksitProComplexKeyInternal Server Error");
 			}
 			return Response.ok(otp).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			String result = gson.toJson(e.getMessage());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -275,6 +273,7 @@ public class RESTIstarUserService {
 	@Path("{userId}/mobile")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateAndVerifyMobileNumber(@PathParam("userId") int userId, @QueryParam("mobile") String mobile) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
@@ -283,9 +282,12 @@ public class RESTIstarUserService {
 
 			IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobileNumber);
 
-			if (istarUser == null && mobileIstarUser != null) {
-				return Response.status(Response.Status.BAD_REQUEST).build();
-			} else {
+			if (istarUser == null) {
+				throw new Exception();
+			} else if (mobileIstarUser != null) {
+				throw new Exception(
+						"istarViksitProComplexKeyA user already exits with this mobile. Please try with another mobile number or raise a ticket.");
+			}
 				Integer otp = null;
 				istarUserServices.updateMobile(istarUser.getId(), mobileNumber);
 
@@ -294,13 +296,14 @@ public class RESTIstarUserService {
 					otp = appServices.sendOTP(mobile.toString());
 				} catch (Exception e) {
 					e.printStackTrace();
-					return Response.status(Response.Status.BAD_GATEWAY).build();
+					throw new Exception();
 				}
-				return Response.ok(otp).build();
-			}
+				return Response.ok(gson.toJson(otp)).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -308,25 +311,26 @@ public class RESTIstarUserService {
 	@Path("{userId}/verify/{isVerified}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response isVerified(@PathParam("userId") int userId, @PathParam("isVerified") String isVerified) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			boolean verifiedUser = Boolean.parseBoolean(isVerified);
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.updateIsVerified(userId, verifiedUser);
 
-			if (istarUser != null) {
-				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
-
-				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-				String result = gson.toJson(studentProfile);
-
-				return Response.ok(result).build();
-			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			if (istarUser == null) {
+				throw new Exception();
 			}
+			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
+
+			String result = gson.toJson(studentProfile);
+
+			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -345,7 +349,8 @@ public class RESTIstarUserService {
 			IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
 
 			if (batchGroup == null) {
-				throw new Exception("Invalid batch code. Please contact your college administrator.");
+				throw new Exception(
+						"istarViksitProComplexKeyInvalid batch code. Please contact your college administrator.");
 			}
 			AppBatchStudentsServices batchStudentServices = new AppBatchStudentsServices();
 			batchStudentServices.createBatchStudents(istarUser, batchGroup, "STUDENT");
@@ -353,17 +358,17 @@ public class RESTIstarUserService {
 			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
 			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(istarUserId);
 
-			if (complexObject != null) {
-				String result = gson.toJson(complexObject);
-
-				return Response.ok(result).build();
-			} else {
-				throw new Exception("Invalid user");
+			if (complexObject == null) {
+				throw new Exception("istarViksitProComplexKeyInvalid user");
 			}
+			String result = gson.toJson(complexObject);
+
+			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			String result = gson.toJson(e.getMessage());
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -371,19 +376,19 @@ public class RESTIstarUserService {
 	@Path("{userId}/skills")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSkillsMap(@PathParam("userId") int istarUserId) {
-
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			AppServices appServices = new AppServices();
 			List<SkillReportPOJO> allSkills = appServices.getSkillsMapOfUser(istarUserId);
 
-			Gson gson = new Gson();
 			String result = gson.toJson(allSkills);
 
 			return Response.ok(result).build();
-
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 
@@ -391,21 +396,22 @@ public class RESTIstarUserService {
 	@Path("{userId}/complex")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getComplexObject(@PathParam("userId") int istarUserId) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
 			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(istarUserId);
 
-			if (complexObject != null) {
-				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-				String result = gson.toJson(complexObject);
-
-				return Response.ok(result).build();
-			} else {
+			if (complexObject == null) {
 				throw new Exception();
 			}
+			String result = gson.toJson(complexObject);
+
+			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
 	/*
