@@ -57,9 +57,9 @@ public class RESTAssessmentService {
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 
 			for (Task task : allTaskOfUser) {
-				if (task.getIsActive() && task.getItemType().equals("ASSESSMENT")) {
+				if (task.getItemType().equals("ASSESSMENT")) {
 					Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());
-					if (assessment != null && assessment.getAssessmentQuestions().size() > 0) {
+					if (assessment != null && assessment.getAssessmentQuestions()!=null && assessment.getAssessmentQuestions().size() > 0) {
 						AssessmentPOJO assessmentPOJO = appPOJOUtility.getAssessmentPOJO(assessment);
 						allAssessmentsOfUser.add(assessmentPOJO);
 					}
