@@ -67,11 +67,18 @@ public class AppAssessmentServices {
 					SkillReportPOJO moduleSkillReportPOJO = null;
 					SkillReportPOJO cmsessionSkillReportPOJO = null;
 
+					System.out.println("moduleId->"+moduleId);
 					if (modulesOfAssessment.containsKey(moduleId)) {
+						System.out.println("Contains Module-->"+ moduleId);
 						for (SkillReportPOJO tempModuleSkillReport : skillsReport) {
-							if (tempModuleSkillReport.getId() == moduleId) {
+							System.out.println("MODULE IS-->" + tempModuleSkillReport.getId());
+							if (tempModuleSkillReport.getId().equals(moduleId)) {
+								System.out.println("Module found ");
 								moduleSkillReportPOJO = tempModuleSkillReport;
 								break;
+							}
+							else{
+								System.out.println("Module not found--> "+ moduleId);
 							}
 						}
 
@@ -89,7 +96,9 @@ public class AppAssessmentServices {
 						
 					} else {
 						Module module = appCourseServices.getModule(moduleId);
+						System.out.println("Searching module->"+moduleId);
 						if (module != null) {
+							System.out.println("Found module in the DB->"+moduleId);
 							modulesOfAssessment.put(moduleId, module);
 
 							moduleSkillReportPOJO = new SkillReportPOJO();
@@ -113,6 +122,7 @@ public class AppAssessmentServices {
 							moduleSkillReportPOJO.calculateUserPoints();
 							moduleSkillReportPOJO.calculatePercentage();
 							moduleSkillReportPOJO.generateMessage();
+							System.out.println("Adding module Skill report with id-->" + moduleSkillReportPOJO.getId());
 							skillsReport.add(moduleSkillReportPOJO);
 						}else{
 							System.out.println("Module is null with id->"+moduleId);
