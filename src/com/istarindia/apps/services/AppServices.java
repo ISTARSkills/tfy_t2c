@@ -87,7 +87,41 @@ public class AppServices {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
+	
+	public List<SkillReportPOJO> getSkillsMapOfUser(int istarUserId) {
+
+		List<SkillReportPOJO> allSkills = new ArrayList<SkillReportPOJO>();
+
+		StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
+		List<Integer> allCourseId = studentPlaylistServices.getCoursesforUser(istarUserId);
+
+		AppCourseServices appCourseServices = new AppCourseServices();
+
+		for (Integer courseId : allCourseId) {
+			Course course = appCourseServices.getCourse(courseId);
+			if (course != null) {
+				SkillReportPOJO courseSkillPOJO = new SkillReportPOJO();
+				courseSkillPOJO.setId(course.getId());
+				courseSkillPOJO.setName(course.getCourseName());
+
+				String imageURL = course.getImage_url();
+				courseSkillPOJO.setImageURL(imageURL);
+
+				List<SkillReportPOJO> moduleLevelSkillReport = appCourseServices
+						.getSkillsReportForCourseOfUser(istarUserId, courseId);
+
+				courseSkillPOJO.setSkills(moduleLevelSkillReport);
+				courseSkillPOJO.calculateUserPoints();
+				courseSkillPOJO.calculateTotalPoints();
+				courseSkillPOJO.calculatePercentage();
+				
+				allSkills.add(courseSkillPOJO);
+			}
+		}
+		return allSkills;
+	}
+	
+/*	@SuppressWarnings("unchecked")
 	public List<SkillReportPOJO> getSkillsMapOfUser(int istarUserId){
 		
 		List<SkillReportPOJO> allSkills = new ArrayList<SkillReportPOJO>();
@@ -190,7 +224,7 @@ public class AppServices {
 				moduleSkillPOJO.calculateUserPoints();
 				moduleSkillPOJO.calculateTotalPoints();
 				moduleSkillPOJO.calculatePercentage();	
-				courseSkillPOJO.generateMessage();
+				moduleSkillPOJO.generateMessage();
 				courseSkillPOJO.calculateUserPoints();
 				courseSkillPOJO.calculateTotalPoints();
 				courseSkillPOJO.calculatePercentage();
@@ -198,7 +232,7 @@ public class AppServices {
 			}			
 		}
 		return allSkills;
-	}
+	}*/
 	
 	
 	public Double getMaxPointsOfCmsessionSkill(int cmsessionSkillObjectiveId){
