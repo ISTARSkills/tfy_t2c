@@ -23,18 +23,35 @@ import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
 public class AppServices {
 	
-	public void updateStudentProfile(StudentProfile studentProfile){
+	public void logEntryToLoginTable(IstarUser istarUser, String action){
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();			
+		String sql = "INSERT INTO public.login (id, user_id, created_at, jsession_id, action) VALUES ((select max(id)+1 from login), "+istarUser.getId()+", now(), "+istarUser.getAuthToken()+", "+action+")";
+		SQLQuery query = session.createSQLQuery(sql);
+		query.executeUpdate();
+	}
+	
+	
+	public void updateStudentProfile(StudentProfile studentProfile) throws Exception{
 		
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.getIstarUser(studentProfile.getId());
 	
-		//System.out.println("studentProfile->"+studentProfile.getMobile());
-		//System.out.println("istarUser->"+istarUser.getMobile());
-		
-		if(!studentProfile.getMobile().equals(istarUser.getMobile())){
+		if(!studentProfile.getMobile().equals(istarUser.getMobile())){			
+			IstarUser istarUserByMobile = istarUserServices.getIstarUserByMobile(studentProfile.getMobile());
+			
+			if(istarUserByMobile!=null){
+				throw new Exception("A user already registered with this mobile");
+			}			
 			istarUserServices.updateIsVerified(istarUser.getId(), false);
-		}else{
-			System.out.println("User already verified with this number");
+		}
+		
+		if(!studentProfile.getEmail().equals(istarUser.getEmail())){
+			IstarUser istarUserByEmail = istarUserServices.getIstarUserByEmail(studentProfile.getEmail());
+			
+			if(istarUserByEmail!=null){
+				throw new Exception("A user already registered with this email");
+			}
 		}
 		
 		//update istarUser and isVerified if mobile number is changed
@@ -230,6 +247,15 @@ public class AppServices {
 
 		IstarUserServices istarUserServices = new IstarUserServices();
 		istarUser = istarUserServices.updateAuthenticationTokenForIstarUser(istarUser, authenticationToken);
+
+		return istarUser;
+	}
+	
+	public IstarUser invalidateToken(IstarUser istarUser) {
+		System.out.println("Invalidate Token");
+
+		IstarUserServices istarUserServices = new IstarUserServices();
+		istarUser = istarUserServices.updateAuthenticationTokenForIstarUser(istarUser, null);
 
 		return istarUser;
 	}

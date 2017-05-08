@@ -1,10 +1,8 @@
 package com.istarindia.android.rest;
 
-import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -18,9 +16,7 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.istarindia.android.pojo.ComplexObject;
-import com.istarindia.android.pojo.QuestionResponsePOJO;
 import com.istarindia.android.pojo.SkillReportPOJO;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppPOJOUtility;
@@ -52,20 +48,22 @@ public class RESTIstarUserService {
 			String authenticationToken = AppUtility.getRandomString(20);
 			IstarUser istarUser = null;
 			IstarUser istarUserByMobile = null;
-			
+
 			istarUser = istarUserServices.getIstarUserByEmail(email);
 			istarUserByMobile = istarUserServices.getIstarUserByMobile(mobile);
 
-			if (istarUser != null){
+			if (istarUser != null) {
 				// User with Email already registered
-				return Response.status(Response.Status.CONFLICT).entity("User already registered for this email.").build();
-			} else if (istarUserByMobile!=null) {
+				return Response.status(Response.Status.CONFLICT).entity("A user already registered with this email.")
+						.build();
+			} else if (istarUserByMobile != null) {
 				// User with Mobile already registered
-				return Response.status(Response.Status.CONFLICT).entity("User already registered with this mobile").build();
+				return Response.status(Response.Status.CONFLICT).entity("A user already registered with this mobile")
+						.build();
 			} else {
-				
-				istarUser= istarUserServices.createIstarUser(email, password, mobile, authenticationToken);
-				
+
+				istarUser = istarUserServices.createIstarUser(email, password, mobile, authenticationToken);
+
 				RoleServices roleServices = new RoleServices();
 				Role role = roleServices.getRoleByName("STUDENT");
 
@@ -83,6 +81,8 @@ public class RESTIstarUserService {
 				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 				String result = gson.toJson(studentProfile);
 
+				AppServices appServices = new AppServices();
+				appServices.logEntryToLoginTable(istarUser, "LOGIN");
 				return Response.ok(result).build();
 			}
 		} catch (Exception e) {
@@ -116,7 +116,7 @@ public class RESTIstarUserService {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			
+
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("bad request").build();
 		}
 	}
@@ -127,12 +127,12 @@ public class RESTIstarUserService {
 	public Response updateUserProfile(@PathParam("userId") int userId, @FormParam("profile") String profile) {
 
 		System.out.println("profile->" + profile);
-		
+
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
-			Gson requestGson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();			
+			Gson requestGson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			StudentProfile requestStudentProfile = requestGson.fromJson(profile, StudentProfile.class);
 
 			if (istarUser == null) {
@@ -141,7 +141,7 @@ public class RESTIstarUserService {
 			} else {
 				AppServices appServices = new AppServices();
 				appServices.updateStudentProfile(requestStudentProfile);
-				
+
 				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
@@ -155,23 +155,23 @@ public class RESTIstarUserService {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-	
+
 	@POST
-	@Path("{userId}/image")
+	@Path("{userId}/upload")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateUserProfileImage(@PathParam("userId") int userId, @FormParam("profileImage") String profileImage, @FormParam("format") String format,
-			@FormParam("type") String type) {
+	public Response updateUserProfileImage(@PathParam("userId") int userId,
+			@FormParam("profileImage") String profileImage) {
 
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
-			if (istarUser == null || profileImage==null || format==null || type==null) {
+			if (istarUser == null || profileImage == null) {
 				// User does not exists or invalid input parameters
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 			} else {
 				AppUtility appUtility = new AppUtility();
-				String fileName = appUtility.imageUpload(profileImage, format, type);
+				String fileName = appUtility.imageUpload(profileImage, "jpg", "PROFILE_IMAGE");
 
 				UserProfile userProfile = istarUserServices.updateProfileImage(istarUser, fileName);
 
@@ -193,8 +193,7 @@ public class RESTIstarUserService {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-	
-	
+
 	@PUT
 	@Path("password/reset")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -251,20 +250,20 @@ public class RESTIstarUserService {
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
 			IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobile);
-			
+
 			if (istarUser == null || mobileIstarUser == null) {
 				throw new Exception("Oops! No account registered for this mobile number.");
 			}
-				Integer otp = null;
+			Integer otp = null;
 
-				try {
-					AppServices appServices = new AppServices();
-					otp = appServices.sendOTP(mobile.toString());
-				} catch (Exception e) {
-					e.printStackTrace();
-					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-				}
-				return Response.ok(otp).build();
+			try {
+				AppServices appServices = new AppServices();
+				otp = appServices.sendOTP(mobile.toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			}
+			return Response.ok(otp).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			String result = gson.toJson(e.getMessage());
@@ -281,7 +280,7 @@ public class RESTIstarUserService {
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
 			Long mobileNumber = Long.parseLong(mobile);
-			
+
 			IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobileNumber);
 
 			if (istarUser == null && mobileIstarUser != null) {
@@ -314,7 +313,7 @@ public class RESTIstarUserService {
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.updateIsVerified(userId, verifiedUser);
 
-			if(istarUser!=null){
+			if (istarUser != null) {
 				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
@@ -322,7 +321,7 @@ public class RESTIstarUserService {
 				String result = gson.toJson(studentProfile);
 
 				return Response.ok(result).build();
-			}else{
+			} else {
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 			}
 		} catch (Exception e) {
@@ -338,27 +337,27 @@ public class RESTIstarUserService {
 
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
-			
+
 			AppBatchGroupServices batchGroupServices = new AppBatchGroupServices();
 			BatchGroup batchGroup = batchGroupServices.getBatchGroupByBatchCode(batchCode);
-			
+
 			IstarUserServices istarUserServices = new IstarUserServices();
 			IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
-			
-			if(batchGroup==null){
+
+			if (batchGroup == null) {
 				throw new Exception("Invalid batch code. Please contact your college administrator.");
 			}
 			AppBatchStudentsServices batchStudentServices = new AppBatchStudentsServices();
-			batchStudentServices.createBatchStudents(istarUser, batchGroup, "STUDENT");					
+			batchStudentServices.createBatchStudents(istarUser, batchGroup, "STUDENT");
 
 			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
 			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(istarUserId);
-						
-			if(complexObject!=null){				
+
+			if (complexObject != null) {
 				String result = gson.toJson(complexObject);
 
 				return Response.ok(result).build();
-			}else{
+			} else {
 				throw new Exception("Invalid user");
 			}
 		} catch (Exception e) {
@@ -367,22 +366,22 @@ public class RESTIstarUserService {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result).build();
 		}
 	}
-	
+
 	@GET
 	@Path("{userId}/skills")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getSkillsMap(@PathParam("userId") int istarUserId){
-		
-		try{
-			AppServices appServices= new AppServices();
+	public Response getSkillsMap(@PathParam("userId") int istarUserId) {
+
+		try {
+			AppServices appServices = new AppServices();
 			List<SkillReportPOJO> allSkills = appServices.getSkillsMapOfUser(istarUserId);
-			
+
 			Gson gson = new Gson();
 			String result = gson.toJson(allSkills);
 
 			return Response.ok(result).build();
-			
-		}catch(Exception e){
+
+		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
@@ -391,20 +390,20 @@ public class RESTIstarUserService {
 	@GET
 	@Path("{userId}/complex")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getComplexObject(@PathParam("userId") int istarUserId){
-		try{			
+	public Response getComplexObject(@PathParam("userId") int istarUserId) {
+		try {
 			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
 			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(istarUserId);
-						
-			if(complexObject!=null){				
+
+			if (complexObject != null) {
 				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 				String result = gson.toJson(complexObject);
 
 				return Response.ok(result).build();
-			}else{
+			} else {
 				throw new Exception();
 			}
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}

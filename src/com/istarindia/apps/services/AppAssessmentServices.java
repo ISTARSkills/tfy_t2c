@@ -1,6 +1,7 @@
 package com.istarindia.apps.services;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import com.viksitpro.core.dao.entities.AssessmentDAO;
 import com.viksitpro.core.dao.entities.AssessmentOption;
 import com.viksitpro.core.dao.entities.AssessmentQuestion;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
+import com.viksitpro.core.dao.entities.Module;
 import com.viksitpro.core.dao.entities.Question;
 import com.viksitpro.core.dao.entities.SkillObjective;
 import com.viksitpro.core.dao.entities.SkillObjectiveDAO;
@@ -28,7 +30,151 @@ import com.viksitpro.core.dao.entities.UserGamification;
 
 public class AppAssessmentServices {
 
+	
+	@SuppressWarnings("unchecked")
 	public AssessmentReportPOJO getAssessmentReport(int istarUserId, int assessmentId) {
+
+		Assessment assessment = getAssessment(assessmentId);
+		AssessmentReportPOJO assessmentReportPOJO = null;
+		if (assessment != null) {
+
+			BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+			Session session = baseHibernateDAO.getSession();
+			
+			String sql = "select cast(points as numeric) as points, cast(assessment_benchmark.max_points as numeric), cast(coins as integer), skill_objective, cmsession_id, module_id, course_id, count(batch_group_id) from user_gamification inner join assessment_benchmark on user_gamification.item_id=assessment_benchmark.assessment_id and user_gamification.item_type='ASSESSMENT' and user_gamification.skill_objective=assessment_benchmark.skill_objective_id where timestamp in (select max(timestamp) from user_gamification where istar_user="
+					+ istarUserId + " and item_id=" + assessmentId +" and item_type='ASSESSMENT') group by cast(points as numeric), coins, skill_objective, module_id, cmsession_id, course_id, assessment_benchmark.max_points order by course_id, cmsession_id, module_id, skill_objective";
+
+			System.out.println("AssessmentReport Query->" + sql);
+			SQLQuery query = session.createSQLQuery(sql);
+			List<Object[]> result = query.list();
+
+			if (result.size() > 0) {
+
+				HashMap<Integer, Module> modulesOfAssessment = new HashMap<Integer, Module>();
+				assessmentReportPOJO = new AssessmentReportPOJO();
+				List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();
+				AppCourseServices appCourseServices = new AppCourseServices();
+
+				for (Object[] row : result) {
+					
+					System.out.println(((BigDecimal) row[0]).doubleValue());
+
+					Double userPoints = ((BigDecimal) row[0]).doubleValue();
+					Double totalPoints = ((BigDecimal) row[1]).doubleValue();
+					Integer coins = (Integer) row[2];
+					Integer cmsessionSkillObjectiveId = (Integer) row[3];
+					Integer moduleId = (Integer) row[5];
+
+					SkillObjective cmsessionSkillObjective = getSkillObjective(cmsessionSkillObjectiveId);
+					SkillReportPOJO moduleSkillReportPOJO = null;
+					SkillReportPOJO cmsessionSkillReportPOJO = null;
+
+					if (modulesOfAssessment.containsKey(moduleId)) {
+						for (SkillReportPOJO tempModuleSkillReport : skillsReport) {
+							if (tempModuleSkillReport.getId() == moduleId) {
+								moduleSkillReportPOJO = tempModuleSkillReport;
+								break;
+							}
+						}
+
+						cmsessionSkillReportPOJO = new SkillReportPOJO();
+						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+						cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
+						cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
+						cmsessionSkillReportPOJO.setUserPoints(userPoints);
+						
+						moduleSkillReportPOJO.getSkills().add(cmsessionSkillReportPOJO);
+						moduleSkillReportPOJO.calculateTotalPoints();
+						moduleSkillReportPOJO.calculateUserPoints();
+						moduleSkillReportPOJO.calculatePercentage();
+						moduleSkillReportPOJO.generateMessage();
+						
+					} else {
+						Module module = appCourseServices.getModule(moduleId);
+						if (module != null) {
+							modulesOfAssessment.put(moduleId, module);
+
+							moduleSkillReportPOJO = new SkillReportPOJO();
+							moduleSkillReportPOJO.setName(module.getModuleName());
+							moduleSkillReportPOJO.setDescription(module.getModule_description());
+							moduleSkillReportPOJO.setImageURL(module.getImage_url());
+
+							List<SkillReportPOJO> cmsessionSkillsReport = new ArrayList<SkillReportPOJO>();
+
+							cmsessionSkillReportPOJO = new SkillReportPOJO();
+							cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+							cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+							cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
+							cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
+							cmsessionSkillReportPOJO.setUserPoints(userPoints);
+
+							cmsessionSkillsReport.add(cmsessionSkillReportPOJO);
+							moduleSkillReportPOJO.setSkills(cmsessionSkillsReport);
+							
+							moduleSkillReportPOJO.calculateTotalPoints();
+							moduleSkillReportPOJO.calculateUserPoints();
+							moduleSkillReportPOJO.calculatePercentage();
+							moduleSkillReportPOJO.generateMessage();
+							skillsReport.add(moduleSkillReportPOJO);
+						}else{
+							System.out.println("Module is null with id->"+moduleId);
+						}
+					}
+				}
+				
+				String sqlBatch = "with batch_groups as (select distinct batch_group_id from user_gamification where istar_user="+istarUserId+" and item_id="+assessmentId+" and item_type='ASSESSMENT'), "
+						+" all_batch_students as (select student_id from batch_students where batch_group_id in (select * from batch_groups)), "
+						+" batch_students_count as (select count(*) from all_batch_students), "
+						+" attempted_students as (select istar_user, max(timestamp) from user_gamification where item_id="+assessmentId+" and item_type='ASSESSMENT' and batch_group_id in (select * from batch_groups) group by istar_user) "
+				        +" select * from (select *, row_number() over(order by user_points desc) as rank, cast(sum(user_points) over ()/(select * from batch_students_count) as numeric) as batch_average, cast(count(*) over() as integer), cast((select count(*) from all_batch_students) as integer) as total_students from (select DISTINCT istar_user, cast(sum(points) as numeric) as user_points from user_gamification where item_id="+assessmentId+" and item_type='ASSESSMENT' and (istar_user, timestamp) in (select * from attempted_students) group by istar_user, batch_group_id) as temptable) as another where istar_user="+istarUserId;
+				
+				System.out.println("sqlBatch->"+sqlBatch);				
+				SQLQuery queryBatch = session.createSQLQuery(sqlBatch);
+				List<Object[]> resultBatch = queryBatch.list();
+				
+				if(resultBatch.size()>0){
+					
+					Integer batchRank =  ((BigInteger) resultBatch.get(0)[2]).intValue(); //not being used, but might need in future
+					Double batchAverage = ((BigDecimal) resultBatch.get(0)[3]).doubleValue();
+					Integer numberOfStudentsInBatchAttemptedAssessment = (Integer) resultBatch.get(0)[4];
+					Integer numberOfStudentsInBatch = (Integer) resultBatch.get(0)[5];
+					
+					assessmentReportPOJO = new AssessmentReportPOJO();
+					
+					assessmentReportPOJO.setId(assessment.getId());
+					assessmentReportPOJO.setName(assessment.getAssessmenttitle());
+					assessmentReportPOJO.setSkillsReport(skillsReport); //what if skill size is zero
+					assessmentReportPOJO.setBatchAverage(batchAverage);
+					assessmentReportPOJO.setUsersAttemptedCount(numberOfStudentsInBatchAttemptedAssessment);
+					assessmentReportPOJO.setTotalNumberOfUsersInBatch(numberOfStudentsInBatch);
+					
+					String questionsSQL = "select cast(count(case when correct=true then 1 else null end) as integer) as correct_questions, cast(count(distinct question_id) as integer) as total_questions, cast(sum(time_taken) as integer) as duration from student_assessment where student_id="+istarUserId+" and assessment_id="+assessmentId;
+					
+					System.out.println("questionsSQL->"+questionsSQL);
+					SQLQuery queryQuestions = session.createSQLQuery(questionsSQL);
+					List<Object[]> resultQuestions = queryQuestions.list();
+					
+					if(resultQuestions.size()>0){
+						Integer correctQuestions = (Integer) resultQuestions.get(0)[0];
+						Integer totalQuestions = (Integer) resultQuestions.get(0)[1];
+						Integer duration = (Integer) resultQuestions.get(0)[2]; //not being used, but might need in future
+						
+						assessmentReportPOJO.setTotalNumberOfCorrectlyAnsweredQuestions(correctQuestions);
+						assessmentReportPOJO.setTotalNumberOfQuestions(totalQuestions);
+					}
+					
+					assessmentReportPOJO.calculateTotalScore();
+					assessmentReportPOJO.calculateUserScore();
+					assessmentReportPOJO.calculateAccuracy();
+					assessmentReportPOJO.generateMessageAndDescription(50);
+				}
+			}
+		}
+		return assessmentReportPOJO;
+	}
+	
+/*	public AssessmentReportPOJO getAssessmentReport(int istarUserId, int assessmentId) {
 		System.out.println("Getting assessment report");
 		AssessmentReportPOJO assessmentReportPOJO = null;
 
@@ -147,8 +293,23 @@ public class AppAssessmentServices {
 		}
 		assessmentReportPOJO.generateMessageAndDescription(50); //50 is cut off marks
 		return assessmentReportPOJO;
-	}
+	}*/
 
+	
+	public List<Integer> getAssessmentsOfUser(int istarUserId){
+		
+		String sql = "select distinct item_id from user_gamification where istar_user="+istarUserId+" and timestamp is not null";
+		System.out.println("all Assessments of user from UsrGmfctn---->"+sql);
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		SQLQuery query = session.createSQLQuery(sql);
+		
+		List<Integer> results = query.list();
+		
+		return results;
+	}
+	
 	public AssessmentResponsePOJO getAssessmentResponseOfUser(int assessmentId, int istarUserId) {
 
 		AssessmentResponsePOJO assessmentResponsePOJO = new AssessmentResponsePOJO();
@@ -199,13 +360,29 @@ public class AppAssessmentServices {
 	}
 
 	public List<AssessmentReportPOJO> getAllAssessmentReportsOfUser(int istarUserId) {
+		List<Integer> assessmentIds = getAssessmentsOfUser(istarUserId);
+		List<AssessmentReportPOJO> allReports = new ArrayList<AssessmentReportPOJO>();
+		if(assessmentIds.size()>0){
+			for(Integer assessmentId: assessmentIds){
+				AssessmentReportPOJO assessmentReportPOJO = getAssessmentReport(istarUserId, assessmentId);
+				if(assessmentReportPOJO!=null){
+					allReports.add(assessmentReportPOJO);
+				}
+			}
+		}
+		return allReports;		
+	}
+	
+	
+	
+	/*public List<AssessmentReportPOJO> getAllAssessmentReportsOfUser(int istarUserId) {
 
 		List<AssessmentReportPOJO> allReports = new ArrayList<AssessmentReportPOJO>();
 
 		HashMap<Integer, Integer> numberOfCorrectlyAnsweredQuestions = getNumberOfCorrectlyAnsweredQuestionsOfAllAssessments(
 				istarUserId);
-/*		HashMap<Integer, Integer> numberOfUsersAttemptedAssessments = getNumberOfUsersAttemptedTheAssessmentOfUser(
-				istarUserId);*/
+		HashMap<Integer, Integer> numberOfUsersAttemptedAssessments = getNumberOfUsersAttemptedTheAssessmentOfUser(
+				istarUserId);
 		HashMap<Integer, HashMap<String, Object>> batchAverageOfAssessments = calculateBatchAverageOfAllAssessments(
 				istarUserId);
 		HashMap<Integer, HashMap<Integer, Double>> skillsBenchmarkForAssessments = getMaxPointsForSkillObjectiveOfAllAssessment(istarUserId);
@@ -330,7 +507,7 @@ public class AppAssessmentServices {
 			}
 		}
 		return allReports;
-	}
+	}*/
 
 	/*
 	 * public HashMap<String, Object>
@@ -461,7 +638,7 @@ public class AppAssessmentServices {
 	}*/
 
 	@SuppressWarnings("unchecked")
-	public HashMap<Integer, HashMap<String, Object>> calculateBatchAverageOfAllAssessments(Integer istarUserId) {
+	public HashMap<Integer, HashMap<String, Object>> calculateBatchAverageOfAllAssessments11(Integer istarUserId) {
 
 		HashMap<Integer, HashMap<String, Object>> allAssessmentsMap = new HashMap<Integer, HashMap<String, Object>>();
 

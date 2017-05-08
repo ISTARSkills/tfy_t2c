@@ -8,10 +8,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.SecureRandom;
-import java.util.Base64;
+
 import java.util.Properties;
 import java.util.Random;
 import java.util.UUID;
+
+import org.apache.tomcat.util.codec.binary.Base64;
 
 public class AppUtility {
 
@@ -51,7 +53,7 @@ public class AppUtility {
 		
 		String fileName = UUID.randomUUID().toString()+"."+fileExtension;
 		String filePath = uploadFolder.getAbsolutePath()+"/"+fileName;
-		byte[] imgByteArray = Base64.getDecoder().decode(profileImage);
+		byte[] imgByteArray = Base64.decodeBase64(profileImage);
         FileOutputStream file = new FileOutputStream(filePath);
         String fileURL = fileURLPrefix + subDirectory +fileName;
        

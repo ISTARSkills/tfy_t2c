@@ -72,7 +72,7 @@ public class RESTCourseService {
 	public Response getLeaderboardOfAllCoursesOfUser(@PathParam("userId") int userId){
 		
 		try{			
-			StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
+		/*	StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 			List<StudentPlaylist> allStudentPlaylist = studentPlaylistServices.getStudentPlaylistOfUser(userId);
 			
 			Set<Integer> allCourseId = new HashSet<Integer>();
@@ -80,9 +80,9 @@ public class RESTCourseService {
 			for(StudentPlaylist StudentPlaylist : allStudentPlaylist){
 				allCourseId.add(StudentPlaylist.getCourse().getId());
 			}
-			
+			*/
 			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
-			List<CourseRankPOJO> allCourseRanks = appUserRankUtility.getCourseRankPOJOForCoursesOfUsersBatch(userId, allCourseId);
+			List<CourseRankPOJO> allCourseRanks = appUserRankUtility.getCourseRankPOJOForCoursesOfUsersBatch(userId);
 			
 			Gson gson = new Gson();
 			String result = gson.toJson(allCourseRanks);

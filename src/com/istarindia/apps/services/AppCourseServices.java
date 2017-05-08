@@ -2,6 +2,7 @@ package com.istarindia.apps.services;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,12 +35,6 @@ import com.viksitpro.core.dao.entities.SkillObjective;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 
 public class AppCourseServices {
-
-	public List<CoursePOJO> getCoursesOfUser(int istarUserId){
-		
-		return null;
-	}
-	
 	
 	public CoursePOJO getCourseOfUser(int istarUserId, int courseId){
 		CoursePOJO coursePOJO = null;
@@ -139,7 +134,92 @@ public class AppCourseServices {
 		return coursePOJO;
 	}
 	
+	
 	public List<SkillReportPOJO> getSkillsReportForCourseOfUser(int istarUserId, int courseId){
+		
+		List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();
+		
+		String sql = "select skill_objective,cmsession_id,module_id,course_id, sum(points) as user_points, sum(max_points) as total_points from  (select user_gamification.skill_objective, user_gamification.cmsession_id, user_gamification.module_id, user_gamification.course_id, user_gamification.item_id, cast(user_gamification.points as numeric), cast(assessment_benchmark.max_points as numeric), count(student_playlist.lesson_id)  from user_gamification inner join student_playlist on user_gamification.cmsession_id=student_playlist.cmsession_id and user_gamification.module_id=student_playlist.module_id and user_gamification.course_id=student_playlist.course_id inner join assessment_benchmark on user_gamification.item_id=assessment_benchmark.assessment_id and user_gamification.item_type='ASSESSMENT' and user_gamification.skill_objective=assessment_benchmark.skill_objective_id where timestamp in (select max(timestamp) from user_gamification where istar_user="+istarUserId+" and course_id="+courseId+" and item_type='ASSESSMENT' group by item_id) group by user_gamification.skill_objective, user_gamification.cmsession_id, user_gamification.module_id, user_gamification.course_id, cast(user_gamification.points as numeric),cast(assessment_benchmark.max_points as numeric), user_gamification.item_id) as temptable group by skill_objective,cmsession_id,module_id,course_id";
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		SQLQuery query = session.createSQLQuery(sql);		
+		List<Object[]> result = query.list();
+		
+		if(result.size()>0){
+			HashMap<Integer, Module> modulesOfAssessment = new HashMap<Integer, Module>();
+			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
+			
+			for(Object[] row : result){
+				Integer cmsessionSkillObjectiveId = (Integer) row[0];
+				Integer moduleId = (Integer) row[2];				
+				Double userPoints = ((BigDecimal) row[4]).doubleValue();
+				Double totalPoints = ((BigDecimal) row[5]).doubleValue();
+
+				SkillObjective cmsessionSkillObjective = appAssessmentServices.getSkillObjective(cmsessionSkillObjectiveId);
+				SkillReportPOJO moduleSkillReportPOJO = null;
+				SkillReportPOJO cmsessionSkillReportPOJO = null;
+
+				if (modulesOfAssessment.containsKey(moduleId)) {
+					for (SkillReportPOJO tempModuleSkillReport : skillsReport) {
+						if (tempModuleSkillReport.getId() == moduleId) {
+							moduleSkillReportPOJO = tempModuleSkillReport;
+							break;
+						}
+					}
+
+					cmsessionSkillReportPOJO = new SkillReportPOJO();
+					cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+					cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+					cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
+					cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
+					cmsessionSkillReportPOJO.setUserPoints(userPoints);
+					
+					moduleSkillReportPOJO.getSkills().add(cmsessionSkillReportPOJO);
+					moduleSkillReportPOJO.calculateTotalPoints();
+					moduleSkillReportPOJO.calculateUserPoints();
+					moduleSkillReportPOJO.calculatePercentage();
+					moduleSkillReportPOJO.generateMessage();
+					
+				} else {
+					Module module = getModule(moduleId);
+					if (module != null) {
+						modulesOfAssessment.put(moduleId, module);
+
+						moduleSkillReportPOJO = new SkillReportPOJO();
+						moduleSkillReportPOJO.setName(module.getModuleName());
+						moduleSkillReportPOJO.setDescription(module.getModule_description());
+						moduleSkillReportPOJO.setImageURL(module.getImage_url());
+
+						List<SkillReportPOJO> cmsessionSkillsReport = new ArrayList<SkillReportPOJO>();
+
+						cmsessionSkillReportPOJO = new SkillReportPOJO();
+						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+						cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
+						cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
+						cmsessionSkillReportPOJO.setUserPoints(userPoints);
+
+						cmsessionSkillsReport.add(cmsessionSkillReportPOJO);
+						moduleSkillReportPOJO.setSkills(cmsessionSkillsReport);
+						
+						moduleSkillReportPOJO.calculateTotalPoints();
+						moduleSkillReportPOJO.calculateUserPoints();
+						moduleSkillReportPOJO.calculatePercentage();
+						moduleSkillReportPOJO.generateMessage();
+						skillsReport.add(moduleSkillReportPOJO);
+					}else{
+						System.out.println("Module is null with id->"+moduleId);
+					}
+				}
+			}
+		}		
+		return skillsReport;
+	}
+	
+	
+/*	public List<SkillReportPOJO> getSkillsReportForCourseOfUser(int istarUserId, int courseId){
 		//long previousTime = System.currentTimeMillis();
 		//System.err.println("500000000->" + "Time->"+(System.currentTimeMillis()-previousTime));
 		List<SkillReportPOJO> allSkillsReport = new ArrayList<SkillReportPOJO>();
@@ -190,7 +270,7 @@ public class AppCourseServices {
 			}
 		}
 		return allSkillsReport;
-	}
+	}*/
 	
 	public Double getTotalPointsOfCourseForUser(int istarUserId, int courseId, int numberOfLessons){
 

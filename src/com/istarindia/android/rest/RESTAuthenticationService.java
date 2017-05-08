@@ -1,19 +1,27 @@
 package com.istarindia.android.rest;
 
 import java.util.HashSet;
+import java.util.List;
 
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppPOJOUtility;
+import com.istarindia.android.utility.AppUtility;
 import com.istarindia.apps.services.AppServices;
+import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Role;
 import com.viksitpro.core.dao.entities.UserProfile;
@@ -51,6 +59,7 @@ public class RESTAuthenticationService {
 			System.out.println("Returing system profile");
 
 			String result = gson.toJson(studentProfile);
+			appServices.logEntryToLoginTable(istarUser, "LOGIN");			
 			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -75,7 +84,7 @@ public class RESTAuthenticationService {
 		try {
 			if (istarUser == null) {
 
-				istarUser = istarUserServices.createIstarUser(email, "test123", null, null, socialMedia);
+				istarUser = istarUserServices.createIstarUser(email, AppUtility.getRandomString(10), null, null, socialMedia);
 				UserProfile userProfile = istarUserServices.createUserProfile(istarUser.getId(), null, name, null, null,
 						null, profileImage, null);
 
@@ -100,9 +109,34 @@ public class RESTAuthenticationService {
 			System.out.println("Returing system profile");
 
 			String result = gson.toJson(studentProfile);
-
+			appServices.logEntryToLoginTable(istarUser, "LOGIN_"+socialMedia);
 			return Response.ok(result).build();
 		} catch (Exception e) {
+			e.printStackTrace();
+			String result = gson.toJson(e.getMessage());
+			return Response.status(Response.Status.UNAUTHORIZED).entity(result).build();
+		}
+	}
+	
+	@POST
+	@Path("logout/user/{userId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response logoutUser(@PathParam("userId") int userId){
+	
+		Gson gson = new Gson();
+		try{
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+			if(istarUser==null){
+				return Response.ok(gson.toJson("Invalid User")).build();				
+			}
+			
+			AppServices appServices = new AppServices();
+			appServices.logEntryToLoginTable(istarUser, "LOGOUT");
+			appServices.invalidateToken(istarUser);
+			
+			return Response.ok(gson.toJson("USER LOGGED OUT")).build();
+		}catch(Exception e){
 			e.printStackTrace();
 			String result = gson.toJson(e.getMessage());
 			return Response.status(Response.Status.UNAUTHORIZED).entity(result).build();
