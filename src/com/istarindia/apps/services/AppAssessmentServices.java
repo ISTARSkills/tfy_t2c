@@ -177,6 +177,11 @@ public class AppAssessmentServices {
 					assessmentReportPOJO.calculateUserScore();
 					assessmentReportPOJO.calculateAccuracy();
 					assessmentReportPOJO.generateMessageAndDescription(50);
+					
+					AssessmentResponsePOJO assessmentResponse = getAssessmentResponseOfUser(assessmentId, istarUserId);
+					if(assessmentResponse!=null){
+						assessmentReportPOJO.setAssessmentResponse(assessmentResponse);
+					}
 				}
 			}
 		}
@@ -322,13 +327,14 @@ public class AppAssessmentServices {
 	
 	public AssessmentResponsePOJO getAssessmentResponseOfUser(int assessmentId, int istarUserId) {
 
-		AssessmentResponsePOJO assessmentResponsePOJO = new AssessmentResponsePOJO();
+		AssessmentResponsePOJO assessmentResponsePOJO = null;
 		StudentAssessmentServices studentAssessmentServices = new StudentAssessmentServices();
 		List<StudentAssessment> allStudentAssessments = studentAssessmentServices
 				.getStudentAssessmentForUser(istarUserId, assessmentId);
 		List<QuestionResponsePOJO> allQuestionsResponse = new ArrayList<QuestionResponsePOJO>();
 
 		if (allStudentAssessments.size() > 0) {
+			assessmentResponsePOJO = new AssessmentResponsePOJO();
 			for (StudentAssessment studentAssessment : allStudentAssessments) {
 				QuestionResponsePOJO questionResponsePOJO = new QuestionResponsePOJO();
 				List<Integer> markedOptions = new ArrayList<Integer>();
