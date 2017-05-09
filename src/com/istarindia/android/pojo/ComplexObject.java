@@ -15,7 +15,7 @@ public class ComplexObject {
 	private List<TaskSummaryPOJO> tasks;
 	private List<AssessmentPOJO> assessments;
 	private List<AssessmentReportPOJO> assessmentReports;
-	private List<AssessmentResponsePOJO> assessmentResponses;
+	//private List<AssessmentResponsePOJO> assessmentResponses;
 	private List<CoursePOJO> courses;
 	private List<CourseRankPOJO> leaderboards;
 	private List<DailyTaskPOJO> events;
@@ -79,14 +79,14 @@ public class ComplexObject {
 		this.assessmentReports = assessmentReports;
 	}
 
-	@XmlElement(name = "assessmentResponses", required = false)
+/*	@XmlElement(name = "assessmentResponses", required = false)
 	public List<AssessmentResponsePOJO> getAssessmentResponses() {
 		return assessmentResponses;
 	}
 
 	public void setAssessmentResponses(List<AssessmentResponsePOJO> assessmentResponses) {
 		this.assessmentResponses = assessmentResponses;
-	}
+	}*/
 
 	@XmlElement(name = "courses", required = false)
 	public List<CoursePOJO> getCourses() {

@@ -113,7 +113,7 @@ public class AppComplexObjectServices {
 			complexObject.setAssessments(allAssessmentsOfUser);
 			System.err.println("complexObject allAssessmentsOfUser->" + allAssessmentsOfUser.size() + "Time->" + (System.currentTimeMillis()-previousTime));
 			
-			//Assessment Responses
+		/*	//Assessment Responses
 			List<AssessmentResponsePOJO> allResponse = new ArrayList<AssessmentResponsePOJO>();
 			List<Integer> allAssessmentIds = studentAssessmentServices.getAllAssessmentsAttemptedByUser(userId);
 			for (Integer assessmentId : allAssessmentIds) {
@@ -123,8 +123,8 @@ public class AppComplexObjectServices {
 					allResponse.add(response);
 				}
 			}
-			complexObject.setAssessmentResponses(allResponse);
-			System.err.println("complexObject allResponse->" + allResponse.size() + "Time->" + (System.currentTimeMillis()-previousTime));
+			complexObject.setAssessmentResponses(allResponse);*/
+			//System.err.println("complexObject allResponse->" + allResponse.size() + "Time->" + (System.currentTimeMillis()-previousTime));
 			
 			//Assessment Reports			
 			List<AssessmentReportPOJO> allAssessmentReport = appAssessmentServices.getAllAssessmentReportsOfUser(userId);

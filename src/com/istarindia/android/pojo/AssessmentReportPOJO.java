@@ -23,6 +23,7 @@ public class AssessmentReportPOJO {
 	private String message;
 	private String messageDescription;
 	private List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();
+	private AssessmentResponsePOJO assessmentResponse;
 	
 	public AssessmentReportPOJO(){
 		
@@ -132,6 +133,15 @@ public class AssessmentReportPOJO {
 
 	public void setMessageDescription(String messageDescription) {
 		this.messageDescription = messageDescription;
+	}
+	
+	@XmlAttribute(name = "messageDescription", required = false)
+	public AssessmentResponsePOJO getAssessmentResponse() {
+		return assessmentResponse;
+	}
+
+	public void setAssessmentResponse(AssessmentResponsePOJO assessmentResponse) {
+		this.assessmentResponse = assessmentResponse;
 	}
 
 	public void generateMessageAndDescription(Integer cutOffMarks){

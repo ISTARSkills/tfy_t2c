@@ -356,12 +356,7 @@ public class AppUserRankUtility {
 		
 		StudentRankPOJO studentRankPOJO = null;
 		
-		String sql = "select * from (select *, COALESCE(cast(row_number() over (order by total_points desc) as integer),0) as rank from "
-				+ "(select user_gamification.istar_user, cast(sum(user_gamification.points) as integer)as total_points, cast(sum(user_gamification.coins) as integer) as total_coins "
-				+ "from assessment,user_gamification where user_gamification.item_id=assessment.id  and user_gamification.istar_user in "
-				+ "(select student_id from batch_students where batch_group_id in "
-				+ "(select batch_group_id from batch_students where batch_students.student_id= :istarUserId)) "
-				+ "group by user_gamification.istar_user order by total_points desc) as batch_ranks) as user_rank where istar_user=:istarUserId";
+		String sql = "select * from (select istar_user, cast(row_number() over (order by user_points desc) as integer) as overall_rank, sum(user_points) over (partition by istar_user) as overall_points, sum(user_coins) over (partition by istar_user) as overall_coins from (select istar_user, course_id,  sum(points) as user_points, sum(coins) as user_coins from (select istar_user, skill_objective, cast(points as numeric), cast(coins as numeric), timestamp, cmsession_id, module_id, course_id, item_id,count(batch_group_id) from user_gamification where (istar_user, timestamp,course_id, item_id) in (select istar_user, max(timestamp),course_id,item_id  from user_gamification where batch_group_id in (select distinct batch_group_id from user_gamification where istar_user="+istarUserId+") group by istar_user, course_id,item_id) group by istar_user, skill_objective, cast(points as numeric), cast(coins as numeric), timestamp, cmsession_id, module_id, course_id, item_id order by istar_user,item_id) as temptable group by istar_user, course_id order by user_points desc, istar_user) as another) as onemore where istar_user="+istarUserId;
 		
 		System.out.println("Student Rank pojo "+sql);
 		
@@ -369,30 +364,30 @@ public class AppUserRankUtility {
 		Session session = baseHibernateDAO.getSession();
 		
 		SQLQuery query = session.createSQLQuery(sql);
-		query.setParameter("istarUserId",istarUserId);
 		
 		List results = query.list();
 		
 		if(results.size() > 0){
 		Object[] studentData = (Object[]) results.get(0);
 		
-		Integer istarUserInBatchId = (Integer) studentData[0];
-		Integer points = (Integer) studentData[1];
-		Integer coins = (Integer) studentData[2];
-		Integer rank = (Integer) studentData[3];
+		//Integer istarUserInBatchId = (Integer) studentData[0];
+		Integer rank = (Integer) studentData[1];
+		Integer points = ((BigDecimal) studentData[2]).intValue();
+		Integer coins = ((BigDecimal) studentData[3]).intValue();
+		
 		
 		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUserInBatch = istarUserServices.getIstarUser(istarUserInBatchId);
+		IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
 		
 		studentRankPOJO = new StudentRankPOJO();
 
-		studentRankPOJO.setId(istarUserInBatch.getId());
+		studentRankPOJO.setId(istarUser.getId());
 		
-		if(istarUserInBatch.getUserProfile()!=null){
-			studentRankPOJO.setName(istarUserInBatch.getUserProfile().getFirstName());
-			studentRankPOJO.setImageURL(istarUserInBatch.getUserProfile().getProfileImage());
+		if(istarUser.getUserProfile()!=null){
+			studentRankPOJO.setName(istarUser.getUserProfile().getFirstName());
+			studentRankPOJO.setImageURL(istarUser.getUserProfile().getProfileImage());
 		}else{
-			studentRankPOJO.setName(istarUserInBatch.getEmail());
+			studentRankPOJO.setName(istarUser.getEmail());
 		}
 		
 		studentRankPOJO.setPoints(points);
