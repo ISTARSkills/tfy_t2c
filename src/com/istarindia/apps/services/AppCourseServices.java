@@ -131,6 +131,7 @@ public class AppCourseServices {
 				modulePOJO.sortLessonsAndAssignStatus();
 			}
 		}
+		coursePOJO.sortModulesAndAssignStatus();
 		return coursePOJO;
 	}
 	

@@ -148,7 +148,7 @@ public class CoursePOJO {
 			}
 		}
 		coursePOJO.setStatus(courseStatus);
-		coursePOJO.setMessage(numberOfCompletedModules + " of " + coursePOJO.getModules().size() + "modules completed");
+		coursePOJO.setMessage(numberOfCompletedModules + " of " + coursePOJO.getModules().size() + " modules completed");
 	return coursePOJO;
 	}
 	
