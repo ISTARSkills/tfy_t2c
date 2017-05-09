@@ -133,7 +133,7 @@ public class AppAssessmentServices {
 				}
 				
 				String sqlBatch = "with batch_groups as (select distinct batch_group_id from user_gamification where istar_user="+istarUserId+" and item_id="+assessmentId+" and item_type='ASSESSMENT'), "
-						+" all_batch_students as (select student_id from batch_students where batch_group_id in (select * from batch_groups)), "
+						+" all_batch_students as (select distinct student_id from batch_students where batch_group_id in (select * from batch_groups)), "
 						+" batch_students_count as (select count(*) from all_batch_students), "
 						+" attempted_students as (select istar_user, max(timestamp) from user_gamification where item_id="+assessmentId+" and item_type='ASSESSMENT' and batch_group_id in (select * from batch_groups) group by istar_user) "
 				        +" select * from (select *, row_number() over(order by user_points desc) as rank, cast(sum(user_points) over ()/(select * from batch_students_count) as numeric) as batch_average, cast(count(*) over() as integer), cast((select count(*) from all_batch_students) as integer) as total_students from (select DISTINCT istar_user, cast(sum(points) as numeric) as user_points from user_gamification where item_id="+assessmentId+" and item_type='ASSESSMENT' and (istar_user, timestamp) in (select * from attempted_students) group by istar_user, batch_group_id) as temptable) as another where istar_user="+istarUserId;
