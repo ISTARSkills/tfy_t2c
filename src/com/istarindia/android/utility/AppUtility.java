@@ -16,10 +16,10 @@ import org.apache.tomcat.util.codec.binary.Base64;
 
 public class AppUtility {
 
-	public String imageUpload(String profileImage, String fileFormat, String type) throws IOException{
+	public String imageUpload(String profileImage, String fileFormat, String type, String context) throws IOException{
 		
 		String imageUploadPath ="";
-		String subDirectory = "";
+		String subDirectory = "users"+"/";
 		String fileURLPrefix="";
 		String fileExtension = fileFormat;
 
@@ -35,27 +35,34 @@ public class AppUtility {
 					System.out.println("fileURLPrefix"+fileURLPrefix);
 					System.out.println("benchmark"+benchmark);
 				}
-		
-		switch(type){
-		case "PROFILE_IMAGE" :
-			subDirectory = "users/images/";
-				break;		
-		}
-		
+
+				File rootUploadFolder = new File(imageUploadPath+subDirectory);
+				if(!rootUploadFolder.exists()){
+					System.out.println("RootUploadFolder does not exists, creating new one");
+					rootUploadFolder.mkdir();
+				}
+				
+				if(context!=null){
+					subDirectory = subDirectory + context + "/";
+				}						
+				
+				System.out.println("subDirectory"+subDirectory);
 		imageUploadPath = imageUploadPath+subDirectory;
 		File uploadFolder = new File(imageUploadPath);
-		
+		System.out.println(uploadFolder.getAbsolutePath());
 		if(!uploadFolder.exists()){
+			System.out.println("Folder does not exists");
 			uploadFolder.mkdir();
 		}
-						
-		
+								
 		String fileName = UUID.randomUUID().toString()+"."+fileExtension;
+		System.out.println("fileName"+fileName);
 		String filePath = uploadFolder.getAbsolutePath()+"/"+fileName;
+		System.out.println("filePath"+filePath);
 		byte[] imgByteArray = Base64.decodeBase64(profileImage);
         FileOutputStream file = new FileOutputStream(filePath);
         String fileURL = fileURLPrefix + subDirectory +fileName;
-       
+        System.out.println("fileURL"+fileURL);
         file.write(imgByteArray);
         file.close();
 				

@@ -87,6 +87,7 @@ public class AppAssessmentServices {
 						cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
 						cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
 						cmsessionSkillReportPOJO.setUserPoints(userPoints);
+						cmsessionSkillReportPOJO.calculatePercentage();
 						
 						moduleSkillReportPOJO.getSkills().add(cmsessionSkillReportPOJO);
 						moduleSkillReportPOJO.calculateTotalPoints();
@@ -114,6 +115,7 @@ public class AppAssessmentServices {
 							cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
 							cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
 							cmsessionSkillReportPOJO.setUserPoints(userPoints);
+							cmsessionSkillReportPOJO.calculatePercentage();
 
 							cmsessionSkillsReport.add(cmsessionSkillReportPOJO);
 							moduleSkillReportPOJO.setSkills(cmsessionSkillsReport);

@@ -60,29 +60,29 @@ public class RESTIstarUserService {
 			} else if (istarUserByMobile != null) {
 				// User with Mobile already registered
 				throw new Exception("istarViksitProComplexKeyA user already registered with this mobile");
-			} 
+			}
 
-				istarUser = istarUserServices.createIstarUser(email, password, mobile, authenticationToken);
+			istarUser = istarUserServices.createIstarUser(email, password, mobile, authenticationToken);
 
-				RoleServices roleServices = new RoleServices();
-				Role role = roleServices.getRoleByName("STUDENT");
+			RoleServices roleServices = new RoleServices();
+			Role role = roleServices.getRoleByName("STUDENT");
 
-				UserRoleServices userRoleServices = new UserRoleServices();
-				UserRole userRole = userRoleServices.createUserRole(istarUser, role, 1);
+			UserRoleServices userRoleServices = new UserRoleServices();
+			UserRole userRole = userRoleServices.createUserRole(istarUser, role, 1);
 
-				HashSet<UserRole> allUserRole = new HashSet<UserRole>();
-				allUserRole.add(userRole);
+			HashSet<UserRole> allUserRole = new HashSet<UserRole>();
+			allUserRole.add(userRole);
 
-				istarUser.setUserRoles(allUserRole);
+			istarUser.setUserRoles(allUserRole);
 
-				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
+			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
-				String result = gson.toJson(studentProfile);
+			String result = gson.toJson(studentProfile);
 
-				AppServices appServices = new AppServices();
-				appServices.logEntryToLoginTable(istarUser, "LOGIN");
-				return Response.ok(result).build();
+			AppServices appServices = new AppServices();
+			appServices.logEntryToLoginTable(istarUser, "LOGIN");
+			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
@@ -103,12 +103,12 @@ public class RESTIstarUserService {
 			if (istarUser == null) {
 				throw new Exception("istarViksitProComplexKeyUser does not exists");
 			}
-				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
+			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
-				String result = gson.toJson(studentProfile);
+			String result = gson.toJson(studentProfile);
 
-				return Response.ok(result).build();
+			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
@@ -134,15 +134,15 @@ public class RESTIstarUserService {
 			if (istarUser == null) {
 				throw new Exception();
 			}
-				AppServices appServices = new AppServices();
-				appServices.updateStudentProfile(requestStudentProfile);
+			AppServices appServices = new AppServices();
+			appServices.updateStudentProfile(requestStudentProfile);
 
-				AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-				StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
+			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
+			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
-				String result = gson.toJson(studentProfile);
+			String result = gson.toJson(studentProfile);
 
-				return Response.ok(result).build();
+			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
@@ -169,7 +169,7 @@ public class RESTIstarUserService {
 				throw new Exception("istarViksitProComplexKeyInvalid Image");
 			}
 			AppUtility appUtility = new AppUtility();
-			String fileName = appUtility.imageUpload(profileImage, "jpg", "PROFILE_IMAGE");
+			String fileName = appUtility.imageUpload(profileImage, "jpg", "PROFILE_IMAGE", istarUser.getId()+"");
 
 			UserProfile userProfile = istarUserServices.updateProfileImage(istarUser, fileName);
 
@@ -199,10 +199,10 @@ public class RESTIstarUserService {
 			if (istarUser == null) {
 				return Response.status(404).build();
 			}
-				istarUser = istarUserServices.updateIstarUser(istarUser.getId(), istarUser.getEmail(), password,
-						istarUser.getMobile());
-				String result = gson.toJson("DONE");
-				return Response.ok(result).build();
+			istarUser = istarUserServices.updateIstarUser(istarUser.getId(), istarUser.getEmail(), password,
+					istarUser.getMobile());
+			String result = gson.toJson("DONE");
+			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
@@ -284,21 +284,21 @@ public class RESTIstarUserService {
 
 			if (istarUser == null) {
 				throw new Exception();
-			} else if (mobileIstarUser != null && mobileIstarUser.getId()!=istarUser.getId()) {
+			} else if (mobileIstarUser != null && mobileIstarUser.getId() != istarUser.getId()) {
 				throw new Exception(
 						"istarViksitProComplexKeyA user already exits with this mobile. Please try with another mobile number or raise a ticket.");
 			}
-				Integer otp = null;
-				istarUserServices.updateMobile(istarUser.getId(), mobileNumber);
+			Integer otp = null;
+			istarUserServices.updateMobile(istarUser.getId(), mobileNumber);
 
-				try {
-					AppServices appServices = new AppServices();
-					otp = appServices.sendOTP(mobile.toString());
-				} catch (Exception e) {
-					e.printStackTrace();
-					throw new Exception();
-				}
-				return Response.ok(gson.toJson(otp)).build();
+			try {
+				AppServices appServices = new AppServices();
+				otp = appServices.sendOTP(mobile.toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new Exception();
+			}
+			return Response.ok(gson.toJson(otp)).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			String result = e.getMessage() != null ? gson.toJson(e.getMessage())

@@ -52,7 +52,7 @@ public class AppPOJOUtility {
 		StudentProfile studentProfile = new StudentProfile();
 
 		studentProfile.setId(student.getId());
-		//studentProfile.setPassword(student.getPassword());
+		// studentProfile.setPassword(student.getPassword());
 		studentProfile.setMobile(student.getMobile());
 		studentProfile.setEmail(student.getEmail());
 		studentProfile.setAuthenticationToken(student.getAuthToken());
@@ -84,10 +84,10 @@ public class AppPOJOUtility {
 			studentProfile.setResumeURL(student.getProfessionalProfile().getResumeUrl());
 			studentProfile.setUnderGraduationYear(student.getProfessionalProfile().getUnderGraduationYear());
 		}
-		
+
 		AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
-		StudentRankPOJO studentRank= appUserRankUtility.getStudentRankPOJOOfAUser(student.getId());
-		if(studentRank!=null){
+		StudentRankPOJO studentRank = appUserRankUtility.getStudentRankPOJOOfAUser(student.getId());
+		if (studentRank != null) {
 			studentProfile.setCoins(studentRank.getCoins());
 			studentProfile.setExperiencePoints(studentRank.getPoints());
 			studentProfile.setBatchRank(studentRank.getBatchRank());
@@ -121,7 +121,7 @@ public class AppPOJOUtility {
 				modulePOJO.setStatus("");
 
 				ArrayList<LessonPOJO> lessons = new ArrayList<LessonPOJO>();
-				
+
 				for (Cmsession cmsession : module.getCmsessions()) {
 					for (Lesson lesson : cmsession.getLessons()) {
 						LessonPOJO lessonPOJO = new LessonPOJO();
@@ -139,7 +139,7 @@ public class AppPOJOUtility {
 						lessons.add(lessonPOJO);
 					}
 				}
-				//modulePOJO.setLessons(lessons);
+				// modulePOJO.setLessons(lessons);
 				modules.add(modulePOJO);
 			}
 			coursePOJO.setModules(modules);
@@ -194,7 +194,7 @@ public class AppPOJOUtility {
 		ArrayList<QuestionPOJO> questions = new ArrayList<QuestionPOJO>();
 
 		for (AssessmentQuestion assessmentQuestion : assessmentQuestions) {
-			if(assessmentQuestion.getQuestion().getContext_id()==assessment.getCourse()){
+			if (assessmentQuestion.getQuestion().getContext_id() == assessment.getCourse()) {
 				questions.add(getQuestionPOJO(assessmentQuestion));
 			}
 			questions.add(getQuestionPOJO(assessmentQuestion));
@@ -227,7 +227,7 @@ public class AppPOJOUtility {
 		List<Integer> answers = new ArrayList<Integer>();
 
 		for (AssessmentOption assessmentOption : allAssessmentOption) {
-			if(assessmentOption.getText()!=null && !assessmentOption.getText().trim().isEmpty()){
+			if (assessmentOption.getText() != null && !assessmentOption.getText().trim().isEmpty()) {
 				options.add(getOptionPOJO(assessmentOption));
 				if (assessmentOption.getMarkingScheme() == 1) {
 					answers.add(assessmentOption.getId());
