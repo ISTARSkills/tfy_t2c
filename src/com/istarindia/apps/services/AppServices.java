@@ -281,7 +281,7 @@ public class AppServices {
 		String authenticationToken = AppUtility.getRandomString(20);
 
 		IstarUserServices istarUserServices = new IstarUserServices();
-		istarUser = istarUserServices.updateAuthenticationTokenForIstarUser(istarUser, authenticationToken);
+		istarUser = istarUserServices.updateAuthenticationTokenForIstarUser(istarUser.getId(), authenticationToken);
 
 		return istarUser;
 	}
@@ -290,7 +290,7 @@ public class AppServices {
 		System.out.println("Invalidate Token");
 
 		IstarUserServices istarUserServices = new IstarUserServices();
-		istarUser = istarUserServices.updateAuthenticationTokenForIstarUser(istarUser, null);
+		istarUser = istarUserServices.updateAuthenticationTokenForIstarUser(istarUser.getId(), null);
 
 		return istarUser;
 	}

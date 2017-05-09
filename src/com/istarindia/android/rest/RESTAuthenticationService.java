@@ -46,7 +46,7 @@ public class RESTAuthenticationService {
 			}
 			AppServices appServices = new AppServices();
 			istarUser = appServices.assignToken(istarUser);
-
+			
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);

@@ -69,7 +69,7 @@ public class AppPOJOUtility {
 			if (student.getUserProfile().getAddress() != null) {
 				studentProfile.setLocation(student.getUserProfile().getAddress().getPincode().getCity());
 			}
-			studentProfile.setProfileImage(student.getUserProfile().getProfileImage());
+			studentProfile.setProfileImage(student.getUserProfile().getImage());
 		}
 
 		if (student.getProfessionalProfile() != null) {
