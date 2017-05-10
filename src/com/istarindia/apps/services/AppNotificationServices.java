@@ -142,6 +142,9 @@ public class AppNotificationServices {
 			
 			notificationPOJO.getItem().put("id", assessment.getId());
 			notificationPOJO.getItem().put("courseId", course.getId());
+			if(task!=null){
+				notificationPOJO.getItem().put("taskId", task.getId());
+			}
 		}
 		return notificationPOJO;
 	}
