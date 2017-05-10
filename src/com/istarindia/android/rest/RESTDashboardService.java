@@ -83,7 +83,7 @@ public class RESTDashboardService {
 
 	@GET
 	@Path("{taskId}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_XML)
 	public Response getTaskDetails(@PathParam("userId") int userId, @PathParam("taskId") int taskId) {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
@@ -93,24 +93,22 @@ public class RESTDashboardService {
 			TaskServices taskServices = new TaskServices();
 			Task task = taskServices.getTask(taskId);
 
+			Object result = null;
 			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
 
 			if (task == null || task.getIstarUserByActor().getId() != istarUser.getId()) {
 				throw new Exception();
 			}
-			TaskSummaryPOJO taskSummaryPOJO = null;
 				String itemType = task.getItemType();
 
 				switch (itemType) {
 				case TaskCategory.ASSESSMENT:
-					taskSummaryPOJO = dashboardUtility.getTaskSummaryPOJOForAssessment(task);
+					result = (AssessmentPOJO) dashboardUtility.getAssessmentForTask(task);
 					break;
 				case TaskCategory.LESSON:
-					taskSummaryPOJO = dashboardUtility.getTaskSummaryPOJOForLesson(task);
+					result = (String) dashboardUtility.getLessonForTask(task);
 					break;
 				}
-				String result = gson.toJson(taskSummaryPOJO);
-
 				return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -132,6 +130,13 @@ public class RESTDashboardService {
 			TaskServices taskServices = new TaskServices();
 			taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
 
+			Task task = taskServices.getTask(taskId);
+			
+			if(task.getItemType().equals(TaskCategory.LESSON)){
+				AppDashboardUtility appDashboardUtility = new AppDashboardUtility();
+				appDashboardUtility.updateStudentPlaylistStatus(task.getItemId(), userId, "COMPLETED");
+			}
+			
 			String result = gson.toJson("DONE");
 			return Response.ok(result).build();
 		} catch (Exception e) {

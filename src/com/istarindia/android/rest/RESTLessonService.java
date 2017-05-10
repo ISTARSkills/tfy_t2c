@@ -1,5 +1,7 @@
 package com.istarindia.android.rest;
 
+import java.util.List;
+
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -9,10 +11,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.istarindia.android.pojo.LessonPOJO;
 import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.StudentPlaylistServices;
+import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 
@@ -34,6 +41,51 @@ public class RESTLessonService {
 			}
 
 			return Response.ok(lessonXML).build();
+		}catch(Exception e){
+			e.printStackTrace();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
+		}
+	}
+	
+	@GET
+	@Path("{lessonId}/pojo")
+	@Produces(MediaType.APPLICATION_XML)
+	public Response getLessonPOJO(@PathParam("userId") int istarUserId, @PathParam("lessonId") int lessonId){
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		try{
+			BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+			Session session = baseHibernateDAO.getSession();
+			
+			String sql = "select id, status from student_playlist where student_id="+istarUserId+" and lesson_id="+lessonId;
+			System.out.println("Lesson SP-->"+sql);
+			SQLQuery query = session.createSQLQuery(sql);
+			List<Object[]> queryResult = query.list();
+			
+			AppCourseServices appCourseServices = new AppCourseServices();
+			Lesson lesson = appCourseServices.getLesson(lessonId);
+			if(queryResult.size()<=0 && lesson==null){
+				throw new Exception("No entry in student playlist");
+			}
+				
+				Integer studentPlaylistId = (Integer) queryResult.get(0)[0];
+				String status = (String) queryResult.get(0)[1];
+				
+				LessonPOJO lessonPOJO = new LessonPOJO();
+				lessonPOJO.setId(lesson.getId());
+				lessonPOJO.setTitle(lesson.getTitle());
+				lessonPOJO.setDescription(lesson.getDescription());
+				lessonPOJO.setDuration(lesson.getDuration());
+				lessonPOJO.setPlaylistId(studentPlaylistId);
+				lessonPOJO.setStatus(status);
+				lessonPOJO.setSubject(lesson.getSubject());
+				lessonPOJO.setType(lesson.getType());
+				lessonPOJO.setOrderId(studentPlaylistId);
+				
+				String result = gson.toJson(lessonPOJO);
+
+				return Response.ok(result).build();
 		}catch(Exception e){
 			e.printStackTrace();
 			String result = e.getMessage() != null ? gson.toJson(e.getMessage())

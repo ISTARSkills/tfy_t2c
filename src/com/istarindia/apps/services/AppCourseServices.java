@@ -278,6 +278,105 @@ public class AppCourseServices {
 		return skillsReport;
 	}
 	
+	/*public List<SkillReportPOJO> getSkillReportTreeForCourseOfUser(int istarUserId, int courseId){
+		
+		List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();
+		
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+		
+		String lessonsStatusSQL = "select course_id, module_id, cmsession_id,cast(count(case when status='COMPLETE' then 1 end) as integer) as completed_lessons, cast(count(*) as integer) as total_lessons from student_playlist where student_id="+istarUserId+" and course_id="+courseId+" group by course_id, module_id,cmsession_id";
+		
+		SQLQuery sessionQuery = session.createSQLQuery(lessonsStatusSQL);		
+		List<Object[]> sessionStatusResult = sessionQuery.list();
+		
+		
+		if(sessionStatusResult.size()>0){
+			HashMap<Integer, Module> modulesOfAssessment = new HashMap<Integer, Module>();
+			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
+			for(Object[] sessionRow: sessionStatusResult){
+				//Integer courseId = (Integer) sessionRow[0];
+				Integer moduleId = (Integer) sessionRow[1];
+				Integer cmsessionId = (Integer) sessionRow[2];
+				Integer completedLessons = (Integer) sessionRow[3];
+				Integer totalLessons = (Integer) sessionRow[4];
+				
+				SkillObjective cmsessionSkillObjective = appAssessmentServices.getSkillObjective(cmsessionSkillObjectiveId);
+				SkillReportPOJO moduleSkillReportPOJO = null;
+				SkillReportPOJO cmsessionSkillReportPOJO = null;
+				
+				if (modulesOfAssessment.containsKey(moduleId)) {
+					for (SkillReportPOJO tempModuleSkillReport : skillsReport) {
+						if (tempModuleSkillReport.getId() == moduleId) {
+							moduleSkillReportPOJO = tempModuleSkillReport;
+							break;
+						}
+					}
+
+					cmsessionSkillReportPOJO = new SkillReportPOJO();
+					cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+					cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+					cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
+					
+					
+					if(courseStatus.containsKey(cmsessionId)){
+						cmsessionSkillReportPOJO.setTotalPoints(totalPoints + (benchmark*courseStatus.get(cmsessionId).get("totalLessons")));
+						cmsessionSkillReportPOJO.setUserPoints(userPoints + (benchmark*courseStatus.get(cmsessionId).get("completedLessons")));						
+					}else{
+						cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
+						cmsessionSkillReportPOJO.setUserPoints(userPoints);
+					}
+					
+					moduleSkillReportPOJO.getSkills().add(cmsessionSkillReportPOJO);
+					moduleSkillReportPOJO.calculateTotalPoints();
+					moduleSkillReportPOJO.calculateUserPoints();
+					moduleSkillReportPOJO.calculatePercentage();
+					moduleSkillReportPOJO.generateMessage();
+					
+				} else {
+					Module module = getModule(moduleId);
+					if (module != null) {
+						modulesOfAssessment.put(moduleId, module);
+
+						moduleSkillReportPOJO = new SkillReportPOJO();
+						moduleSkillReportPOJO.setId(module.getId());
+						moduleSkillReportPOJO.setName(module.getModuleName());
+						moduleSkillReportPOJO.setDescription(module.getModule_description());
+						moduleSkillReportPOJO.setImageURL(module.getImage_url());
+
+						List<SkillReportPOJO> cmsessionSkillsReport = new ArrayList<SkillReportPOJO>();
+
+						cmsessionSkillReportPOJO = new SkillReportPOJO();
+						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+						cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
+
+						if(courseStatus.containsKey(cmsessionId)){
+							cmsessionSkillReportPOJO.setTotalPoints(totalPoints + (benchmark*courseStatus.get(cmsessionId).get("totalLessons")));
+							cmsessionSkillReportPOJO.setUserPoints(userPoints + (benchmark*courseStatus.get(cmsessionId).get("completedLessons")));						
+						}else{
+							cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
+							cmsessionSkillReportPOJO.setUserPoints(userPoints);
+						}
+
+						cmsessionSkillsReport.add(cmsessionSkillReportPOJO);
+						moduleSkillReportPOJO.setSkills(cmsessionSkillsReport);
+						
+						moduleSkillReportPOJO.calculateTotalPoints();
+						moduleSkillReportPOJO.calculateUserPoints();
+						moduleSkillReportPOJO.calculatePercentage();
+						moduleSkillReportPOJO.generateMessage();
+						skillsReport.add(moduleSkillReportPOJO);
+					}else{
+						System.out.println("Module is null with id->"+moduleId);
+					}
+				}
+
+			}
+		}		
+		return null;
+	}*/
+	
 	
 /*	public List<SkillReportPOJO> getSkillsReportForCourseOfUser(int istarUserId, int courseId){
 		//long previousTime = System.currentTimeMillis();
