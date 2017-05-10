@@ -106,6 +106,9 @@ public class AppNotificationServices {
 			notificationPOJO.getItem().put("moduleId", studentPlaylist.getModule().getId());
 			notificationPOJO.getItem().put("courseId", studentPlaylist.getCourse().getId());
 			notificationPOJO.getItem().put("cmsessionId", studentPlaylist.getCmsession().getId());
+			if(task!=null){
+				notificationPOJO.getItem().put("taskId", task.getId());
+			}
 			}
 		}
 		return notificationPOJO;
