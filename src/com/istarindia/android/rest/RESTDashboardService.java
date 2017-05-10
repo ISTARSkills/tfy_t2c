@@ -83,7 +83,7 @@ public class RESTDashboardService {
 
 	@GET
 	@Path("{taskId}")
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTaskDetails(@PathParam("userId") int userId, @PathParam("taskId") int taskId) {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
@@ -93,22 +93,24 @@ public class RESTDashboardService {
 			TaskServices taskServices = new TaskServices();
 			Task task = taskServices.getTask(taskId);
 
-			Object result = null;
 			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
 
 			if (task == null || task.getIstarUserByActor().getId() != istarUser.getId()) {
 				throw new Exception();
 			}
+			TaskSummaryPOJO taskSummaryPOJO = null;
 				String itemType = task.getItemType();
 
 				switch (itemType) {
 				case TaskCategory.ASSESSMENT:
-					result = (AssessmentPOJO) dashboardUtility.getAssessmentForTask(task);
+					taskSummaryPOJO = dashboardUtility.getTaskSummaryPOJOForAssessment(task);
 					break;
 				case TaskCategory.LESSON:
-					result = (String) dashboardUtility.getLessonForTask(task);
+					taskSummaryPOJO = dashboardUtility.getTaskSummaryPOJOForLesson(task);
 					break;
 				}
+				String result = gson.toJson(taskSummaryPOJO);
+
 				return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
