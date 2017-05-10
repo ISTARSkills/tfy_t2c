@@ -128,7 +128,7 @@ public class RESTDashboardService {
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
 			TaskServices taskServices = new TaskServices();
-			taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
+			taskServices.completeTask("COMPLETE", false, taskId, istarUser.getAuthToken());
 
 			Task task = taskServices.getTask(taskId);
 			

@@ -120,7 +120,7 @@ public class AppDashboardUtility {
 	public void updateStudentPlaylistStatus(int lessonId, int istarUserId, String status){		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();			
-		String sql = "update student_playlist status="+status+" where student_id="+istarUserId+" and lesson_id="+lessonId;
+		String sql = "update student_playlist set status='"+status+"' where student_id="+istarUserId+" and lesson_id="+lessonId;
 		System.out.println(sql);
 		SQLQuery query = session.createSQLQuery(sql);
 		query.executeUpdate();
