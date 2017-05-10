@@ -63,10 +63,12 @@ public class AppCourseServices {
 			
 			int moduleOrderId = 0;
 			
+			Set<Integer> cmsessionIds = new HashSet<Integer>();
+			
 			for(StudentPlaylist studentPlaylist : allStudentPlaylist){
 				ModulePOJO modulePOJO = null;
 				Module module = studentPlaylist.getModule();
-				//Cmsession cmsession = studentPlaylist.getCmsession();
+				Cmsession cmsession = studentPlaylist.getCmsession();
 				Lesson lesson = studentPlaylist.getLesson();
 				
 				for(ModulePOJO tempModulePOJO : coursePOJO.getModules()){
@@ -83,12 +85,16 @@ public class AppCourseServices {
 					modulePOJO.setDescription(module.getModule_description());
 					modulePOJO.setOrderId(++moduleOrderId);
 					
-					Set<String> allSkillObjectivesOfModule = new HashSet<String>();
-					for (SkillObjective skillObjective : module.getSkillObjectives()) {
-						allSkillObjectivesOfModule.add(skillObjective.getName());
+					if(!cmsessionIds.contains(cmsession.getId())){
+						System.out.println("Adding CMSession Skill");
+						Set<String> allSkillObjectivesOfModule = new HashSet<String>();
+						for (SkillObjective skillObjective : module.getSkillObjectives()) {
+							allSkillObjectivesOfModule.add(skillObjective.getName());
+						}
+						cmsessionIds.add(cmsession.getId());
+						modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
 					}
-					modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
-					
+	
 					CmsessionPOJO cmsessionPOJO = new CmsessionPOJO();
 					LessonPOJO lessonPOJO = new LessonPOJO();
 					lessonPOJO.setId(lesson.getId());
@@ -110,6 +116,17 @@ public class AppCourseServices {
 					modulePOJO.getLessons().add(cmsessionPOJO);
 					coursePOJO.getModules().add(modulePOJO);
 				}else{
+					
+					if(!cmsessionIds.contains(cmsession.getId())){
+						System.out.println("Adding CMSession Skill");
+						Set<String> allSkillObjectivesOfModule = new HashSet<String>();
+						for (SkillObjective skillObjective : module.getSkillObjectives()) {
+							allSkillObjectivesOfModule.add(skillObjective.getName());
+						}
+						cmsessionIds.add(cmsession.getId());
+						modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
+					}
+					
 					CmsessionPOJO cmsessionPOJO = new CmsessionPOJO();
 					LessonPOJO lessonPOJO = new LessonPOJO();
 					lessonPOJO.setId(lesson.getId());
