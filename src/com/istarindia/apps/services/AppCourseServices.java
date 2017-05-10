@@ -61,6 +61,8 @@ public class AppCourseServices {
 				coursePOJO.setRank(studentRankPOJO.getBatchRank());
 			}
 			
+			int moduleOrderId = 0;
+			
 			for(StudentPlaylist studentPlaylist : allStudentPlaylist){
 				ModulePOJO modulePOJO = null;
 				Module module = studentPlaylist.getModule();
@@ -79,7 +81,7 @@ public class AppCourseServices {
 					modulePOJO.setName(module.getModuleName());
 					modulePOJO.setImageURL(module.getImage_url());
 					modulePOJO.setDescription(module.getModule_description());
-					modulePOJO.setOrderId(module.getOrderId());
+					modulePOJO.setOrderId(++moduleOrderId);
 					
 					Set<String> allSkillObjectivesOfModule = new HashSet<String>();
 					for (SkillObjective skillObjective : module.getSkillObjectives()) {
@@ -97,7 +99,7 @@ public class AppCourseServices {
 					lessonPOJO.setStatus(studentPlaylist.getStatus());
 					lessonPOJO.setSubject(lesson.getSubject());
 					lessonPOJO.setType(lesson.getType());
-					lessonPOJO.setOrderId(lesson.getOrderId());
+					lessonPOJO.setOrderId(studentPlaylist.getId());
 					
 					cmsessionPOJO.setId(lesson.getId());
 					cmsessionPOJO.setType("LESSON_"+lesson.getType());
@@ -118,7 +120,7 @@ public class AppCourseServices {
 					lessonPOJO.setStatus(studentPlaylist.getStatus());
 					lessonPOJO.setSubject(lesson.getSubject());
 					lessonPOJO.setType(lesson.getType());
-					lessonPOJO.setOrderId(lesson.getOrderId());
+					lessonPOJO.setOrderId(studentPlaylist.getId());
 					
 					cmsessionPOJO.setId(lesson.getId());
 					cmsessionPOJO.setType("LESSON_"+lesson.getType());
