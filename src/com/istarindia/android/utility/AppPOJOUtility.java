@@ -212,7 +212,7 @@ public class AppPOJOUtility {
 
 		questionPOJO.setId(question.getId());
 		questionPOJO.setOrderId(orderId);
-		questionPOJO.setText(question.getQuestionText());
+		questionPOJO.setText(question.getComprehensivePassageText() + question.getQuestionText());
 		questionPOJO.setType(question.getQuestionType());
 		questionPOJO.setDifficultyLevel(question.getDifficultyLevel());
 		questionPOJO.setExplanation(question.getExplanation());
