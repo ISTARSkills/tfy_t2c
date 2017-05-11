@@ -81,6 +81,42 @@ public class RESTDashboardService {
 		}
 	}
 
+	@GET
+	@Path("{taskId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getTaskDetails(@PathParam("userId") int userId, @PathParam("taskId") int taskId) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		try {
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+
+			TaskServices taskServices = new TaskServices();
+			Task task = taskServices.getTask(taskId);
+
+			Object result = null;
+			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
+
+			if (task == null || task.getIstarUserByActor().getId() != istarUser.getId()) {
+				throw new Exception();
+			}
+				String itemType = task.getItemType();
+
+				switch (itemType) {
+				case TaskCategory.ASSESSMENT:
+					result = (AssessmentPOJO) dashboardUtility.getAssessmentForTask(task);
+					return Response.ok(result).build();
+				case TaskCategory.LESSON:
+					result = (String) dashboardUtility.getLessonForTask(task);
+					return Response.ok(gson.toJson(result)).build();
+				}
+				throw new Exception();
+		} catch (Exception e) {
+			e.printStackTrace();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
+		}
+	}
 	
 	@GET
 	@Path("{taskId}/pojo")
@@ -125,7 +161,7 @@ public class RESTDashboardService {
 	}
 	
 	
-	@GET
+/*	@GET
 	@Path("{taskId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTaskDetails(@PathParam("userId") int userId, @PathParam("taskId") int taskId) {
@@ -160,7 +196,8 @@ public class RESTDashboardService {
 					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
 			return Response.status(Response.Status.OK).entity(result).build();
 		}
-	}
+	}*/
+	
 
 	@PUT
 	@Path("{taskId}")
