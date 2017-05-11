@@ -177,6 +177,7 @@ public class AppCourseServices {
 		
 		if(result.size()>0 && sessionStatusResult.size()>0){
 			HashMap<Integer, Module> modulesOfAssessment = new HashMap<Integer, Module>();
+			HashMap<Integer, SkillObjective> cmsessionSkillObjectiveOfAssessment= new HashMap<Integer, SkillObjective>();
 			
 			HashMap<Integer, HashMap<String, Integer>> courseStatus = new HashMap<Integer, HashMap<String, Integer>>();
 			Double benchmark = getBenchmark();
@@ -215,11 +216,22 @@ public class AppCourseServices {
 						}
 					}
 
+					if(cmsessionSkillObjectiveOfAssessment.containsKey(cmsessionSkillObjectiveId)){
+						for(SkillReportPOJO tempCmsessionSkillReport : moduleSkillReportPOJO.getSkills()){
+							if(tempCmsessionSkillReport.getId()==cmsessionSkillObjectiveId){
+								cmsessionSkillReportPOJO=tempCmsessionSkillReport;
+								break;
+							}
+						}
+					}
+					
+					if(cmsessionSkillReportPOJO==null){
+						//System.out.println("New Skill-->"+ cmsessionSkillObjective.getName()+"-->"+cmsessionSkillObjective.getId());
 					cmsessionSkillReportPOJO = new SkillReportPOJO();
 					cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
 					cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
 					cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
-					
+					cmsessionSkillObjectiveOfAssessment.put(cmsessionSkillObjectiveId, cmsessionSkillObjective);
 					
 					if(courseStatus.containsKey(cmsessionId)){
 						cmsessionSkillReportPOJO.setTotalPoints(totalPoints + (benchmark*courseStatus.get(cmsessionId).get("totalLessons")));
@@ -230,6 +242,11 @@ public class AppCourseServices {
 					}
 					
 					moduleSkillReportPOJO.getSkills().add(cmsessionSkillReportPOJO);
+					}else{
+						//System.out.println("Old Skill-->"+ cmsessionSkillObjective.getName()+"-->"+cmsessionSkillObjective.getId());
+						cmsessionSkillReportPOJO.setTotalPoints(cmsessionSkillReportPOJO.getTotalPoints()+totalPoints);
+						cmsessionSkillReportPOJO.setUserPoints(cmsessionSkillReportPOJO.getUserPoints()+userPoints);
+					}
 					moduleSkillReportPOJO.calculateTotalPoints();
 					moduleSkillReportPOJO.calculateUserPoints();
 					moduleSkillReportPOJO.calculatePercentage();
@@ -247,6 +264,7 @@ public class AppCourseServices {
 						moduleSkillReportPOJO.setImageURL(module.getImage_url());
 
 						List<SkillReportPOJO> cmsessionSkillsReport = new ArrayList<SkillReportPOJO>();
+						cmsessionSkillObjectiveOfAssessment.put(cmsessionSkillObjectiveId, cmsessionSkillObjective);
 
 						cmsessionSkillReportPOJO = new SkillReportPOJO();
 						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
