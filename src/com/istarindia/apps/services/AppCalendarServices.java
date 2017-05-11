@@ -9,6 +9,10 @@ import org.hibernate.Session;
 
 import com.istarindia.android.pojo.DailyTaskPOJO;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
+import com.viksitpro.core.dao.entities.Lesson;
+import com.viksitpro.core.dao.entities.Task;
+import com.viksitpro.core.dao.utils.task.TaskServices;
+import com.viksitpro.core.utilities.TaskCategory;
 
 public class AppCalendarServices {
 
@@ -30,7 +34,7 @@ public class AppCalendarServices {
 		query.setParameter("day", day);
 		
 		List<Object[]> result = query.list();
-		
+
 		for(Object[] dailyTask : result){
 			Integer id = (Integer) dailyTask[0];
 			String status = (String) dailyTask[1];
@@ -54,6 +58,16 @@ public class AppCalendarServices {
 			if(status.equals("COMPLETE")){
 				dailyTaskPOJO.setCompletedAt(completedAt);
 			}
+			
+			if(itemType.equals(TaskCategory.LESSON)){
+				AppCourseServices appCourseServices = new AppCourseServices();
+				Lesson lesson = appCourseServices.getLesson(itemId);
+				dailyTaskPOJO.setItemType(itemType+"_"+lesson.getType());
+			}else{
+				dailyTaskPOJO.setItemType(itemType);
+			}
+			
+			
 			allTasks.add(dailyTaskPOJO);
 		}
 		return allTasks;
@@ -94,7 +108,14 @@ public class AppCalendarServices {
 			dailyTaskPOJO.setStartDate(startDate);
 			dailyTaskPOJO.setEndDate(endDate);
 			dailyTaskPOJO.setItemId(itemId);
-			dailyTaskPOJO.setItemType(itemType);
+			
+			if(itemType.equals(TaskCategory.LESSON)){
+				AppCourseServices appCourseServices = new AppCourseServices();
+				Lesson lesson = appCourseServices.getLesson(itemId);
+				dailyTaskPOJO.setItemType(itemType+"_"+lesson.getType());
+			}else{
+				dailyTaskPOJO.setItemType(itemType);
+			}
 			
 			if(status.equals("COMPLETE")){
 				dailyTaskPOJO.setCompletedAt(completedAt);
@@ -138,7 +159,14 @@ public class AppCalendarServices {
 			dailyTaskPOJO.setStartDate(startDate);
 			dailyTaskPOJO.setEndDate(endDate);
 			dailyTaskPOJO.setItemId(itemId);
-			dailyTaskPOJO.setItemType(itemType);
+			
+			if(itemType.equals(TaskCategory.LESSON)){
+				AppCourseServices appCourseServices = new AppCourseServices();
+				Lesson lesson = appCourseServices.getLesson(itemId);
+				dailyTaskPOJO.setItemType(itemType+"_"+lesson.getType());
+			}else{
+				dailyTaskPOJO.setItemType(itemType);
+			}
 			
 			if(status.equals("COMPLETE")){
 				dailyTaskPOJO.setCompletedAt(completedAt);
@@ -181,7 +209,14 @@ public class AppCalendarServices {
 			dailyTaskPOJO.setStartDate(startDate);
 			dailyTaskPOJO.setEndDate(endDate);
 			dailyTaskPOJO.setItemId(itemId);
-			dailyTaskPOJO.setItemType(itemType);
+			
+			if(itemType.equals(TaskCategory.LESSON)){
+				AppCourseServices appCourseServices = new AppCourseServices();
+				Lesson lesson = appCourseServices.getLesson(itemId);
+				dailyTaskPOJO.setItemType(itemType+"_"+lesson.getType());
+			}else{
+				dailyTaskPOJO.setItemType(itemType);
+			}
 			
 			if(status.equals("COMPLETE")){
 				dailyTaskPOJO.setCompletedAt(completedAt);
