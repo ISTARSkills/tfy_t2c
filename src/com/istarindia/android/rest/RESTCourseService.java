@@ -103,7 +103,7 @@ public class RESTCourseService {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try{			
 			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
-			CourseRankPOJO courseRankPOJO = appUserRankUtility.getCourseRankPOJOForCoursesOfUsersBatch(userId, courseId);
+			CourseRankPOJO courseRankPOJO = appUserRankUtility.getLeaderboardForCourseOfUser(userId, courseId);
 			
 			String result = gson.toJson(courseRankPOJO);
 			
