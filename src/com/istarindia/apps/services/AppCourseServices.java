@@ -247,6 +247,7 @@ public class AppCourseServices {
 						cmsessionSkillReportPOJO.setTotalPoints(cmsessionSkillReportPOJO.getTotalPoints()+totalPoints);
 						cmsessionSkillReportPOJO.setUserPoints(cmsessionSkillReportPOJO.getUserPoints()+userPoints);
 					}
+					cmsessionSkillReportPOJO.calculatePercentage();
 					moduleSkillReportPOJO.calculateTotalPoints();
 					moduleSkillReportPOJO.calculateUserPoints();
 					moduleSkillReportPOJO.calculatePercentage();
@@ -282,6 +283,7 @@ public class AppCourseServices {
 						cmsessionSkillsReport.add(cmsessionSkillReportPOJO);
 						moduleSkillReportPOJO.setSkills(cmsessionSkillsReport);
 						
+						cmsessionSkillReportPOJO.calculatePercentage();
 						moduleSkillReportPOJO.calculateTotalPoints();
 						moduleSkillReportPOJO.calculateUserPoints();
 						moduleSkillReportPOJO.calculatePercentage();
