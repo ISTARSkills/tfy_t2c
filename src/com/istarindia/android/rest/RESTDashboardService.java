@@ -81,6 +81,50 @@ public class RESTDashboardService {
 		}
 	}
 
+	
+	@GET
+	@Path("{taskId}/pojo")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getTaskSummaryForUser(@PathParam("userId") int userId, @PathParam("taskId") int taskId) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		try {
+			TaskServices taskServices = new TaskServices();
+			Task task = taskServices.getTask(taskId);
+
+			if(task==null){
+				throw new Exception("Invlaid Task ID");
+			}
+			
+			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
+
+				TaskSummaryPOJO taskSummaryPOJO = null;
+				String itemType = task.getItemType();
+
+				switch (itemType) {
+				case TaskCategory.ASSESSMENT:
+					taskSummaryPOJO = dashboardUtility.getTaskSummaryPOJOForAssessment(task);
+					break;
+				case TaskCategory.LESSON:
+					taskSummaryPOJO = dashboardUtility.getTaskSummaryPOJOForLesson(task);
+					break;
+				}
+
+				if(taskSummaryPOJO==null){
+					throw new Exception("Invlaid Task ID");
+				}
+
+			String result = gson.toJson(taskSummaryPOJO);
+
+			return Response.ok(result).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
+		}
+	}
+	
+	
 	@GET
 	@Path("{taskId}")
 	@Produces(MediaType.APPLICATION_JSON)
