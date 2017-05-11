@@ -100,7 +100,7 @@ public class AppComplexObjectServices {
 			System.err.println("complexObject allTaskSummary->" + allTaskSummary.size() + "Time->" + (System.currentTimeMillis()-previousTime));
 			
 			//Assessments			
-			List<AssessmentPOJO> allAssessmentsOfUser = new ArrayList<AssessmentPOJO>();	
+/*			List<AssessmentPOJO> allAssessmentsOfUser = new ArrayList<AssessmentPOJO>();	
 			for (Task task : allTaskOfUser) {
 				if (task.getItemType().equals("ASSESSMENT")) {
 					Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());
@@ -112,7 +112,7 @@ public class AppComplexObjectServices {
 			}
 			complexObject.setAssessments(allAssessmentsOfUser);
 			System.err.println("complexObject allAssessmentsOfUser->" + allAssessmentsOfUser.size() + "Time->" + (System.currentTimeMillis()-previousTime));
-			
+	*/		
 		/*	//Assessment Responses
 			List<AssessmentResponsePOJO> allResponse = new ArrayList<AssessmentResponsePOJO>();
 			List<Integer> allAssessmentIds = studentAssessmentServices.getAllAssessmentsAttemptedByUser(userId);
