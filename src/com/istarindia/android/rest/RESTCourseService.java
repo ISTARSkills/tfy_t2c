@@ -28,6 +28,9 @@ public class RESTCourseService {
 		try {
 			AppCourseServices appCourseServices = new AppCourseServices();
 			CoursePOJO coursePOJO = appCourseServices.getCourseOfUser(istarUserId, courseId);
+			if(coursePOJO==null){
+				throw new Exception();
+			}
 			coursePOJO.setSkillObjectives(appCourseServices.getSkillsReportForCourseOfUser(istarUserId, courseId));
 
 			String result = gson.toJson(coursePOJO);

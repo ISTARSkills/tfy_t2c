@@ -149,8 +149,8 @@ public class AppCourseServices {
 				}
 				modulePOJO.sortLessonsAndAssignStatus();
 			}
-		}
-		coursePOJO.sortModulesAndAssignStatus();
+			coursePOJO.sortModulesAndAssignStatus();
+		}		
 		return coursePOJO;
 	}
 	
@@ -175,14 +175,15 @@ public class AppCourseServices {
 		SQLQuery sessionQuery = session.createSQLQuery(lessonsStatusSQL);		
 		List<Object[]> sessionStatusResult = sessionQuery.list();
 		
+		HashMap<Integer, Module> modulesOfAssessment = new HashMap<Integer, Module>();
+		HashMap<Integer, SkillObjective> cmsessionSkillObjectiveOfAssessment= new HashMap<Integer, SkillObjective>();
+		
+		HashMap<Integer, HashMap<String, Integer>> courseStatus = new HashMap<Integer, HashMap<String, Integer>>();
+		Double benchmark = getBenchmark();
+		System.out.println("benchmark->" + benchmark);
+		AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
 		if(result.size()>0 && sessionStatusResult.size()>0){
-			HashMap<Integer, Module> modulesOfAssessment = new HashMap<Integer, Module>();
-			HashMap<Integer, SkillObjective> cmsessionSkillObjectiveOfAssessment= new HashMap<Integer, SkillObjective>();
-			
-			HashMap<Integer, HashMap<String, Integer>> courseStatus = new HashMap<Integer, HashMap<String, Integer>>();
-			Double benchmark = getBenchmark();
-			
-			System.out.println("benchmark->" + benchmark);
+					
 			for(Object[] sessionRow: sessionStatusResult){
 				Integer cmsessionId = (Integer) sessionRow[0];
 				Integer completedLessons = (Integer) sessionRow[1];
@@ -195,7 +196,7 @@ public class AppCourseServices {
 				courseStatus.put(cmsessionId, sessionStatus);
 			}
 			
-			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
+			
 			
 			for(Object[] row : result){
 				Integer cmsessionSkillObjectiveId = (Integer) row[0];
@@ -293,6 +294,100 @@ public class AppCourseServices {
 						System.out.println("Module is null with id->"+moduleId);
 					}
 				}
+			}
+		}else{
+			String sqlLessonsFromStudentPlaylist = "with temptable as (select student_playlist.lesson_id, student_playlist.status, student_playlist.cmsession_id,student_playlist.module_id, skill_objective.parent_skill from student_playlist inner join lesson_skill_objective on student_playlist.lesson_id=lesson_skill_objective.lessonid and student_playlist.course_id=lesson_skill_objective.context_id inner join skill_objective on lesson_skill_objective.learning_objectiveid=skill_objective.id where student_id="+istarUserId+" and course_id="+courseId+" group by student_playlist.lesson_id, student_playlist.status, student_playlist.module_id, student_playlist.cmsession_id, skill_objective.parent_skill order by student_playlist.lesson_id,student_playlist.cmsession_id, student_playlist.module_id) select parent_skill as cmsession_skill_objective, module_id, cast(count(lesson_id) as integer) as total_lessons, cast(count(case when status='COMPLETE' then 1 end) as integer) as completed_lessons  from temptable group by parent_skill, module_id";
+						
+			SQLQuery lessonsFromStudentPlaylistQuery = session.createSQLQuery(sqlLessonsFromStudentPlaylist);		
+			List<Object[]> lessonsFromStudentPlaylistResult = lessonsFromStudentPlaylistQuery.list();
+			
+			if(lessonsFromStudentPlaylistResult.size()>0){
+
+				for(Object[] sessionRow: lessonsFromStudentPlaylistResult){
+					Integer cmsessionSkillObjectiveId = (Integer) sessionRow[0];
+					Integer moduleId = (Integer) sessionRow[1];
+					Integer completedLessons = (Integer) sessionRow[2];
+					Integer totalLessons = (Integer) sessionRow[3];
+					
+					SkillObjective cmsessionSkillObjective = appAssessmentServices.getSkillObjective(cmsessionSkillObjectiveId);
+					SkillReportPOJO moduleSkillReportPOJO = null;
+					SkillReportPOJO cmsessionSkillReportPOJO = null;
+					
+					if(modulesOfAssessment.containsKey(moduleId)){
+
+						for (SkillReportPOJO tempModuleSkillReport : skillsReport) {
+							if (tempModuleSkillReport.getId() == moduleId) {
+								moduleSkillReportPOJO = tempModuleSkillReport;
+								break;
+							}
+						}
+
+						if(cmsessionSkillObjectiveOfAssessment.containsKey(cmsessionSkillObjectiveId)){
+							for(SkillReportPOJO tempCmsessionSkillReport : moduleSkillReportPOJO.getSkills()){
+								if(tempCmsessionSkillReport.getId()==cmsessionSkillObjectiveId){
+									cmsessionSkillReportPOJO=tempCmsessionSkillReport;
+									break;
+								}
+							}
+						}
+						
+						if(cmsessionSkillReportPOJO==null){
+							//System.out.println("New Skill-->"+ cmsessionSkillObjective.getName()+"-->"+cmsessionSkillObjective.getId());
+						cmsessionSkillReportPOJO = new SkillReportPOJO();
+						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+						cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
+						cmsessionSkillObjectiveOfAssessment.put(cmsessionSkillObjectiveId, cmsessionSkillObjective);
+						cmsessionSkillReportPOJO.setTotalPoints(benchmark*totalLessons);
+						cmsessionSkillReportPOJO.setUserPoints(benchmark*completedLessons);												
+						moduleSkillReportPOJO.getSkills().add(cmsessionSkillReportPOJO);
+						}else{
+							cmsessionSkillReportPOJO.setTotalPoints(cmsessionSkillReportPOJO.getTotalPoints()+(benchmark*totalLessons));
+							cmsessionSkillReportPOJO.setUserPoints(cmsessionSkillReportPOJO.getUserPoints()+(benchmark*completedLessons));
+						}
+						cmsessionSkillReportPOJO.calculatePercentage();
+						moduleSkillReportPOJO.calculateTotalPoints();
+						moduleSkillReportPOJO.calculateUserPoints();
+						moduleSkillReportPOJO.calculatePercentage();
+						moduleSkillReportPOJO.generateMessage();
+					}else{
+						Module module = getModule(moduleId);
+						if (module != null) {
+							modulesOfAssessment.put(moduleId, module);
+
+							moduleSkillReportPOJO = new SkillReportPOJO();
+							moduleSkillReportPOJO.setId(module.getId());
+							moduleSkillReportPOJO.setName(module.getModuleName());
+							moduleSkillReportPOJO.setDescription(module.getModule_description());
+							moduleSkillReportPOJO.setImageURL(module.getImage_url());
+
+							List<SkillReportPOJO> cmsessionSkillsReport = new ArrayList<SkillReportPOJO>();
+							cmsessionSkillObjectiveOfAssessment.put(cmsessionSkillObjectiveId, cmsessionSkillObjective);
+
+							cmsessionSkillReportPOJO = new SkillReportPOJO();
+							cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+							cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
+							cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
+							cmsessionSkillReportPOJO.setTotalPoints(benchmark*totalLessons);
+							cmsessionSkillReportPOJO.setUserPoints(benchmark*completedLessons);												
+							cmsessionSkillReportPOJO.setTotalPoints(cmsessionSkillReportPOJO.getTotalPoints()+(benchmark*totalLessons));
+							cmsessionSkillReportPOJO.setUserPoints(cmsessionSkillReportPOJO.getUserPoints()+(benchmark*completedLessons));
+							
+							cmsessionSkillsReport.add(cmsessionSkillReportPOJO);
+							moduleSkillReportPOJO.setSkills(cmsessionSkillsReport);
+							
+							cmsessionSkillReportPOJO.calculatePercentage();
+							moduleSkillReportPOJO.calculateTotalPoints();
+							moduleSkillReportPOJO.calculateUserPoints();
+							moduleSkillReportPOJO.calculatePercentage();
+							moduleSkillReportPOJO.generateMessage();
+							skillsReport.add(moduleSkillReportPOJO);
+						}else{
+							System.out.println("Module is null with id->"+moduleId);
+						}
+					}
+				}
+				
 			}
 		}		
 		return skillsReport;

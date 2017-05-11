@@ -197,7 +197,6 @@ public class AppPOJOUtility {
 			if (assessmentQuestion.getQuestion().getContext_id() == assessment.getCourse()) {
 				questions.add(getQuestionPOJO(assessmentQuestion));
 			}
-			questions.add(getQuestionPOJO(assessmentQuestion));
 		}
 		assessmentPOJO.setQuestions(questions);
 
