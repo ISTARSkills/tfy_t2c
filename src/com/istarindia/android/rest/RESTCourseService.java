@@ -105,6 +105,10 @@ public class RESTCourseService {
 			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
 			CourseRankPOJO courseRankPOJO = appUserRankUtility.getLeaderboardForCourseOfUser(userId, courseId);
 			
+			if(courseRankPOJO==null){
+				throw new Exception();
+			}
+			
 			String result = gson.toJson(courseRankPOJO);
 			
 			return Response.ok(result).build();
