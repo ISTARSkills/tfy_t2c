@@ -88,7 +88,7 @@ public class AppCourseServices {
 					if(!cmsessionIds.contains(cmsession.getId())){
 						System.out.println("Adding CMSession Skill");
 						Set<String> allSkillObjectivesOfModule = new HashSet<String>();
-						for (SkillObjective skillObjective : module.getSkillObjectives()) {
+						for (SkillObjective skillObjective : cmsession.getSkillObjectives()) {
 							allSkillObjectivesOfModule.add(skillObjective.getName());
 						}
 						cmsessionIds.add(cmsession.getId());
@@ -120,7 +120,7 @@ public class AppCourseServices {
 					if(!cmsessionIds.contains(cmsession.getId())){
 						System.out.println("Adding CMSession Skill");
 						Set<String> allSkillObjectivesOfModule = new HashSet<String>();
-						for (SkillObjective skillObjective : module.getSkillObjectives()) {
+						for (SkillObjective skillObjective : cmsession.getSkillObjectives()) {
 							allSkillObjectivesOfModule.add(skillObjective.getName());
 						}
 						cmsessionIds.add(cmsession.getId());

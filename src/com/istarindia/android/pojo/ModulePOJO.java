@@ -2,7 +2,9 @@ package com.istarindia.android.pojo;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -18,7 +20,7 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 	private String imageURL;
 	private Integer orderId;
 	private List<CmsessionPOJO> lessons = new ArrayList<CmsessionPOJO>();
-	private List<String> skillObjectives = new ArrayList<String>();
+	private Set<String> skillObjectives = new HashSet<String>();
 	
 	public ModulePOJO(){
 		
@@ -74,10 +76,10 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 	}
 
 	@XmlElement(name = "skillObjectives", required = false)
-	public List<String> getSkillObjectives() {
+	public Set<String> getSkillObjectives() {
 		return skillObjectives;
 	}
-	public void setSkillObjectives(List<String> skillObjectives) {
+	public void setSkillObjectives(Set<String> skillObjectives) {
 		this.skillObjectives = skillObjectives;
 	}
 	
