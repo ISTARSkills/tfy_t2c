@@ -170,7 +170,7 @@ public class AppCourseServices {
 		SQLQuery query = session.createSQLQuery(sql);		
 		List<Object[]> result = query.list();
 		
-		String lessonsStatusSQL = "select cmsession_id,cast(count(case when status='COMPLETE' then 1 end) as integer) as completed_lessons, cast(count(*) as integer) as total_lessons from student_playlist where student_id="+istarUserId+" and course_id="+courseId+" group by cmsession_id";
+		String lessonsStatusSQL = "select cmsession_id,cast(count(case when status='COMPLETED' then 1 end) as integer) as completed_lessons, cast(count(*) as integer) as total_lessons from student_playlist where student_id="+istarUserId+" and course_id="+courseId+" group by cmsession_id";
 		
 		SQLQuery sessionQuery = session.createSQLQuery(lessonsStatusSQL);		
 		List<Object[]> sessionStatusResult = sessionQuery.list();
@@ -296,7 +296,7 @@ public class AppCourseServices {
 				}
 			}
 		}else{
-			String sqlLessonsFromStudentPlaylist = "with temptable as (select student_playlist.lesson_id, student_playlist.status, student_playlist.cmsession_id,student_playlist.module_id, skill_objective.parent_skill from student_playlist inner join lesson_skill_objective on student_playlist.lesson_id=lesson_skill_objective.lessonid and student_playlist.course_id=lesson_skill_objective.context_id inner join skill_objective on lesson_skill_objective.learning_objectiveid=skill_objective.id where student_id="+istarUserId+" and course_id="+courseId+" group by student_playlist.lesson_id, student_playlist.status, student_playlist.module_id, student_playlist.cmsession_id, skill_objective.parent_skill order by student_playlist.lesson_id,student_playlist.cmsession_id, student_playlist.module_id) select parent_skill as cmsession_skill_objective, module_id, cast(count(lesson_id) as integer) as total_lessons, cast(count(case when status='COMPLETE' then 1 end) as integer) as completed_lessons  from temptable group by parent_skill, module_id";
+			String sqlLessonsFromStudentPlaylist = "with temptable as (select student_playlist.lesson_id, student_playlist.status, student_playlist.cmsession_id,student_playlist.module_id, skill_objective.parent_skill from student_playlist inner join lesson_skill_objective on student_playlist.lesson_id=lesson_skill_objective.lessonid and student_playlist.course_id=lesson_skill_objective.context_id inner join skill_objective on lesson_skill_objective.learning_objectiveid=skill_objective.id where student_id="+istarUserId+" and course_id="+courseId+" group by student_playlist.lesson_id, student_playlist.status, student_playlist.module_id, student_playlist.cmsession_id, skill_objective.parent_skill order by student_playlist.lesson_id,student_playlist.cmsession_id, student_playlist.module_id) select parent_skill as cmsession_skill_objective, module_id, cast(count(lesson_id) as integer) as total_lessons, cast(count(case when status='COMPLETED' then 1 end) as integer) as completed_lessons  from temptable group by parent_skill, module_id";
 						
 			SQLQuery lessonsFromStudentPlaylistQuery = session.createSQLQuery(sqlLessonsFromStudentPlaylist);		
 			List<Object[]> lessonsFromStudentPlaylistResult = lessonsFromStudentPlaylistQuery.list();
@@ -400,7 +400,7 @@ public class AppCourseServices {
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
 		
-		String lessonsStatusSQL = "select course_id, module_id, cmsession_id,cast(count(case when status='COMPLETE' then 1 end) as integer) as completed_lessons, cast(count(*) as integer) as total_lessons from student_playlist where student_id="+istarUserId+" and course_id="+courseId+" group by course_id, module_id,cmsession_id";
+		String lessonsStatusSQL = "select course_id, module_id, cmsession_id,cast(count(case when status='COMPLETED' then 1 end) as integer) as completed_lessons, cast(count(*) as integer) as total_lessons from student_playlist where student_id="+istarUserId+" and course_id="+courseId+" group by course_id, module_id,cmsession_id";
 		
 		SQLQuery sessionQuery = session.createSQLQuery(lessonsStatusSQL);		
 		List<Object[]> sessionStatusResult = sessionQuery.list();
@@ -751,7 +751,7 @@ public class AppCourseServices {
 	}
 	
 	public Double getProgressOfUserForCourse(int istarUserId, int courseId){
-		String sql = "select COALESCE(cast(count(case when status='INCOMPLETE' then 1 end) as integer),0) as incomplete, COALESCE(cast(count(case when status='COMPLETE' then 1 end) as integer),0) as complete  from student_playlist where student_id= :istarUserId and course_id= :courseId";
+		String sql = "select COALESCE(cast(count(case when status='INCOMPLETE' then 1 end) as integer),0) as incomplete, COALESCE(cast(count(case when status='COMPLETED' then 1 end) as integer),0) as complete  from student_playlist where student_id= :istarUserId and course_id= :courseId";
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
 

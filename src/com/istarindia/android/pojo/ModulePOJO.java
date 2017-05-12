@@ -95,7 +95,7 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 		ModulePOJO modulePOJO = this;		
 		Collections.sort(modulePOJO.getLessons());
 		
-		String moduleStatus = "COMPLETE";
+		String moduleStatus = "COMPLETED";
 		
 		for(CmsessionPOJO cmsession: modulePOJO.getLessons()){
 			if((cmsession.getStatus().equals("INCOMPLETE"))){

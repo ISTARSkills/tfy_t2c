@@ -36,7 +36,7 @@ public class AppDashboardUtility {
 				taskSummaryPOJO.setStatus("INCOMPLETE");
 				taskSummaryPOJO.setDate(task.getEndDate());
 			}else{
-				taskSummaryPOJO.setStatus("COMPLETE");
+				taskSummaryPOJO.setStatus("COMPLETED");
 				taskSummaryPOJO.setDate(task.getUpdatedAt());
 			}
 			taskSummaryPOJO.setTitle(assessment.getAssessmenttitle());
@@ -71,15 +71,14 @@ public class AppDashboardUtility {
 				taskSummaryPOJO.setStatus("INCOMPLETE");
 				taskSummaryPOJO.setDate(task.getEndDate());
 			}else{
-				taskSummaryPOJO.setStatus("COMPLETE");
+				taskSummaryPOJO.setStatus("COMPLETED");
 				taskSummaryPOJO.setDate(task.getUpdatedAt());
 			}
 			taskSummaryPOJO.setHeader(lesson.getSubject());
 			taskSummaryPOJO.setTitle(lesson.getTitle());
 			taskSummaryPOJO.setDescription(lesson.getDescription());
 			taskSummaryPOJO.setImageURL(lesson.getImage_url());
-			taskSummaryPOJO.setDuration(lesson.getDuration());
-			
+			taskSummaryPOJO.setDuration(lesson.getDuration());			
 		}
 		return taskSummaryPOJO;
 	}

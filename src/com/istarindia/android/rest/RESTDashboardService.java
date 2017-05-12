@@ -52,7 +52,7 @@ public class RESTDashboardService {
 					break;
 				}
 				if (taskSummaryPOJO != null) {
-					if (taskSummaryPOJO.getStatus().equals("COMPLETE")) {
+					if (taskSummaryPOJO.getStatus().equals("COMPLETED")) {
 						completedTasks++;
 					}
 					allTaskSummary.add(taskSummaryPOJO);
@@ -209,7 +209,7 @@ public class RESTDashboardService {
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
 			TaskServices taskServices = new TaskServices();
-			taskServices.completeTask("COMPLETE", false, taskId, istarUser.getAuthToken());
+			taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
 
 			Task task = taskServices.getTask(taskId);
 			
@@ -280,7 +280,7 @@ public class RESTDashboardService {
 	 * taskSummaryPOJO.setItemType(task.getItemType()); if(task.getIsActive()){
 	 * taskSummaryPOJO.setStatus("INCOMPLETE");
 	 * taskSummaryPOJO.setDate(task.getEndDate()); }else{
-	 * taskSummaryPOJO.setStatus("COMPLETE");
+	 * taskSummaryPOJO.setStatus("COMPLETED");
 	 * taskSummaryPOJO.setDate(task.getUpdatedAt()); }
 	 * 
 	 * 

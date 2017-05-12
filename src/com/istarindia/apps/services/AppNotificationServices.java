@@ -135,7 +135,7 @@ public class AppNotificationServices {
 		if (assessment != null) {
 			notificationPOJO = new NotificationPOJO();
 			notificationPOJO.setId(istarNotification.getId());
-			notificationPOJO.setMessage(istarNotification.getDetails());
+			notificationPOJO.setMessage(istarNotification.getTitle());
 			notificationPOJO.setStatus(istarNotification.getStatus());
 			notificationPOJO.setTime(istarNotification.getCreatedAt());
 			Course course = appCourseServices.getCourse(assessment.getCourse());

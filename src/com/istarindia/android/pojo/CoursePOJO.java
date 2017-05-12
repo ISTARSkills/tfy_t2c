@@ -138,7 +138,7 @@ public class CoursePOJO {
 		CoursePOJO coursePOJO = this;		
 		Collections.sort(coursePOJO.getModules());
 		
-		String courseStatus = "COMPLETE";
+		String courseStatus = "COMPLETED";
 		int numberOfCompletedModules = 0;
 		for(ModulePOJO module: coursePOJO.getModules()){
 			if(module.getStatus().equals("INCOMPLETE")){
