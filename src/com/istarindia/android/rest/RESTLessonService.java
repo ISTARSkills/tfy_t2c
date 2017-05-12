@@ -1,5 +1,7 @@
 package com.istarindia.android.rest;
 
+import java.io.File;
+import java.io.StringWriter;
 import java.util.List;
 
 import javax.ws.rs.FormParam;
@@ -13,13 +15,18 @@ import javax.ws.rs.core.Response;
 
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.core.Persister;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.istarindia.android.pojo.LessonPOJO;
 import com.istarindia.android.utility.AppDashboardUtility;
+import com.istarindia.android.utility.CreateZIPForItem;
 import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.StudentPlaylistServices;
+import com.viksitpro.core.cms.interactive.InteractiveContent;
+import com.viksitpro.core.cms.lesson.VideoLesson;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
@@ -31,18 +38,55 @@ public class RESTLessonService {
 	@GET
 	@Path("{lessonId}")
 	@Produces(MediaType.APPLICATION_XML)
-	public Response getLesson(@PathParam("lessonId") int lessonId){
+	public Response getLesson(@PathParam("lessonId") int lessonId) {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-		try{
+		try {
 
-			String lessonXML = getLessonXML(lessonId);
-			
-			if(lessonXML==null){
+			AppCourseServices appCourseServices = new AppCourseServices();
+			Lesson lesson = appCourseServices.getLesson(lessonId);
+
+			if (lesson == null) {
 				throw new Exception();
 			}
 
-			return Response.ok(lessonXML).build();
-		}catch(Exception e){
+			CreateZIPForItem createZIPForItem = new CreateZIPForItem();
+
+			String mediaPath = createZIPForItem.getMediaPath();
+			String serverPath = "video/lessons/" + 4483 + ".zip";
+			String lessonZipFileActualPath = mediaPath + "/lessons/" + 4483 + ".zip";
+			File file = new File(lessonZipFileActualPath);
+			Serializer serializer = new Persister();
+			Object object = null;
+			if (!file.exists()) {
+				System.out.println("Creating New Zip file");
+				object = createZIPForItem.generateXMLForLesson(lessonId);
+			} else {
+				String lessonXML = lesson.getLessonXml();
+				System.out.println("Zip file exists");
+
+				if (lessonXML != null && !lessonXML.trim().isEmpty()) {
+					if (lesson.getType().equals("INTERACTIVE")) {
+						InteractiveContent interactiveContent = serializer.read(InteractiveContent.class, lessonXML);
+						interactiveContent.setZipFileURL(serverPath);
+						object = interactiveContent;
+					} else if (lesson.getType().equals("VIDEO")) {
+						VideoLesson videoLesson = serializer.read(VideoLesson.class, lessonXML);
+						videoLesson.setZipFileURL(serverPath);
+						object = videoLesson;
+					}
+				}
+			}
+
+			if (object == null) {
+				throw new Exception();
+			}
+			StringWriter writer = new StringWriter();
+			serializer.write(object, writer);
+			StringBuffer out = writer.getBuffer();
+			String result = out.toString();
+
+			return Response.ok(result).build();
+		} catch (Exception e) {
 			e.printStackTrace();
 			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
 					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
