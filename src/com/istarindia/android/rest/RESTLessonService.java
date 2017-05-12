@@ -17,11 +17,13 @@ import org.hibernate.Session;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.istarindia.android.pojo.LessonPOJO;
+import com.istarindia.android.utility.AppDashboardUtility;
 import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.StudentPlaylistServices;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
+import com.viksitpro.core.dao.entities.Task;
 
 @Path("lessons/user/{userId}")
 public class RESTLessonService {
@@ -32,12 +34,11 @@ public class RESTLessonService {
 	public Response getLesson(@PathParam("lessonId") int lessonId){
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try{
-			String lessonXML = null;
-			AppCourseServices appCourseServices = new AppCourseServices();
-			Lesson lesson = appCourseServices.getLesson(lessonId);
+
+			String lessonXML = getLessonXML(lessonId);
 			
-			if(lesson!=null){
-				lessonXML = lesson.getLessonXml();
+			if(lessonXML==null){
+				throw new Exception();
 			}
 
 			return Response.ok(lessonXML).build();
@@ -47,6 +48,25 @@ public class RESTLessonService {
 					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
 			return Response.status(Response.Status.OK).entity(result).build();
 		}
+	}
+	
+	public String getLessonXML(int lessonId) {
+
+		String lessonXML = null;
+		
+		String sql = "select cast(lesson_xml as varchar) from lesson where id= :lessonId";
+		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+		Session session = baseHibernateDAO.getSession();
+
+		SQLQuery query = session.createSQLQuery(sql);
+		query.setParameter("lessonId", lessonId);
+
+		List<String> results = query.list();
+		
+		if(results.size()>0){
+			lessonXML = results.get(0);
+		}
+		return lessonXML;
 	}
 	
 	@GET
