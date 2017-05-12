@@ -308,7 +308,7 @@ public class CreateZIPForItem {
 		System.out.println("Writing file : '" + pathOffileToInclude + "' to zip file");
 		File file = new File(mediaPath + pathOffileToInclude);
 		FileInputStream fis = new FileInputStream(file);
-		ZipEntry zipEntry = new ZipEntry(pathOffileToInclude.replaceAll("interactive/", ""));
+		ZipEntry zipEntry = new ZipEntry(pathOffileToInclude.replaceAll("interactive/", "").replaceAll(".jpg",".aaa").replaceAll(".png",".aaa").replaceAll(".jpeg",".aaa").replaceAll(".mp4",".aaa").replaceAll(".json",".aaa"));
 		zipOutputStream.putNextEntry(zipEntry);
 		byte[] bytes = new byte[1024];
 		int length;
