@@ -52,8 +52,8 @@ public class RESTLessonService {
 			CreateZIPForItem createZIPForItem = new CreateZIPForItem();
 
 			String mediaPath = createZIPForItem.getMediaPath();
-			String serverPath = "video/lessons/" + 4483 + ".zip";
-			String lessonZipFileActualPath = mediaPath + "/lessons/" + 4483 + ".zip";
+			String serverPath = "video/lessons/" + lessonId + ".zip";
+			String lessonZipFileActualPath = mediaPath + "/lessons/" + lessonId + ".zip";
 			File file = new File(lessonZipFileActualPath);
 			Serializer serializer = new Persister();
 			Object object = null;
