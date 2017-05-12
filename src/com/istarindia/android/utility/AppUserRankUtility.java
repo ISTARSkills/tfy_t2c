@@ -103,7 +103,7 @@ public class AppUserRankUtility {
 					studentRankPOJOForCourse.setId(batchStudentId);
 					if (istarUser.getUserProfile() != null) {
 						studentRankPOJOForCourse.setName(istarUser.getUserProfile().getFirstName());
-						studentRankPOJOForCourse.setImageURL(istarUser.getUserProfile().getProfileImage());
+						studentRankPOJOForCourse.setImageURL(istarUser.getUserProfile().getImage());
 					} else {
 						studentRankPOJOForCourse.setName(istarUser.getEmail());
 						studentRankPOJOForCourse.setImageURL("http://api.talentify.in/video/android_images/"
@@ -303,7 +303,7 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 				studentRankPOJO.setId(istarUserInBatch.getId());
 				if(istarUserInBatch.getUserProfile()!=null){
 				studentRankPOJO.setName(istarUserInBatch.getUserProfile().getFirstName());
-				studentRankPOJO.setImageURL(istarUserInBatch.getUserProfile().getProfileImage());
+				studentRankPOJO.setImageURL(istarUserInBatch.getUserProfile().getImage());
 				}else{
 				studentRankPOJO.setName(istarUserInBatch.getEmail());
 				studentRankPOJO.setImageURL("http://api.talentify.in/video/android_images/" + istarUserInBatch.getEmail().substring(0, 1).toUpperCase() + ".png");
