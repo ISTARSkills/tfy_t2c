@@ -225,4 +225,31 @@ public class AppCalendarServices {
 		}
 		return allTasks;
 	}
+	
+	public DailyTaskPOJO getDailyTaskPOJO(Task task) {
+
+		DailyTaskPOJO dailyTaskPOJO = null;
+		if (task != null) {
+			dailyTaskPOJO = new DailyTaskPOJO();
+			dailyTaskPOJO.setId(task.getId());
+			dailyTaskPOJO.setName(task.getName());
+			dailyTaskPOJO.setStatus(task.getState());
+			dailyTaskPOJO.setStartDate(task.getStartDate());
+			dailyTaskPOJO.setEndDate(task.getEndDate());
+			dailyTaskPOJO.setItemId(task.getItemId());
+
+			if (task.getItemType().equals(TaskCategory.LESSON)) {
+				AppCourseServices appCourseServices = new AppCourseServices();
+				Lesson lesson = appCourseServices.getLesson(task.getItemId());
+				dailyTaskPOJO.setItemType(task.getItemType() + "_" + lesson.getType());
+			} else {
+				dailyTaskPOJO.setItemType(task.getItemType());
+			}
+
+			if (task.getState().equals("COMPLETE")) {
+				dailyTaskPOJO.setCompletedAt(task.getUpdatedAt());
+			}
+		}
+		return dailyTaskPOJO;
+	}
 }
