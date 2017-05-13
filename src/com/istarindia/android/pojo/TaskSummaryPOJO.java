@@ -175,4 +175,10 @@ public class TaskSummaryPOJO {
 	public void setMessageForIncompleteTasks(String messageForIncompleteTasks) {
 		this.messageForIncompleteTasks = messageForIncompleteTasks;
 	}
+
+	
+	
+	
+	
+	
 }

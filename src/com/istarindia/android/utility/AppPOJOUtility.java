@@ -242,9 +242,9 @@ public class AppPOJOUtility {
 	public OptionPOJO getOptionPOJO(AssessmentOption assessmentOption) {
 
 		OptionPOJO optionPOJO = new OptionPOJO();
-
+		
 		optionPOJO.setId(assessmentOption.getId());
-		optionPOJO.setText(assessmentOption.getText());
+		optionPOJO.setText(assessmentOption.getText().replaceAll("\n", "").replaceAll("\r\n", ""));
 
 		return optionPOJO;
 	}

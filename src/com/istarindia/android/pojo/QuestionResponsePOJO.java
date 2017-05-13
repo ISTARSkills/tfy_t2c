@@ -11,7 +11,7 @@ public class QuestionResponsePOJO {
 
 	private Integer questionId;
 	private List<Integer> options;
-	private Integer duration;
+	private Integer duration = 0;
 	
 	public QuestionResponsePOJO(){
 		

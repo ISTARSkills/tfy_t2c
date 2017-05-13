@@ -6,10 +6,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
 import java.security.SecureRandom;
-
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -17,6 +21,21 @@ import org.apache.tomcat.util.codec.binary.Base64;
 public class AppUtility {
 
 	public String imageUpload(String profileImage, String fileFormat, String type, String context) throws IOException{
+		Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+		// add owners permission
+		perms.add(PosixFilePermission.OWNER_READ);
+		perms.add(PosixFilePermission.OWNER_WRITE);
+		perms.add(PosixFilePermission.OWNER_EXECUTE);
+		// add group permissions
+		perms.add(PosixFilePermission.GROUP_READ);
+		perms.add(PosixFilePermission.GROUP_WRITE);
+		perms.add(PosixFilePermission.GROUP_EXECUTE);
+		// add others permissions
+		perms.add(PosixFilePermission.OTHERS_READ);
+		perms.add(PosixFilePermission.OTHERS_WRITE);
+		perms.add(PosixFilePermission.OTHERS_EXECUTE);
+		
+		
 		
 		String imageUploadPath ="";
 		String subDirectory = "users"+"/";
@@ -64,8 +83,12 @@ public class AppUtility {
         String fileURL = fileURLPrefix + subDirectory +fileName;
         System.out.println("fileURL"+fileURL);
         file.write(imgByteArray);
+      
+        
         file.close();
-				
+        File f = new File(filePath);
+        Files.setPosixFilePermissions(Paths.get(f.getAbsolutePath()), perms);
+		
 		return fileURL;
 	}
 	

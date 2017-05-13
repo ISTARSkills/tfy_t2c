@@ -171,7 +171,7 @@ public class AppCourseServices {
 		List<Object[]> result = query.list();
 		
 		String lessonsStatusSQL = "select cmsession_id,cast(count(case when status='COMPLETED' then 1 end) as integer) as completed_lessons, cast(count(*) as integer) as total_lessons from student_playlist where student_id="+istarUserId+" and course_id="+courseId+" group by cmsession_id";
-		
+		System.out.println("lessonsStatusSQL"+lessonsStatusSQL);
 		SQLQuery sessionQuery = session.createSQLQuery(lessonsStatusSQL);		
 		List<Object[]> sessionStatusResult = sessionQuery.list();
 		

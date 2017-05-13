@@ -60,6 +60,7 @@ public class AppComplexObjectServices {
 			//Skills -- to be changed
 			List<SkillReportPOJO> allSkills = appServices.getSkillsMapOfUser(userId);
 			complexObject.setSkills(allSkills);
+			
 			System.err.println("complexObject allSkills->" + allSkills.size() + "Time->" + (System.currentTimeMillis()-previousTime));
 			
 			//Tasks		
@@ -164,5 +165,7 @@ public class AppComplexObjectServices {
 			System.err.println("complexObject allNotifications->" + allNotifications.size() + "Time->" + (System.currentTimeMillis()-previousTime));
 		}
 		return complexObject;
-	}	
+	}
+
+	
 }

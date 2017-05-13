@@ -20,11 +20,13 @@ import com.google.gson.reflect.TypeToken;
 import com.istarindia.android.pojo.AssessmentPOJO;
 import com.istarindia.android.pojo.AssessmentReportPOJO;
 import com.istarindia.android.pojo.AssessmentResponsePOJO;
+import com.istarindia.android.pojo.ComplexObject;
 import com.istarindia.android.pojo.QuestionResponsePOJO;
 import com.istarindia.android.utility.AppContentServiceUtility;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.apps.services.AppAssessmentServices;
 import com.istarindia.apps.services.AppBatchStudentsServices;
+import com.istarindia.apps.services.AppComplexObjectServices;
 import com.istarindia.apps.services.ReportServices;
 import com.istarindia.apps.services.StudentAssessmentServices;
 import com.viksitpro.core.dao.entities.Assessment;
@@ -186,10 +188,20 @@ public class RESTAssessmentService {
 			TaskServices taskServices = new TaskServices();
 			taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
 
-			AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReport(istarUserId,
+			
+			
+			/*AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReport(istarUserId,
 					assessment.getId());
 			String result = gson.toJson(assessmentReportPOJO);
+			 */
+			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
+			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(istarUserId);
 
+			if (complexObject == null) {
+				throw new Exception();
+			}
+			String result = gson.toJson(complexObject);
+			
 			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
