@@ -106,7 +106,7 @@ public class AppUserRankUtility {
 						studentRankPOJOForCourse.setImageURL(istarUser.getUserProfile().getImage());
 					} else {
 						studentRankPOJOForCourse.setName(istarUser.getEmail());
-						studentRankPOJOForCourse.setImageURL("http://api.talentify.in/video/android_images/"
+						studentRankPOJOForCourse.setImageURL("http://cdn.talentify.in/video/android_images/"
 								+ istarUser.getEmail().substring(0, 1).toUpperCase() + ".png");
 					}
 					studentRankPOJOForCourse.setPoints(courseUserPoints.intValue());
@@ -204,7 +204,7 @@ public class AppUserRankUtility {
 					studentRankPOJOForCourse.setImageURL(istarUser.getUserProfile().getProfileImage());
 				}else{
 					studentRankPOJOForCourse.setName(istarUser.getEmail());
-					studentRankPOJOForCourse.setImageURL("http://api.talentify.in/video/android_images/" + istarUser.getEmail().substring(0, 1).toUpperCase() + ".png");
+					studentRankPOJOForCourse.setImageURL("http://cdn.talentify.in/video/android_images/" + istarUser.getEmail().substring(0, 1).toUpperCase() + ".png");
 				}
 				studentRankPOJOForCourse.setPoints(courseUserPoints.intValue());
 				studentRankPOJOForCourse.setBatchRank(courseRank);
@@ -255,7 +255,7 @@ public class AppUserRankUtility {
 				studentRankPOJO.setImageURL(istarUserInBatch.getUserProfile().getProfileImage());
 				}else{
 				studentRankPOJO.setName(istarUserInBatch.getEmail());
-				studentRankPOJO.setImageURL("http://api.talentify.in/video/android_images/" + istarUserInBatch.getEmail().substring(0, 1).toUpperCase() + ".png");
+				studentRankPOJO.setImageURL("http://cdn.talentify.in/video/android_images/" + istarUserInBatch.getEmail().substring(0, 1).toUpperCase() + ".png");
 				}
 				studentRankPOJO.setPoints(points);
 				studentRankPOJO.setCoins(coins);
@@ -306,7 +306,7 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 				studentRankPOJO.setImageURL(istarUserInBatch.getUserProfile().getImage());
 				}else{
 				studentRankPOJO.setName(istarUserInBatch.getEmail());
-				studentRankPOJO.setImageURL("http://api.talentify.in/video/android_images/" + istarUserInBatch.getEmail().substring(0, 1).toUpperCase() + ".png");
+				studentRankPOJO.setImageURL("http://cdn.talentify.in/video/android_images/" + istarUserInBatch.getEmail().substring(0, 1).toUpperCase() + ".png");
 				}
 				studentRankPOJO.setPoints(courseUserPoints.intValue());
 				studentRankPOJO.setCoins(0);
@@ -374,7 +374,7 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 				studentRankPOJO.setImageURL(istarUserInBatch.getUserProfile().getProfileImage());
 				}else{
 				studentRankPOJO.setName(istarUserInBatch.getEmail());
-				studentRankPOJO.setImageURL("http://api.talentify.in/video/android_images/" + istarUserInBatch.getEmail().substring(0, 1).toUpperCase() + ".png");
+				studentRankPOJO.setImageURL("http://cdn.talentify.in/video/android_images/" + istarUserInBatch.getEmail().substring(0, 1).toUpperCase() + ".png");
 				}
 				studentRankPOJO.setPoints(points);
 				studentRankPOJO.setCoins(coins);
@@ -442,7 +442,7 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 				studentRankPOJO.setImageURL(istarUserInBatch.getUserProfile().getProfileImage());
 				}else{
 				studentRankPOJO.setName(istarUserInBatch.getEmail());
-				studentRankPOJO.setImageURL("http://api.talentify.in/video/android_images/" + istarUserInBatch.getEmail().substring(0, 1).toUpperCase() + ".png");
+				studentRankPOJO.setImageURL("http://cdn.talentify.in/video/android_images/" + istarUserInBatch.getEmail().substring(0, 1).toUpperCase() + ".png");
 				}
 				studentRankPOJO.setPoints(points);
 				studentRankPOJO.setCoins(coins);
