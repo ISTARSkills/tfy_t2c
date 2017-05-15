@@ -311,7 +311,7 @@ public class AppAssessmentServices {
 
 	
 	@SuppressWarnings("unchecked")
-	public List<Integer> getAssessmentsOfUser(int istarUserId){
+	public List<Integer> getAttemptedAssessmentsOfUser(int istarUserId){
 		
 		String sql = "select distinct item_id from user_gamification where istar_user="+istarUserId+" and timestamp is not null";
 		System.out.println("all Assessments of user from UsrGmfctn---->"+sql);
@@ -376,7 +376,7 @@ public class AppAssessmentServices {
 	}
 
 	public List<AssessmentReportPOJO> getAllAssessmentReportsOfUser(int istarUserId) {
-		List<Integer> assessmentIds = getAssessmentsOfUser(istarUserId);
+		List<Integer> assessmentIds = getAttemptedAssessmentsOfUser(istarUserId);
 		List<AssessmentReportPOJO> allReports = new ArrayList<AssessmentReportPOJO>();
 		if(assessmentIds.size()>0){
 			for(Integer assessmentId: assessmentIds){

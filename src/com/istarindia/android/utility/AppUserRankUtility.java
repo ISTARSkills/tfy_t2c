@@ -81,7 +81,9 @@ public class AppUserRankUtility {
 			courseRankPOJO.setDescription(course.getCourseDescription());
 			courseRankPOJO.setName(course.getCourseName());
 
-			String sql = "select *, cast(row_number() over (order by points desc) as integer) from (with usr_gmfct as (select istar_user, points, skill_objective, item_id, item_type, cmsession_id, module_id, course_id, count(batch_group_id) from user_gamification where course_id = "+courseId+" and batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+" and course_id="+courseId+") and (istar_user,item_id, timestamp) in (select istar_user, item_id, max(timestamp) from user_gamification where istar_user in (select distinct student_id from batch_students where batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+")) group by istar_user, item_id) group by istar_user, skill_objective, points, item_id, item_type, cmsession_id, module_id, course_id),students_of_batch as (select distinct student_id from batch_students where batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+")) select students_of_batch.student_id, cast(COALESCE(sum(points),0) as numeric) as points from students_of_batch left join usr_gmfct on students_of_batch.student_id=usr_gmfct.istar_user group by students_of_batch.student_id order by points desc) as temptable";
+			String sql = "select *, cast(row_number() over (order by points desc) as integer) from (with usr_gmfct as (select istar_user, points,coins, skill_objective, item_id, item_type, item_id, cmsession_id, module_id, course_id, count(batch_group_id) from user_gamification where course_id = "+courseId+" and batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+" and course_id="+courseId+") and (istar_user,item_id, item_type, timestamp) in (select istar_user, item_id, item_type, max(timestamp) from user_gamification where istar_user in (select distinct student_id from batch_students where batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+")) group by istar_user, item_id,item_type) group by istar_user, skill_objective, points, coins, item_id, item_type, cmsession_id, module_id, course_id),students_of_batch as (select distinct student_id from batch_students where batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+")) select students_of_batch.student_id, cast(COALESCE(sum(points),0) as numeric) as points, cast(COALESCE(sum(coins),0) as numeric) as coins from students_of_batch left join usr_gmfct on students_of_batch.student_id=usr_gmfct.istar_user group by students_of_batch.student_id order by points desc) as temptable";
+			
+			System.out.println("Course Leaderboard--->"+ sql);
 
 			BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 			Session session = baseHibernateDAO.getSession();
@@ -95,7 +97,8 @@ public class AppUserRankUtility {
 				for (Object[] row : result) {
 					Integer batchStudentId = (Integer) row[0];
 					Double courseUserPoints = ((BigDecimal) row[1]).doubleValue();
-					Integer courseRank = (Integer) row[2];
+					//Double courseUserCoins = ((BigDecimal) row[2]).doubleValue();
+					Integer courseRank = (Integer) row[3];
 
 					StudentRankPOJO studentRankPOJOForCourse = new StudentRankPOJO();
 					IstarUser istarUser = istarUserServices.getIstarUser(batchStudentId);
@@ -278,7 +281,7 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
 		
-		String sql = "select *, cast(row_number() over (order by points desc) as integer) from (with usr_gmfct as (select istar_user, points, skill_objective, item_id, item_type, cmsession_id, module_id, course_id, count(batch_group_id) from user_gamification where batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+") and (istar_user,item_id, timestamp) in (select istar_user, item_id, max(timestamp) from user_gamification where istar_user in (select distinct student_id from batch_students where batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+")) group by istar_user, item_id) group by istar_user, skill_objective, points, item_id, item_type, cmsession_id, module_id, course_id),students_of_batch as (select distinct student_id from batch_students where batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+")) select students_of_batch.student_id, cast(COALESCE(sum(points),0) as numeric) as points from students_of_batch left join usr_gmfct on students_of_batch.student_id=usr_gmfct.istar_user group by students_of_batch.student_id order by points desc) as temptable";
+		String sql = "select *, cast(row_number() over (order by points desc) as integer) from (with usr_gmfct as (select istar_user, points, coins, skill_objective, item_id, item_type, cmsession_id, module_id, course_id, count(batch_group_id) from user_gamification where batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+") and (istar_user,item_id, item_type, timestamp) in (select istar_user, item_id,item_type, max(timestamp) from user_gamification where istar_user in (select distinct student_id from batch_students where batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+")) group by istar_user, item_id,item_type) group by istar_user, skill_objective, points, coins, item_id, item_type, cmsession_id, module_id, course_id),students_of_batch as (select distinct student_id from batch_students where batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+")) select students_of_batch.student_id, cast(COALESCE(sum(points),0) as numeric) as points, cast(COALESCE(sum(coins),0) as numeric) as coins from students_of_batch left join usr_gmfct on students_of_batch.student_id=usr_gmfct.istar_user group by students_of_batch.student_id order by points desc, coins desc) as temptable";
 		System.out.println("Leaderboard Query->" + sql);
 		SQLQuery query = session.createSQLQuery(sql);
 		List<Object[]> result = query.list();
@@ -294,7 +297,7 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 			for(Object[] row : result){
 				Integer batchStudentId = (Integer) row[0];
 				Double courseUserPoints = ((BigDecimal) row[1]).doubleValue();
-				Integer courseRank = (Integer) row[2];
+				Integer courseRank = (Integer) row[3];
 				
 				IstarUser istarUserInBatch = istarUserServices.getIstarUser(batchStudentId);
 				
@@ -390,7 +393,7 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 		return allCourseRanks;
 	}*/
 	
-	@SuppressWarnings("unchecked")
+/*	@SuppressWarnings("unchecked")
 	public CourseRankPOJO getCourseRankPOJOForCoursesOfUsersBatch(Integer istarUserId, Integer courseId){
 		
 		CourseRankPOJO courseRankPOJO = null;
@@ -454,7 +457,7 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 			courseRankPOJO.setAllStudentRanks(allStudentRanksOfABatch);
 			}
 		return courseRankPOJO;
-	}
+	}*/
 	
 	
 	@SuppressWarnings("rawtypes")
@@ -462,34 +465,27 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 		
 		StudentRankPOJO studentRankPOJO = null;
 		
-		String sql = "select * from (select *, COALESCE(cast(row_number() over (order by total_points desc) as integer),0) as rank from "
-				+ "(select user_gamification.istar_user, cast(sum(user_gamification.points) as integer)as total_points, cast(sum(user_gamification.coins) as integer) as total_coins "
-				+ "from assessment,user_gamification where user_gamification.item_id=assessment.id and assessment.course_id= :courseId  and user_gamification.istar_user in "
-				+ "(select student_id from batch_students where batch_group_id in "
-				+ "(select batch_group_id from batch_students where batch_students.student_id= :istarUserId)) "
-				+ "group by user_gamification.istar_user order by total_points desc) as batch_ranks) as user_rank where istar_user=:istarUserId";
+		String sql = "select * from (select *, cast(row_number() over (order by points desc) as integer) from (with usr_gmfct as (select istar_user, points,coins, skill_objective, item_id, item_type, item_id, cmsession_id, module_id, course_id, count(batch_group_id) from user_gamification where course_id = "+courseId+" and batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+" and course_id="+courseId+") and (istar_user,item_id, item_type, timestamp) in (select istar_user, item_id, item_type, max(timestamp) from user_gamification where istar_user in (select distinct student_id from batch_students where batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+")) group by istar_user, item_id,item_type) group by istar_user, skill_objective, points, coins, item_id, item_type, cmsession_id, module_id, course_id),students_of_batch as (select distinct student_id from batch_students where batch_group_id in (select distinct batch_group_id from batch_students where student_id="+istarUserId+")) select students_of_batch.student_id, cast(COALESCE(sum(points),0) as numeric) as points, cast(COALESCE(sum(coins),0) as numeric) as coins from students_of_batch left join usr_gmfct on students_of_batch.student_id=usr_gmfct.istar_user group by students_of_batch.student_id order by points desc) as temptable) as another_temp where student_id="+istarUserId;
 		
-		System.out.println("Student Rank pojo "+sql);
+		System.out.println("Student Rank pojo for course-->"+sql);
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
 		
 		SQLQuery query = session.createSQLQuery(sql);
-		query.setParameter("istarUserId",istarUserId);
-		query.setParameter("courseId",courseId);
-		
+
 		List results = query.list();
 		
 		if(results.size() > 0){
-		Object[] studentData = (Object[]) results.get(0);
+		Object[] row = (Object[]) results.get(0);
 		
-		Integer istarUserInBatchId = (Integer) studentData[0];
-		Integer points = (Integer) studentData[1];
-		Integer coins = (Integer) studentData[2];
-		Integer rank = (Integer) studentData[3];
+		Integer batchStudentId = (Integer) row[0];
+		Double courseUserPoints = ((BigDecimal) row[1]).doubleValue();
+		Double courseUserCoins = ((BigDecimal) row[2]).doubleValue();
+		Integer courseRank = (Integer) row[3];
 		
 		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUserInBatch = istarUserServices.getIstarUser(istarUserInBatchId);
+		IstarUser istarUserInBatch = istarUserServices.getIstarUser(batchStudentId);
 		
 		studentRankPOJO = new StudentRankPOJO();
 
@@ -502,9 +498,9 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 			studentRankPOJO.setName(istarUserInBatch.getEmail());
 		}
 		
-		studentRankPOJO.setPoints(points);
-		studentRankPOJO.setCoins(coins);
-		studentRankPOJO.setBatchRank(rank);
+		studentRankPOJO.setPoints(courseUserPoints.intValue());
+		studentRankPOJO.setCoins(courseUserCoins.intValue());
+		studentRankPOJO.setBatchRank(courseRank);
 		}
 		return studentRankPOJO;
 	}
@@ -516,7 +512,7 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 		StudentRankPOJO studentRankPOJO = null;
 		
 		//String sql = "select * from (select istar_user, cast(row_number() over (order by user_points desc) as integer) as overall_rank, sum(user_points) over (partition by istar_user) as overall_points, sum(user_coins) over (partition by istar_user) as overall_coins from (select istar_user, course_id,  sum(points) as user_points, sum(coins) as user_coins from (select istar_user, skill_objective, cast(points as numeric), cast(coins as numeric), timestamp, cmsession_id, module_id, course_id, item_id,count(batch_group_id) from user_gamification where (istar_user, timestamp,course_id, item_id) in (select istar_user, max(timestamp),course_id,item_id  from user_gamification where batch_group_id in (select distinct batch_group_id from user_gamification where istar_user="+istarUserId+") group by istar_user, course_id,item_id) group by istar_user, skill_objective, cast(points as numeric), cast(coins as numeric), timestamp, cmsession_id, module_id, course_id, item_id order by istar_user,item_id) as temptable group by istar_user, course_id order by user_points desc, istar_user) as another) as onemore where istar_user="+istarUserId;
-		String sql = "select * from (select *, CAST (ROW_NUMBER () OVER (ORDER BY overall_points DESC,overall_coins DESC) AS INTEGER) AS overall_rank from (SELECT istar_user, SUM (user_points) as overall_points, SUM (user_coins)  aS overall_coins FROM (SELECT istar_user, course_id, SUM (points) AS user_points, SUM (coins) AS user_coins FROM (SELECT istar_user, skill_objective, CAST (points AS NUMERIC), CAST (coins AS NUMERIC), TIMESTAMP, cmsession_id, module_id, course_id, item_id, COUNT (batch_group_id) FROM user_gamification WHERE (istar_user, TIMESTAMP, course_id, item_id ) IN (SELECT istar_user, MAX (TIMESTAMP), course_id, item_id FROM user_gamification WHERE batch_group_id IN (SELECT DISTINCT batch_group_id FROM user_gamification WHERE istar_user ="+istarUserId+" ) GROUP BY istar_user, course_id, item_id ) GROUP BY istar_user, skill_objective, CAST (points AS NUMERIC), CAST (coins AS NUMERIC), TIMESTAMP, cmsession_id, module_id, course_id, item_id ORDER BY istar_user, item_id ) AS temptable GROUP BY istar_user, course_id ORDER BY user_points DESC, istar_user ) AS another group by istar_user) as yet_another) as one_last where istar_user="+istarUserId;
+		String sql = "select * from (select *, CAST (ROW_NUMBER () OVER (ORDER BY overall_points DESC) AS INTEGER) AS overall_rank from (SELECT istar_user, SUM (user_points) as overall_points, SUM (user_coins)  aS overall_coins FROM (SELECT istar_user, course_id, SUM (points) AS user_points, SUM (coins) AS user_coins FROM (SELECT istar_user, skill_objective, CAST (points AS NUMERIC), CAST (coins AS NUMERIC), TIMESTAMP, cmsession_id, module_id, course_id, item_id, item_type, COUNT (batch_group_id) FROM user_gamification WHERE (istar_user, TIMESTAMP, course_id, item_id,item_type ) IN (SELECT istar_user, MAX (TIMESTAMP), course_id, item_id,item_type FROM user_gamification WHERE batch_group_id IN (SELECT DISTINCT batch_group_id FROM user_gamification WHERE istar_user ="+istarUserId+" ) GROUP BY istar_user, course_id, item_id,item_type ) GROUP BY istar_user, skill_objective, CAST (points AS NUMERIC), CAST (coins AS NUMERIC), TIMESTAMP, cmsession_id, module_id, course_id, item_id,item_type ORDER BY istar_user, item_id,item_type ) AS temptable GROUP BY istar_user, course_id ORDER BY user_points DESC, istar_user ) AS another group by istar_user) as yet_another) as one_last where istar_user="+istarUserId;
 		System.out.println("Student Rank pojo "+sql);
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
