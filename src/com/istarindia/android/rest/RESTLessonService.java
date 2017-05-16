@@ -179,7 +179,7 @@ public class RESTLessonService {
 			appCourseServices.insertIntoUserGamificationOnCompletitionOfLessonByUser(studentPlaylist.getIstarUser().getId(), studentPlaylist.getLesson().getId(), studentPlaylist.getCourse().getId());
 			
 			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
-			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(studentPlaylist.getId());
+			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(studentPlaylist.getIstarUser().getId());
 
 			if (complexObject == null) {
 				throw new Exception();
