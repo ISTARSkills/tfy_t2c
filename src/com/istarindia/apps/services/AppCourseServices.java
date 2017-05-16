@@ -429,8 +429,9 @@ public class AppCourseServices {
 				for(Object[] sessionRow: lessonsFromStudentPlaylistResult){
 					Integer cmsessionSkillObjectiveId = (Integer) sessionRow[0];
 					Integer moduleId = (Integer) sessionRow[1];
-					Integer completedLessons = (Integer) sessionRow[2];
-					Integer totalLessons = (Integer) sessionRow[3];
+					Integer totalLessons = (Integer) sessionRow[2];
+					Integer completedLessons = (Integer) sessionRow[3];
+					
 					
 					SkillObjective cmsessionSkillObjective = appAssessmentServices.getSkillObjective(cmsessionSkillObjectiveId);
 					SkillReportPOJO moduleSkillReportPOJO = null;
