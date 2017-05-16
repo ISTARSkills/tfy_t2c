@@ -15,7 +15,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 
-import com.istarindia.android.pojo.CmsessionPOJO;
+import com.istarindia.android.pojo.ConcreteItemPOJO;
 import com.istarindia.android.pojo.CoursePOJO;
 import com.istarindia.android.pojo.LessonPOJO;
 import com.istarindia.android.pojo.ModulePOJO;
@@ -38,6 +38,21 @@ import com.viksitpro.core.dao.entities.StudentPlaylist;
 public class AppCourseServices {
 	
 	public CoursePOJO getCourseOfUser(int istarUserId, int courseId){
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+					System.out.println("media_url_path"+mediaUrlPath);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
+		
 		CoursePOJO coursePOJO = null;
 		StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 		AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
@@ -51,7 +66,7 @@ public class AppCourseServices {
 			coursePOJO.setId(course.getId());
 			coursePOJO.setCategory(course.getCategory());
 			coursePOJO.setDescription(course.getCourseDescription());
-			coursePOJO.setImageURL(course.getImage_url());
+			coursePOJO.setImageURL(mediaUrlPath+course.getImage_url());
 			coursePOJO.setName(course.getCourseName());				
 			coursePOJO.setTotalPoints(getTotalPointsOfCourseForUser(istarUserId, courseId, allStudentPlaylist.size()));
 
@@ -82,7 +97,7 @@ public class AppCourseServices {
 					modulePOJO = new ModulePOJO();
 					modulePOJO.setId(module.getId());
 					modulePOJO.setName(module.getModuleName());
-					modulePOJO.setImageURL(module.getImage_url());
+					modulePOJO.setImageURL(mediaUrlPath+module.getImage_url());
 					modulePOJO.setDescription(module.getModule_description());
 					modulePOJO.setOrderId(++moduleOrderId);
 					
@@ -96,7 +111,7 @@ public class AppCourseServices {
 						modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
 					}
 	
-					CmsessionPOJO cmsessionPOJO = new CmsessionPOJO();
+					ConcreteItemPOJO ConcreteItemPOJO = new ConcreteItemPOJO();
 					LessonPOJO lessonPOJO = new LessonPOJO();
 					lessonPOJO.setId(lesson.getId());
 					lessonPOJO.setTitle(lesson.getTitle());
@@ -108,13 +123,13 @@ public class AppCourseServices {
 					lessonPOJO.setType(lesson.getType());
 					lessonPOJO.setOrderId(studentPlaylist.getId());
 					
-					cmsessionPOJO.setId(lesson.getId());
-					cmsessionPOJO.setType("LESSON_"+lesson.getType());
-					cmsessionPOJO.setLesson(lessonPOJO);
-					cmsessionPOJO.setOrderId(studentPlaylist.getId());
-					cmsessionPOJO.setStatus(studentPlaylist.getStatus());
-					
-					modulePOJO.getLessons().add(cmsessionPOJO);
+					ConcreteItemPOJO.setId(lesson.getId());
+					ConcreteItemPOJO.setType("LESSON_"+lesson.getType());
+					ConcreteItemPOJO.setLesson(lessonPOJO);
+					ConcreteItemPOJO.setOrderId(studentPlaylist.getId());
+					ConcreteItemPOJO.setStatus(studentPlaylist.getStatus());
+					ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
+					modulePOJO.getLessons().add(ConcreteItemPOJO);
 					coursePOJO.getModules().add(modulePOJO);
 				}else{
 					
@@ -128,7 +143,7 @@ public class AppCourseServices {
 						modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
 					}
 					
-					CmsessionPOJO cmsessionPOJO = new CmsessionPOJO();
+					ConcreteItemPOJO ConcreteItemPOJO = new ConcreteItemPOJO();
 					LessonPOJO lessonPOJO = new LessonPOJO();
 					lessonPOJO.setId(lesson.getId());
 					lessonPOJO.setTitle(lesson.getTitle());
@@ -140,13 +155,13 @@ public class AppCourseServices {
 					lessonPOJO.setType(lesson.getType());
 					lessonPOJO.setOrderId(studentPlaylist.getId());
 					
-					cmsessionPOJO.setId(lesson.getId());
-					cmsessionPOJO.setType("LESSON_"+lesson.getType());
-					cmsessionPOJO.setLesson(lessonPOJO);
-					cmsessionPOJO.setOrderId(studentPlaylist.getId());
-					cmsessionPOJO.setStatus(studentPlaylist.getStatus());
-					
-					modulePOJO.getLessons().add(cmsessionPOJO);
+					ConcreteItemPOJO.setId(lesson.getId());
+					ConcreteItemPOJO.setType("LESSON_"+lesson.getType());
+					ConcreteItemPOJO.setLesson(lessonPOJO);
+					ConcreteItemPOJO.setOrderId(studentPlaylist.getId());
+					ConcreteItemPOJO.setStatus(studentPlaylist.getStatus());
+					ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
+					modulePOJO.getLessons().add(ConcreteItemPOJO);
 				}
 				modulePOJO.sortLessonsAndAssignStatus();
 			}
@@ -414,8 +429,9 @@ public class AppCourseServices {
 				for(Object[] sessionRow: lessonsFromStudentPlaylistResult){
 					Integer cmsessionSkillObjectiveId = (Integer) sessionRow[0];
 					Integer moduleId = (Integer) sessionRow[1];
-					Integer completedLessons = (Integer) sessionRow[2];
-					Integer totalLessons = (Integer) sessionRow[3];
+					Integer totalLessons = (Integer) sessionRow[2];
+					Integer completedLessons = (Integer) sessionRow[3];
+					
 					
 					SkillObjective cmsessionSkillObjective = appAssessmentServices.getSkillObjective(cmsessionSkillObjectiveId);
 					SkillReportPOJO moduleSkillReportPOJO = null;

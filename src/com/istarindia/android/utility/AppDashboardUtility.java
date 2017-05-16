@@ -1,6 +1,9 @@
 package com.istarindia.android.utility;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -40,7 +43,7 @@ public class AppDashboardUtility {
 				taskSummaryPOJO.setDate(task.getUpdatedAt());
 			}
 			taskSummaryPOJO.setTitle(assessment.getAssessmenttitle());
-			taskSummaryPOJO.setImageURL("/root/talentify/assessment.png");
+			taskSummaryPOJO.setImageURL(null);
 			taskSummaryPOJO.setHeader(assessment.getAssessmentType());
 			taskSummaryPOJO.setItemPoints(appAssessmentServices.getMaxPointsOfAssessment(assessment.getId()).intValue());
 			taskSummaryPOJO.setNumberOfQuestions(assessment.getAssessmentQuestions().size());
@@ -55,6 +58,20 @@ public class AppDashboardUtility {
 	}
 	
 	public TaskSummaryPOJO getTaskSummaryPOJOForLesson(Task task){
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+					System.out.println("media_url_path"+mediaUrlPath);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
 		
 		TaskSummaryPOJO taskSummaryPOJO = null;
 		
@@ -77,7 +94,7 @@ public class AppDashboardUtility {
 			taskSummaryPOJO.setHeader(lesson.getSubject());
 			taskSummaryPOJO.setTitle(lesson.getTitle());
 			taskSummaryPOJO.setDescription(lesson.getDescription());
-			taskSummaryPOJO.setImageURL(lesson.getImage_url());
+			taskSummaryPOJO.setImageURL(mediaUrlPath+lesson.getImage_url());
 			taskSummaryPOJO.setDuration(lesson.getDuration());			
 		}
 		return taskSummaryPOJO;

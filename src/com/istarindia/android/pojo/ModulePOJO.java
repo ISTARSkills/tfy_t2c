@@ -19,7 +19,7 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 	private String status;
 	private String imageURL;
 	private Integer orderId;
-	private List<CmsessionPOJO> lessons = new ArrayList<CmsessionPOJO>();
+	private List<ConcreteItemPOJO> lessons = new ArrayList<ConcreteItemPOJO>();
 	private Set<String> skillObjectives = new HashSet<String>();
 	
 	public ModulePOJO(){
@@ -67,11 +67,11 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 	}
 	
 	@XmlAttribute(name = "lessons", required = false)
-	public List<CmsessionPOJO> getLessons() {
+	public List<ConcreteItemPOJO> getLessons() {
 		return lessons;
 	}
 
-	public void setLessons(List<CmsessionPOJO> lessons) {
+	public void setLessons(List<ConcreteItemPOJO> lessons) {
 		this.lessons = lessons;
 	}
 
@@ -97,7 +97,7 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 		
 		String moduleStatus = "COMPLETED";
 		
-		for(CmsessionPOJO cmsession: modulePOJO.getLessons()){
+		for(ConcreteItemPOJO cmsession: modulePOJO.getLessons()){
 			if((cmsession.getStatus().equals("INCOMPLETE"))){
 				moduleStatus = "INCOMPLETE";
 			}

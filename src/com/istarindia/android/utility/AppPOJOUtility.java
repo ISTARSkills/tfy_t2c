@@ -1,7 +1,10 @@
 package com.istarindia.android.utility;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import com.istarindia.android.pojo.AssessmentPOJO;
@@ -49,6 +52,21 @@ public class AppPOJOUtility {
 
 	public StudentProfile getStudentProfile(IstarUser student) {
 		System.out.println("POJO service");
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+					System.out.println("media_url_path"+mediaUrlPath);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
+		
 		StudentProfile studentProfile = new StudentProfile();
 
 		studentProfile.setId(student.getId());
@@ -69,7 +87,7 @@ public class AppPOJOUtility {
 			if (student.getUserProfile().getAddress() != null) {
 				studentProfile.setLocation(student.getUserProfile().getAddress().getPincode().getCity());
 			}
-			studentProfile.setProfileImage(student.getUserProfile().getImage());
+			studentProfile.setProfileImage(mediaUrlPath+student.getUserProfile().getImage());
 		}
 
 		if (student.getProfessionalProfile() != null) {

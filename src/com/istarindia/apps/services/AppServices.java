@@ -91,6 +91,21 @@ public class AppServices {
 	
 	public List<SkillReportPOJO> getSkillsMapOfUser(int istarUserId) {
 
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+					System.out.println("media_url_path"+mediaUrlPath);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
+		
 		List<SkillReportPOJO> allSkills = new ArrayList<SkillReportPOJO>();
 
 		StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
@@ -105,7 +120,7 @@ public class AppServices {
 				courseSkillPOJO.setId(course.getId());
 				courseSkillPOJO.setName(course.getCourseName());
 
-				String imageURL = course.getImage_url();
+				String imageURL = mediaUrlPath+course.getImage_url();
 				courseSkillPOJO.setImageURL(imageURL);
 
 				List<SkillReportPOJO> moduleLevelSkillReport = appCourseServices

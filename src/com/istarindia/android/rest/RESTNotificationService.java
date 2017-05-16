@@ -51,30 +51,42 @@ public class RESTNotificationService {
 	public Response getNotificationAndEventPOJO(@PathParam("userId") int userId, @PathParam("notificationId") int notificationId){
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try{
+			System.out.println("notification id "+notificationId);
 			IstarNotificationServices istarNotificationServices = new IstarNotificationServices();
 			IstarNotification istarNotification = istarNotificationServices.getIstarNotification(notificationId);
 			
 			TaskServices taskServices = new TaskServices();
-			Task task = taskServices.getTask(istarNotification.getTaskId());
-			
-			if(istarNotification==null || task==null){
-				throw new Exception();
+			if(istarNotification.getTaskId()!=null)
+			{
+				Task task = taskServices.getTask(istarNotification.getTaskId());
+				
+				if(istarNotification==null || task==null){
+					throw new Exception();
+				}
+				
+				AppNotificationServices appNotificationServices = new AppNotificationServices();
+				NotificationPOJO notificationPOJO = appNotificationServices.getNotificationPOJO(istarNotification);
+	
+				AppCalendarServices appCalendarServices = new AppCalendarServices();
+				DailyTaskPOJO dailyTaskPOJO = appCalendarServices.getDailyTaskPOJO(task);
+				
+				HashMap<String, Object> jsonMap = new HashMap<String, Object>();
+				
+				jsonMap.put("notification", notificationPOJO);
+				jsonMap.put("event", dailyTaskPOJO);
+	
+				String result = gson.toJson(jsonMap);
+				return Response.ok(result).build();
 			}
+			else
+			{
+				HashMap<String, Object> jsonMap = new HashMap<String, Object>();
+				String result = gson.toJson(jsonMap);
+				
+				return Response.ok(result).build();
+			}	
 			
-			AppNotificationServices appNotificationServices = new AppNotificationServices();
-			NotificationPOJO notificationPOJO = appNotificationServices.getNotificationPOJO(istarNotification);
-
-			AppCalendarServices appCalendarServices = new AppCalendarServices();
-			DailyTaskPOJO dailyTaskPOJO = appCalendarServices.getDailyTaskPOJO(task);
 			
-			HashMap<String, Object> jsonMap = new HashMap<String, Object>();
-			
-			jsonMap.put("notification", notificationPOJO);
-			jsonMap.put("event", dailyTaskPOJO);
-
-			String result = gson.toJson(jsonMap);
-
-			return Response.ok(result).build();			
 		}catch(Exception e){
 			e.printStackTrace();
 			String result = e.getMessage() != null ? gson.toJson(e.getMessage())

@@ -169,12 +169,13 @@ public class RESTIstarUserService {
 				throw new Exception("istarViksitProComplexKeyInvalid Image");
 			}
 			AppUtility appUtility = new AppUtility();
-			String fileName = appUtility.imageUpload(profileImage, "jpg", "PROFILE_IMAGE", istarUser.getId()+"");
-
+			String fileName = appUtility.imageUpload(profileImage, "jpg", "PROFILE_IMAGE", istarUser.getId()+"");			
 			UserProfile userProfile = istarUserServices.updateProfileImage(istarUser, fileName);
-
+			istarUserServices.testProfile(userId,fileName);
+			
+			istarUser = istarUserServices.getIstarUser(userId);
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(userProfile.getIstarUser());
+			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 
 			String result = gson.toJson(studentProfile);
 
@@ -414,46 +415,5 @@ public class RESTIstarUserService {
 			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
-	/*
-	 * @GET
-	 * 
-	 * @Path("mobile/verify")
-	 * 
-	 * @Produces(MediaType.APPLICATION_JSON) public Response
-	 * verifyMobileNumber(@QueryParam("mobile") Long mobile) { Integer otp =
-	 * null;
-	 * 
-	 * IstarUserServices istarUserServices = new IstarUserServices(); IstarUser
-	 * istarUser = istarUserServices.getIstarUserByMobile(mobile);
-	 * 
-	 * try { AppServices appServices = new AppServices(); otp =
-	 * appServices.sendOTP(mobile.toString()); } catch (Exception e) {
-	 * e.printStackTrace(); return
-	 * Response.status(Response.Status.BAD_GATEWAY).build(); }
-	 * 
-	 * Gson gson = new Gson(); String result = gson.toJson(otp);
-	 * 
-	 * return Response.ok(result).build(); }
-	 */
 
-	/*
-	 * @PUT
-	 * 
-	 * @Path("{userId}/mobile")
-	 * 
-	 * @Produces(MediaType.APPLICATION_JSON) public Response
-	 * updateMobileNumber(@PathParam("userId") int userId, @FormParam("mobile")
-	 * Long mobile) { System.out.println("Request to update mobile number->" +
-	 * mobile); IstarUserServices istarUserServices = new IstarUserServices();
-	 * IstarUser istarUser = istarUserServices.getIstarUser(userId);
-	 * 
-	 * if (istarUser == null) { return
-	 * Response.status(Response.Status.BAD_REQUEST).build(); } else {
-	 * System.out.println("Updating mobile number"); istarUser =
-	 * istarUserServices.updateMobile(istarUser.getId(), mobile);
-	 * 
-	 * System.out.println("Updated mobile number is :" + istarUser.getMobile());
-	 * 
-	 * return Response.status(Response.Status.CREATED).build(); } }
-	 */
 }

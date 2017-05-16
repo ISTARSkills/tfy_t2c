@@ -1,10 +1,13 @@
 package com.istarindia.android.utility;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import org.hibernate.SQLQuery;
@@ -69,7 +72,20 @@ public class AppUserRankUtility {
 	
 	
 	public CourseRankPOJO getLeaderboardForCourseOfUser(int istarUserId, int courseId) {
+		String mediaUrlPath ="";
+		try{
+		Properties properties = new Properties();
+		String propertyFileName = "app.properties";
+		InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+		if (inputStream != null) {
+		properties.load(inputStream);
+		mediaUrlPath =  properties.getProperty("media_url_path");
+		System.out.println("media_url_path"+mediaUrlPath);
+		}
+		} catch (IOException e) {
+		e.printStackTrace();
 
+		}
 		AppCourseServices appCourseServices = new AppCourseServices();
 		Course course = appCourseServices.getCourse(courseId);
 		CourseRankPOJO courseRankPOJO = null;
@@ -106,11 +122,11 @@ public class AppUserRankUtility {
 					studentRankPOJOForCourse.setId(batchStudentId);
 					if (istarUser.getUserProfile() != null) {
 						studentRankPOJOForCourse.setName(istarUser.getUserProfile().getFirstName());
-						studentRankPOJOForCourse.setImageURL(istarUser.getUserProfile().getImage());
+						studentRankPOJOForCourse.setImageURL(mediaUrlPath+"users/"+istarUser.getUserProfile().getImage());
 					} else {
 						studentRankPOJOForCourse.setName(istarUser.getEmail());
-						studentRankPOJOForCourse.setImageURL("http://cdn.talentify.in/video/android_images/"
-								+ istarUser.getEmail().substring(0, 1).toUpperCase() + ".png");
+						studentRankPOJOForCourse.setImageURL(mediaUrlPath+"users/"
+								+ istarUser.getEmail().charAt(0)+ ".png");
 					}
 					studentRankPOJOForCourse.setPoints(courseUserPoints.intValue());
 					studentRankPOJOForCourse.setBatchRank(courseRank);
@@ -273,7 +289,21 @@ public class AppUserRankUtility {
 	}*/
 	
 public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
+	String mediaUrlPath ="";
+	try{
+		Properties properties = new Properties();
+		String propertyFileName = "app.properties";
+		InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+			if (inputStream != null) {
+				properties.load(inputStream);
+				mediaUrlPath =  properties.getProperty("media_url_path");
+				System.out.println("media_url_path"+mediaUrlPath);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		
+	}
+	
 		CourseRankPOJO overallRankPOJO = null;
 		
 		IstarUserServices istarUserServices = new IstarUserServices();
@@ -306,10 +336,18 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 				studentRankPOJO.setId(istarUserInBatch.getId());
 				if(istarUserInBatch.getUserProfile()!=null){
 				studentRankPOJO.setName(istarUserInBatch.getUserProfile().getFirstName());
-				studentRankPOJO.setImageURL(istarUserInBatch.getUserProfile().getImage());
+				studentRankPOJO.setImageURL(mediaUrlPath+istarUserInBatch.getUserProfile().getImage());
 				}else{
 				studentRankPOJO.setName(istarUserInBatch.getEmail());
-				studentRankPOJO.setImageURL("http://cdn.talentify.in/video/android_images/" + istarUserInBatch.getEmail().substring(0, 1).toUpperCase() + ".png");
+				if(istarUserInBatch.getUserProfile()!=null)
+				{
+					studentRankPOJO.setImageURL(mediaUrlPath + istarUserInBatch.getUserProfile().getImage());
+				}
+				else
+				{
+					studentRankPOJO.setImageURL(mediaUrlPath + "/users/"+istarUserInBatch.getEmail().charAt(0)+".png");
+				}	
+				
 				}
 				studentRankPOJO.setPoints(courseUserPoints.intValue());
 				studentRankPOJO.setCoins(0);
@@ -321,7 +359,7 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 			overallRankPOJO.setAllStudentRanks(allStudentRanksOfABatch);
 		}
 		return overallRankPOJO;
-	}
+	}	
 	
 /*	@SuppressWarnings("unchecked")
 	public List<CourseRankPOJO> getCourseRankPOJOForCoursesOfUsersBatch(Integer istarUserId, Set<Integer> allCourses){
