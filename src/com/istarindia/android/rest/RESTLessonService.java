@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -20,9 +21,11 @@ import org.simpleframework.xml.core.Persister;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.istarindia.android.pojo.ComplexObject;
 import com.istarindia.android.pojo.LessonPOJO;
 import com.istarindia.android.utility.AppDashboardUtility;
 import com.istarindia.android.utility.CreateZIPForItem;
+import com.istarindia.apps.services.AppComplexObjectServices;
 import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.StudentPlaylistServices;
 import com.viksitpro.core.cms.interactive.InteractiveContent;
@@ -158,10 +161,10 @@ public class RESTLessonService {
 		}
 	}
 	
-	@PUT
+	@POST
 	@Path("{playlistId}/status")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateLessonStatus(@PathParam("playlistId") int playlistId, @FormParam("status") String status) {
+	public Response updateLessonStatus(@PathParam("playlistId") int playlistId) {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
@@ -171,8 +174,18 @@ public class RESTLessonService {
 				throw new Exception();
 			}
 
-			studentPlaylistServices.updateStatus(studentPlaylist, status);
-			String result = gson.toJson("DONE");
+			studentPlaylistServices.updateStatus(studentPlaylist, "COMPLETED");
+			AppCourseServices appCourseServices = new AppCourseServices();
+			appCourseServices.insertIntoUserGamificationOnCompletitionOfLessonByUser(studentPlaylist.getIstarUser().getId(), studentPlaylist.getLesson().getId(), studentPlaylist.getCourse().getId());
+			
+			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
+			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(studentPlaylist.getId());
+
+			if (complexObject == null) {
+				throw new Exception();
+			}
+			String result = gson.toJson(complexObject);
+			
 			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
