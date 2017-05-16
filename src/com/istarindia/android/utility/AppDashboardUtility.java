@@ -136,12 +136,21 @@ public class AppDashboardUtility {
 	public void updateStudentPlaylistStatus(int lessonId, int istarUserId, String status){		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();			
-		String sql = "update student_playlist set status='"+status+"' where student_id="+istarUserId+" and lesson_id="+lessonId;
+		String sql = "update student_playlist set status='"+status+"' where student_id="+istarUserId+" and lesson_id="+lessonId +" returning course_id";
 		System.out.println(sql);
 		SQLQuery query = session.createSQLQuery(sql);
-		query.executeUpdate();
+		List<Integer> result = query.list();
 		session.close();
 		System.out.println("Updating Student Playlist status");
+		
+		System.out.println("Update User Gamification");
+		
+		if(result.size()>0){
+		AppCourseServices appCourseServices = new AppCourseServices();
+		System.out.println("appCourseServices-->"+appCourseServices);
+		appCourseServices.insertIntoUserGamificationOnCompletitionOfLessonByUser(istarUserId, lessonId, result.get(0));	
+		System.out.println("Updated User Gamification");
+		}
 	}
 
 /*	public Object getDashboardCardForLessonTest(Task task) {
