@@ -169,8 +169,7 @@ public class RESTIstarUserService {
 				throw new Exception("istarViksitProComplexKeyInvalid Image");
 			}
 			AppUtility appUtility = new AppUtility();
-			String fileName = appUtility.imageUpload(profileImage, "jpg", "PROFILE_IMAGE", istarUser.getId()+"");
-
+			String fileName = appUtility.imageUpload(profileImage, "jpg", "PROFILE_IMAGE", istarUser.getId()+"");			
 			UserProfile userProfile = istarUserServices.updateProfileImage(istarUser, fileName);
 
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();

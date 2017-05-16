@@ -3,8 +3,8 @@ package com.istarindia.android.pojo;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "cmsession")
-public class CmsessionPOJO implements Comparable<CmsessionPOJO>{
+@XmlRootElement(name = "concrete_item")
+public class ConcreteItemPOJO implements Comparable<ConcreteItemPOJO>{
 
 	private Integer id;
 	private String type;
@@ -12,8 +12,9 @@ public class CmsessionPOJO implements Comparable<CmsessionPOJO>{
 	private AssessmentPOJO assessment;
 	private String status;
 	private Integer orderId = 0;
+	private Integer taskId;
 	
-	public CmsessionPOJO(){
+	public ConcreteItemPOJO(){
 		
 	}
 
@@ -71,8 +72,18 @@ public class CmsessionPOJO implements Comparable<CmsessionPOJO>{
 		this.status = status;
 	}
 	
+	
+	@XmlAttribute(name = "task_id", required = false)
+	public Integer getTaskId() {
+		return taskId;
+	}
+
+	public void setTaskId(Integer taskId) {
+		this.taskId = taskId;
+	}
+
 	@Override
-	public int compareTo(CmsessionPOJO o) {
+	public int compareTo(ConcreteItemPOJO o) {
 		return this.orderId -o.orderId;
 	}
 }

@@ -42,7 +42,6 @@ public class AppComplexObjectServices {
 			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
 			AppServices appServices= new AppServices();
 			
-			StudentAssessmentServices studentAssessmentServices= new StudentAssessmentServices();
 			StudentPlaylistServices studentPlaylistServices= new StudentPlaylistServices();
 			
 			TaskServices taskServices = new TaskServices();
