@@ -97,7 +97,7 @@ public class AppCourseServices {
 					modulePOJO = new ModulePOJO();
 					modulePOJO.setId(module.getId());
 					modulePOJO.setName(module.getModuleName());
-					modulePOJO.setImageURL(module.getImage_url());
+					modulePOJO.setImageURL(mediaUrlPath+module.getImage_url());
 					modulePOJO.setDescription(module.getModule_description());
 					modulePOJO.setOrderId(++moduleOrderId);
 					

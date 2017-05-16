@@ -3,6 +3,8 @@ package com.istarindia.apps.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Session;
+
 import com.istarindia.android.pojo.AssessmentPOJO;
 import com.istarindia.android.pojo.AssessmentReportPOJO;
 import com.istarindia.android.pojo.AssessmentResponsePOJO;
@@ -33,7 +35,9 @@ public class AppComplexObjectServices {
 		
 		IstarUserServices istarUserServices = new IstarUserServices();
 		IstarUser istarUser = istarUserServices.getIstarUser(userId);
-
+		
+		
+		
 		if(istarUser!=null){
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 			AppDashboardUtility dashboardUtility = new AppDashboardUtility();

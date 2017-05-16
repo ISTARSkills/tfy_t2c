@@ -1,12 +1,17 @@
 package com.istarindia.apps.services;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import com.istarindia.android.pojo.NotificationPOJO;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.IstarNotification;
+import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.dao.entities.Task;
@@ -34,7 +39,20 @@ public class AppNotificationServices {
 	}
 
 	public NotificationPOJO getNotificationPOJO(IstarNotification istarNotification) {
-
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+					System.out.println("media_url_path"+mediaUrlPath);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
 		NotificationPOJO notificationPOJO = null;
 
 		TaskServices taskServices = new TaskServices();
@@ -66,13 +84,34 @@ public class AppNotificationServices {
 			notificationPOJO.setStatus(istarNotification.getStatus());
 			notificationPOJO.setTime(istarNotification.getCreatedAt());
 			notificationPOJO.setItemType(NotificationType.MESSAGE);
+			IstarUser sender = new IstarUserDAO().findById(istarNotification.getSenderId());
+			if(sender.getUserProfile()!=null){
+			notificationPOJO.setImageURL(mediaUrlPath+sender.getUserProfile().getImage());
+			}
+			else
+			{
+				notificationPOJO.setImageURL(mediaUrlPath+"users/"+sender.getEmail().charAt(0)+".png");
+			}	
 		}
 		return notificationPOJO;
 	}
 
 	public NotificationPOJO getNotificationPOJOForLesson(IstarNotification istarNotification) {
 		NotificationPOJO notificationPOJO = null;
-
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+					System.out.println("media_url_path"+mediaUrlPath);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
 		TaskServices taskServices = new TaskServices();
 		Task task = taskServices.getTask(istarNotification.getTaskId());
 		AppCourseServices appCourseServices = new AppCourseServices();
@@ -98,7 +137,7 @@ public class AppNotificationServices {
 			notificationPOJO.setMessage(istarNotification.getDetails());
 			notificationPOJO.setStatus(istarNotification.getStatus());
 			notificationPOJO.setTime(istarNotification.getCreatedAt());
-			notificationPOJO.setImageURL(lesson.getImage_url());
+			notificationPOJO.setImageURL(mediaUrlPath+lesson.getImage_url());
 			notificationPOJO.setItemType(NotificationType.LESSON+"_" + lesson.getType());
 			notificationPOJO.setItemId(lesson.getId());
 			
@@ -115,6 +154,22 @@ public class AppNotificationServices {
 	}
 
 	public NotificationPOJO getNotificationPOJOForAssessment(IstarNotification istarNotification) {
+		
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+					System.out.println("media_url_path"+mediaUrlPath);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
+		
 		NotificationPOJO notificationPOJO = null;
 
 		TaskServices taskServices = new TaskServices();
@@ -142,7 +197,7 @@ public class AppNotificationServices {
 			notificationPOJO.setImageURL(course.getImage_url());
 			notificationPOJO.setItemType(NotificationType.ASSESSMENT);
 			notificationPOJO.setItemId(assessment.getId());
-			
+			notificationPOJO.setImageURL(mediaUrlPath+"course_images/assessment.png");
 			notificationPOJO.getItem().put("id", assessment.getId());
 			notificationPOJO.getItem().put("courseId", course.getId());
 			if(task!=null){
