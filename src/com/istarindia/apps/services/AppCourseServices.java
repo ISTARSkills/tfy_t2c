@@ -296,12 +296,12 @@ public class AppCourseServices {
 		List<SkillReportPOJO> shellTree = getShellSkillTreeForCourse(courseId);
 		for(SkillReportPOJO dd : shellTree)
 		{
-			System.out.println("in mod shell tree "+dd.getName()+" - "+dd.getId());
-			System.out.println("in mod shell tree "+" "+dd.getUserPoints()+" "+dd.getTotalPoints()+" "+dd.getPercentage());
+			System.err.println("in mod shell tree "+dd.getName()+" - "+dd.getId());
+			System.err.println("in mod shell tree "+" "+dd.getUserPoints()+" "+dd.getTotalPoints()+" "+dd.getPercentage());
 			for(SkillReportPOJO ll: dd.getSkills())
 			{
-				System.out.println("in cmsession shell tree "+ll.getName()+" - "+ll.getId());
-				System.out.println("in cmsession shell tree "+" "+ll.getUserPoints()+" "+ll.getTotalPoints()+" "+ll.getPercentage());
+				System.err.println("in cmsession shell tree "+ll.getName()+" - "+ll.getId());
+				System.err.println("in cmsession shell tree "+" "+ll.getUserPoints()+" "+ll.getTotalPoints()+" "+ll.getPercentage());
 			}
 		}
 		DBUTILS utils = new DBUTILS();
@@ -311,12 +311,12 @@ public class AppCourseServices {
 		
 		for(SkillReportPOJO dd : skillReportForCourse)
 		{
-			System.out.println("in filled mod tree "+dd.getName()+" - "+dd.getId());
-			System.out.println("in filled mod tree "+" "+dd.getUserPoints()+" "+dd.getTotalPoints()+" "+dd.getPercentage());
+			System.err.println("in filled mod tree "+dd.getName()+" - "+dd.getId());
+			System.err.println("in filled mod tree "+" "+dd.getUserPoints()+" "+dd.getTotalPoints()+" "+dd.getPercentage());
 			for(SkillReportPOJO ll: dd.getSkills())
 			{
-				System.out.println("in filled sms tree "+ll.getName()+" - "+ll.getId());
-				System.out.println("in filled sms tree "+" "+ll.getUserPoints()+" "+ll.getTotalPoints()+" "+ll.getPercentage());
+				System.err.println("in filled sms tree "+ll.getName()+" - "+ll.getId());
+				System.err.println("in filled sms tree "+" "+ll.getUserPoints()+" "+ll.getTotalPoints()+" "+ll.getPercentage());
 			}
 		}
 		/*String sql = "select skill_objective,cmsession_id,module_id,course_id, sum(points) as user_points, sum(max_points) as total_points from  (select user_gamification.skill_objective, user_gamification.cmsession_id, user_gamification.module_id, user_gamification.course_id, user_gamification.item_id, cast(user_gamification.points as numeric), cast(assessment_benchmark.max_points as numeric), count(student_playlist.lesson_id)  from user_gamification inner join student_playlist on user_gamification.cmsession_id=student_playlist.cmsession_id and user_gamification.module_id=student_playlist.module_id and user_gamification.course_id=student_playlist.course_id inner join assessment_benchmark on user_gamification.item_id=assessment_benchmark.assessment_id and user_gamification.item_type='ASSESSMENT' and user_gamification.skill_objective=assessment_benchmark.skill_objective_id where timestamp in (select max(timestamp) from user_gamification where istar_user="+istarUserId+" and course_id="+courseId+" and item_type='ASSESSMENT' group by item_id) group by user_gamification.skill_objective, user_gamification.cmsession_id, user_gamification.module_id, user_gamification.course_id, cast(user_gamification.points as numeric),cast(assessment_benchmark.max_points as numeric), user_gamification.item_id) as temptable group by skill_objective,cmsession_id,module_id,course_id";
