@@ -34,6 +34,7 @@ import com.viksitpro.core.dao.entities.Module;
 import com.viksitpro.core.dao.entities.ModuleDAO;
 import com.viksitpro.core.dao.entities.SkillObjective;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
+import com.viksitpro.core.utilities.DBUTILS;
 
 public class AppCourseServices {
 	
@@ -57,7 +58,7 @@ public class AppCourseServices {
 		StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 		AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
 		Course course = getCourse(courseId);
-
+		DBUTILS util = new DBUTILS();
 		List<StudentPlaylist> allStudentPlaylist = studentPlaylistServices.getStudentPlaylistOfUserForCourse(istarUserId, courseId);
 		if(course!=null && allStudentPlaylist.size() > 0){
 			
@@ -68,14 +69,25 @@ public class AppCourseServices {
 			coursePOJO.setDescription(course.getCourseDescription());
 			coursePOJO.setImageURL(mediaUrlPath+course.getImage_url());
 			coursePOJO.setName(course.getCourseName());				
-			coursePOJO.setTotalPoints(getTotalPointsOfCourseForUser(istarUserId, courseId, allStudentPlaylist.size()));
-
+			
 			coursePOJO.setProgress(getProgressOfUserForCourse(istarUserId, courseId));
-			StudentRankPOJO studentRankPOJO = appUserRankUtility.getStudentRankPOJOForCourseOfAUser(istarUserId, coursePOJO.getId());
-			if(studentRankPOJO!=null){
-				coursePOJO.setUserPoints(studentRankPOJO.getPoints()*1.0);
-				coursePOJO.setRank(studentRankPOJO.getBatchRank());
+			
+			String getRankPointsForUser="select * from (select istar_user, user_points, total_points,perc ,cast (row_number() over() as integer) as user_rank from (select istar_user, user_points, total_points, cast ((user_points*100)/total_points as integer) as perc from (select T1.istar_user, sum(T1.points) as user_points, sum(T1.max_points) as total_points from ( WITH summary AS (     SELECT p.istar_user, 					p.skill_objective,	            p.points, 						p.max_points,            ROW_NUMBER() OVER(PARTITION BY p.istar_user, p.skill_objective     ORDER BY p.timestamp DESC) AS rk       FROM  user_gamification p where item_type in ('QUESTION', 'LESSON') and batch_group_id=(select batch_group.id from batch_students, batch_group  where batch_students.batch_group_id = batch_group.id and batch_students.student_id = "+istarUserId+" and batch_group.is_primary ='t' limit 1)  and course_id ="+courseId+"			 ) SELECT s.*   FROM summary s  WHERE s.rk = 1 )T1 group by istar_user having (sum(T1.max_points) >0) )T2 order by perc desc, total_points desc , total_points desc )T3 )T4 where istar_user = "+istarUserId+"";
+			List<HashMap<String, Object>> rankPointsData = util.executeQuery(getRankPointsForUser);
+			int rank = 0;
+			double userPoints = 0;
+			double totalPoints = 0;
+			if(rankPointsData.size()>0)
+			{
+				rank = (int)rankPointsData.get(0).get("user_rank");
+				userPoints = (double) rankPointsData.get(0).get("user_points");
+				totalPoints= (double) rankPointsData.get(0).get("total_points");
 			}
+			coursePOJO.setUserPoints(userPoints);
+			coursePOJO.setRank(rank);
+			coursePOJO.setTotalPoints(totalPoints);
+
+		
 			
 			int moduleOrderId = 0;
 			
@@ -281,9 +293,33 @@ public class AppCourseServices {
 	@SuppressWarnings("unchecked")
 	public List<SkillReportPOJO> getSkillsReportForCourseOfUser(int istarUserId, int courseId){
 		
-		List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();
+		List<SkillReportPOJO> shellTree = getShellSkillTreeForCourse(courseId);
+		for(SkillReportPOJO dd : shellTree)
+		{
+			System.out.println("in mod shell tree "+dd.getName()+" - "+dd.getId());
+			System.out.println("in mod shell tree "+" "+dd.getUserPoints()+" "+dd.getTotalPoints()+" "+dd.getPercentage());
+			for(SkillReportPOJO ll: dd.getSkills())
+			{
+				System.out.println("in cmsession shell tree "+ll.getName()+" - "+ll.getId());
+				System.out.println("in cmsession shell tree "+" "+ll.getUserPoints()+" "+ll.getTotalPoints()+" "+ll.getPercentage());
+			}
+		}
+		DBUTILS utils = new DBUTILS();
 		
-		String sql = "select skill_objective,cmsession_id,module_id,course_id, sum(points) as user_points, sum(max_points) as total_points from  (select user_gamification.skill_objective, user_gamification.cmsession_id, user_gamification.module_id, user_gamification.course_id, user_gamification.item_id, cast(user_gamification.points as numeric), cast(assessment_benchmark.max_points as numeric), count(student_playlist.lesson_id)  from user_gamification inner join student_playlist on user_gamification.cmsession_id=student_playlist.cmsession_id and user_gamification.module_id=student_playlist.module_id and user_gamification.course_id=student_playlist.course_id inner join assessment_benchmark on user_gamification.item_id=assessment_benchmark.assessment_id and user_gamification.item_type='ASSESSMENT' and user_gamification.skill_objective=assessment_benchmark.skill_objective_id where timestamp in (select max(timestamp) from user_gamification where istar_user="+istarUserId+" and course_id="+courseId+" and item_type='ASSESSMENT' group by item_id) group by user_gamification.skill_objective, user_gamification.cmsession_id, user_gamification.module_id, user_gamification.course_id, cast(user_gamification.points as numeric),cast(assessment_benchmark.max_points as numeric), user_gamification.item_id) as temptable group by skill_objective,cmsession_id,module_id,course_id";
+		
+		List<SkillReportPOJO> skillReportForCourse= fillShellTreeWithData(shellTree, istarUserId, courseId);
+		
+		for(SkillReportPOJO dd : skillReportForCourse)
+		{
+			System.out.println("in filled mod tree "+dd.getName()+" - "+dd.getId());
+			System.out.println("in filled mod tree "+" "+dd.getUserPoints()+" "+dd.getTotalPoints()+" "+dd.getPercentage());
+			for(SkillReportPOJO ll: dd.getSkills())
+			{
+				System.out.println("in filled sms tree "+ll.getName()+" - "+ll.getId());
+				System.out.println("in filled sms tree "+" "+ll.getUserPoints()+" "+ll.getTotalPoints()+" "+ll.getPercentage());
+			}
+		}
+		/*String sql = "select skill_objective,cmsession_id,module_id,course_id, sum(points) as user_points, sum(max_points) as total_points from  (select user_gamification.skill_objective, user_gamification.cmsession_id, user_gamification.module_id, user_gamification.course_id, user_gamification.item_id, cast(user_gamification.points as numeric), cast(assessment_benchmark.max_points as numeric), count(student_playlist.lesson_id)  from user_gamification inner join student_playlist on user_gamification.cmsession_id=student_playlist.cmsession_id and user_gamification.module_id=student_playlist.module_id and user_gamification.course_id=student_playlist.course_id inner join assessment_benchmark on user_gamification.item_id=assessment_benchmark.assessment_id and user_gamification.item_type='ASSESSMENT' and user_gamification.skill_objective=assessment_benchmark.skill_objective_id where timestamp in (select max(timestamp) from user_gamification where istar_user="+istarUserId+" and course_id="+courseId+" and item_type='ASSESSMENT' group by item_id) group by user_gamification.skill_objective, user_gamification.cmsession_id, user_gamification.module_id, user_gamification.course_id, cast(user_gamification.points as numeric),cast(assessment_benchmark.max_points as numeric), user_gamification.item_id) as temptable group by skill_objective,cmsession_id,module_id,course_id";
 		
 		System.out.println("Course Skill Report->"+sql);
 		
@@ -513,11 +549,153 @@ public class AppCourseServices {
 				}
 				
 			}
-		}		
-		return skillsReport;
+		}	*/	
+		return skillReportForCourse;
 	}
 	
 	
+	private List<SkillReportPOJO> fillShellTreeWithData(List<SkillReportPOJO> shellTree, int istarUserId, int courseId) {
+		
+		String getDataForTree="select * from (select T1.id,T1.skill_objective, T1.points,T1.max_points, cmsession_module.module_id from "
+				+ "(WITH summary AS ( 	SELECT 		P . ID, 		P .skill_objective, 		P .points, 		P .max_points, 		     ROW_NUMBER () OVER ( 			PARTITION BY P .skill_objective 			ORDER BY 				P . TIMESTAMP DESC 		) AS rk 	FROM 		user_gamification P 	where P.course_id ="+courseId+" and P.item_type='QUESTION' ) SELECT 	s.* FROM 	summary s WHERE 	s.rk = 1) T1 "
+						+ "join cmsession_skill_objective on (T1.skill_objective= cmsession_skill_objective.skill_objective_id) "
+						+ "join cmsession_module on (cmsession_module.cmsession_id= cmsession_skill_objective.cmsession_id)	 )LT  "
+						+ "union "
+						+ "select QT.id , QT.skill_objective, QT.points, QT.max_points, QT.module_id from "
+						+ "(WITH summary AS ( 	SELECT 		P . ID, 		P .skill_objective, 		P .points, 		P .max_points, 	 		P .module_id, ROW_NUMBER () OVER ( 			PARTITION BY P .skill_objective 			ORDER BY 				P . TIMESTAMP DESC 		) AS rk 	FROM 		user_gamification P 	where P.course_id = "+courseId+" and P.item_type='LESSON' ) SELECT 	s.* FROM 	summary s WHERE 	s.rk = 1) QT   ";
+		System.out.println("getDataForTree"+getDataForTree);
+		DBUTILS util = new DBUTILS();
+		List<HashMap<String, Object>> data = util.executeQuery(getDataForTree);
+		for(HashMap<String, Object> row: data)
+		{
+			int skillId = (int)row.get("skill_objective");
+			double userPoints = (double)row.get("points");			
+			double maxPoints = (double)row.get("max_points");
+			int moduleId = (int)row.get("module_id");
+			
+			for(SkillReportPOJO mod : shellTree)
+			{
+				if(mod.getId() == moduleId)
+				{
+					List<SkillReportPOJO> cmsSkills = mod.getSkills();
+					for(SkillReportPOJO cmsSkill: cmsSkills)
+					{
+						if(cmsSkill.getId()== skillId)
+						{
+							cmsSkill.setUserPoints(Math.ceil(userPoints));
+							cmsSkill.setTotalPoints(Math.ceil(maxPoints));						
+							cmsSkill.calculatePercentage();
+							//cmsSkills.add(cmsSkill);
+							break;
+						}
+					}
+					mod.calculateUserPoints();
+					mod.calculateTotalPoints();
+					mod.calculatePercentage();
+					
+					break;
+				}
+			}
+		}
+		return shellTree;
+	}
+
+	private List<SkillReportPOJO> getShellSkillTreeForCourse(int courseId) {
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+					System.out.println("media_url_path"+mediaUrlPath);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
+		
+		List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();
+		DBUTILS utils = new DBUTILS();
+		String getEmptyTreeStructure = "select * from (SELECT 	MODULE . ID AS module_id, 	MODULE .module_name, 	COALESCE(module.module_description,' ') as module_description, 	module.image_url, 	skill_objective. ID AS cmsession_skill_id, 	skill_objective. NAME AS cmsession_skill_name FROM 	module_course, 	MODULE, 	cmsession_module, 	cmsession_skill_objective, 	skill_objective WHERE 	module_course.course_id = "+courseId+" AND module_course.module_id = MODULE . ID AND module_course.module_id = cmsession_module.module_id AND cmsession_module.cmsession_id = cmsession_skill_objective.cmsession_id AND cmsession_skill_objective.skill_objective_id = skill_objective. ID ) T1  join (select skill_objective_id, cast (sum(max_points)as float8) as max_points from assessment_benchmark where context_id = "+courseId+" group by skill_objective_id) AB on (AB.skill_objective_id = T1.cmsession_skill_id) ";
+		System.out.println("getEmptyTreeStructure>>>"+getEmptyTreeStructure);
+		List<HashMap<String, Object>> treeStructure = utils.executeQuery(getEmptyTreeStructure);
+		for(HashMap<String, Object> treeRow: treeStructure)
+		{
+			int moduleId = (int)treeRow.get("module_id");
+			String module_name = (String)treeRow.get("module_name");
+			String moduleDesc = (String)treeRow.get("module_description");
+			String moduleImage =mediaUrlPath+"course_images/"+module_name.charAt(0)+".png";
+			if(treeRow.get("module_description")!=null)
+			{
+				moduleImage = mediaUrlPath+treeRow.get("module_description").toString();
+			}
+			String skillName = (String)treeRow.get("cmsession_skill_name");
+			int skillId = (int)treeRow.get("cmsession_skill_id");
+			double maxPoints = (double)treeRow.get("max_points");
+			
+			//lets create a mod pojo by default
+			SkillReportPOJO modPojo = new SkillReportPOJO();
+			modPojo.setName(module_name.trim());
+			modPojo.setId(moduleId);
+			modPojo.setSkills(new ArrayList<>());
+			modPojo.setDescription(moduleDesc);
+			modPojo.setImageURL(moduleImage);
+			
+			boolean moduleAlreadyPresentInTree = false;
+			//we will check if this module pojo already exist in tree or not.
+			//if exist then we will add cmsessions skills only to it
+			//if do not exist then we will create one.
+			for(SkillReportPOJO mod : skillsReport)
+			{
+				if(mod.getId()==moduleId)
+				{
+					modPojo = mod;
+					moduleAlreadyPresentInTree= true;
+					break;
+				}									
+			}
+			
+			
+			boolean skillAlreadyPresent = false;
+			if(modPojo.getSkills()!=null)
+			{
+				for(SkillReportPOJO cmsessionSkill : modPojo.getSkills())
+				{
+					if(cmsessionSkill.getId()== skillId)
+					{
+						skillAlreadyPresent = true;
+						break;
+					}
+				}
+			}
+			
+			//if session skill is not present in module tree then we will add session skill to module tree.
+			if(!skillAlreadyPresent)
+			{
+				SkillReportPOJO sessionSkill = new SkillReportPOJO();
+				sessionSkill.setId(skillId);
+				sessionSkill.setName(skillName);
+				sessionSkill.setUserPoints((double)0);
+				sessionSkill.setTotalPoints(maxPoints);				
+				List<SkillReportPOJO> sessionsSkills = modPojo.getSkills();
+				sessionsSkills.add(sessionSkill);
+				modPojo.setSkills(sessionsSkills);
+			}
+			modPojo.calculatePercentage();
+			modPojo.calculateUserPoints();
+			modPojo.calculateTotalPoints();
+			
+			if(!moduleAlreadyPresentInTree)
+			{
+				skillsReport.add(modPojo);
+			}
+			
+		}
+		 return skillsReport;
+	}
+
 	public void insertIntoUserGamificationOnCompletitionOfLessonByUser(int istarUserId, int lessonId, int courseId){
 		System.out.println("Starting to update UG");
 		String sqlBatch = "select batch_group_id from batch where course_id="+courseId+" and batch_group_id in (select batch_group_id from batch_students where student_id="+istarUserId+")";

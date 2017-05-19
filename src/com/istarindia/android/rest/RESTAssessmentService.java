@@ -27,6 +27,7 @@ import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.apps.services.AppAssessmentServices;
 import com.istarindia.apps.services.AppBatchStudentsServices;
 import com.istarindia.apps.services.AppComplexObjectServices;
+import com.istarindia.apps.services.GamificationServices;
 import com.istarindia.apps.services.ReportServices;
 import com.istarindia.apps.services.StudentAssessmentServices;
 import com.viksitpro.core.dao.entities.Assessment;
@@ -174,22 +175,21 @@ public class RESTAssessmentService {
 
 			ReportServices reportServices = new ReportServices();
 			Report report = reportServices.getAssessmentReportForUser(istarUserId, assessmentId);
-
+			GamificationServices gamificationService = new GamificationServices();
 			if (report == null) {
 				System.out.println("Report is null, creating new report");
 				reportServices.createReport(istarUser, assessment, correctAnswersCount, assessmentDuration,
 						maxPoints.intValue());
+				gamificationService.updateUserGamificationAfterAssessment(istarUser,assessment);
 			} else {
 				System.out.println("Report exists, updating report");
-				reportServices.updateReport(report, istarUser, assessment, correctAnswersCount, assessmentDuration,
-						maxPoints.intValue());
+				reportServices.updateReport(report, istarUser, assessment, correctAnswersCount, assessmentDuration,maxPoints.intValue());
+				gamificationService.updateUserGamificationAfterAssessment(istarUser,assessment);
 			}
 
 			TaskServices taskServices = new TaskServices();
 			taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
 
-			
-			
 			/*AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReport(istarUserId,
 					assessment.getId());
 			String result = gson.toJson(assessmentReportPOJO);

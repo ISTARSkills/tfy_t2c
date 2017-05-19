@@ -146,9 +146,10 @@ public class AppDashboardUtility {
 		System.out.println("Update User Gamification");
 		
 		if(result.size()>0){
-		AppCourseServices appCourseServices = new AppCourseServices();
-		System.out.println("appCourseServices-->"+appCourseServices);
-		appCourseServices.insertIntoUserGamificationOnCompletitionOfLessonByUser(istarUserId, lessonId, result.get(0));	
+		//AppCourseServices appCourseServices = new AppCourseServices();
+		//System.out.println("appCourseServices-->"+appCourseServices);
+		//appCourseServices.insertIntoUserGamificationOnCompletitionOfLessonByUser(istarUserId, lessonId, result.get(0));
+		
 		System.out.println("Updated User Gamification");
 		}
 	}

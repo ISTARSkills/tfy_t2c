@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import com.viksitpro.core.cms.interactive.EntityOption;
 import com.viksitpro.core.cms.interactive.InfoCard;
 import com.viksitpro.core.cms.interactive.InteractiveContent;
 import com.viksitpro.core.cms.lesson.VideoLesson;
+import com.viksitpro.core.cms.oldcontent.CMSPresentation;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.utilities.TaskCategory;
@@ -94,8 +96,21 @@ public class CreateZIPForItem {
 		case "VIDEO":
 			object = createZIPForVideoLesson(lesson);
 			break;
+		case "PRESENTATION":
+			object = createZIPForPresentationLesson(lesson);
+			
+			break;
 		}
 		return object;
+	}
+
+	private Object createZIPForPresentationLesson(Lesson lesson) {
+		String mediaPath = getMediaPath();
+		String mediaURLPath = getMediaURLPath();
+		String xml_object = lesson.getLessonXml();
+		
+		
+		return xml_object;
 	}
 
 	public VideoLesson createZIPForVideoLesson(Lesson lesson) throws Exception{

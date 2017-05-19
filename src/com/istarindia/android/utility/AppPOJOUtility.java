@@ -3,6 +3,7 @@ package com.istarindia.android.utility;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -27,6 +28,7 @@ import com.viksitpro.core.dao.entities.Module;
 import com.viksitpro.core.dao.entities.Question;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.pojo.recruiter.IstarUserPOJO;
+import com.viksitpro.core.utilities.DBUTILS;
 
 public class AppPOJOUtility {
 
@@ -103,13 +105,23 @@ public class AppPOJOUtility {
 			studentProfile.setUnderGraduationYear(student.getProfessionalProfile().getUnderGraduationYear());
 		}
 
-		AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
-		StudentRankPOJO studentRank = appUserRankUtility.getStudentRankPOJOOfAUser(student.getId());
-		if (studentRank != null) {
-			studentProfile.setCoins(studentRank.getCoins());
-			studentProfile.setExperiencePoints(studentRank.getPoints());
-			studentProfile.setBatchRank(studentRank.getBatchRank());
+		DBUTILS util = new DBUTILS(); 
+		String getRankPointsForUser="select * from (select istar_user, user_points, total_points, cast (coins as integer) as coins, perc ,cast (row_number() over() as integer) as user_rank from (select istar_user, user_points, total_points, coins, cast ((user_points*100)/total_points as integer) as perc from (select T1.istar_user, sum(T1.points) as user_points, sum(T1.max_points) as total_points , sum (T1.coins) as coins from ( WITH summary AS (     SELECT p.istar_user, 					p.skill_objective,	            p.points, 						p.coins, 						p.max_points,            ROW_NUMBER() OVER(PARTITION BY p.istar_user, p.skill_objective                                  ORDER BY p.timestamp DESC) AS rk       FROM  user_gamification p where item_type in ('QUESTION', 'LESSON') and batch_group_id=(select batch_group.id from batch_students, batch_group  where batch_students.batch_group_id = batch_group.id and batch_students.student_id = "+student.getId()+" and batch_group.is_primary ='t' limit 1)			 ) SELECT s.*   FROM summary s  WHERE s.rk = 1 )T1 group by istar_user having (sum(T1.max_points) >0) )T2 order by perc desc, total_points desc , total_points desc )T3 )T4 where istar_user = "+student.getId()+"";
+		List<HashMap<String, Object>> rankPointsData = util.executeQuery(getRankPointsForUser);
+		int rank = 0;
+		int coins = 0;
+		double userPoints = 0;
+		double totalPoints = 0;
+		if(rankPointsData.size()>0)
+		{
+			rank = (int)rankPointsData.get(0).get("user_rank");
+			coins = (int)rankPointsData.get(0).get("coins");
+			userPoints = (double) rankPointsData.get(0).get("user_points");
+			totalPoints= (double) rankPointsData.get(0).get("total_points");
 		}
+		studentProfile.setCoins(coins);
+		studentProfile.setExperiencePoints((int)userPoints);
+		studentProfile.setBatchRank(rank);
 		return studentProfile;
 	}
 

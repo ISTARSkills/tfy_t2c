@@ -16,7 +16,10 @@ import com.google.gson.GsonBuilder;
 import com.istarindia.android.pojo.AssessmentPOJO;
 import com.istarindia.android.pojo.TaskSummaryPOJO;
 import com.istarindia.android.utility.AppDashboardUtility;
+import com.istarindia.apps.services.GamificationServices;
 import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.entities.Lesson;
+import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
@@ -216,6 +219,9 @@ public class RESTDashboardService {
 			if(task.getItemType().equals(TaskCategory.LESSON)){
 				AppDashboardUtility appDashboardUtility = new AppDashboardUtility();
 				appDashboardUtility.updateStudentPlaylistStatus(task.getItemId(), userId, "COMPLETED");
+				GamificationServices gmService = new GamificationServices();
+				Lesson lesson = new LessonDAO().findById(task.getItemId());
+				gmService.updatePointsAndCoinsOnLessonComplete(istarUser, lesson);
 			}
 			
 			String result = gson.toJson("DONE");

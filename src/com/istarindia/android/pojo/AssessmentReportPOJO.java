@@ -173,6 +173,12 @@ public class AssessmentReportPOJO {
 	}
 	
 	public void calculateAccuracy() {
+			if(this.totalNumberOfQuestions!=0){
 		this.accuracy = (double) (Math.round((((double) this.totalNumberOfCorrectlyAnsweredQuestions)/this.totalNumberOfQuestions)*100.0*100.0)/100.0);	
+			}
+			else
+			{
+				this.accuracy=(double)0;
+			}
 		}
 }
