@@ -70,7 +70,7 @@ public class RESTLessonService {
 				
 				
 			} else {
-				String lessonXML = lesson.getLessonXml();
+				String lessonXML = getLessonXML(lesson.getId());
 				System.out.println("Zip file exists");
 
 				if (lessonXML != null && !lessonXML.trim().isEmpty()) {
