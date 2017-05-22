@@ -86,7 +86,8 @@ public class AppCourseServices {
 			
 			coursePOJO.setProgress(getProgressOfUserForCourse(istarUserId, courseId));
 			
-			String getRankPointsForUser="SELECT * FROM ( SELECT istar_user, user_points, total_points, perc, CAST ( Rank () OVER (order by user_points desc) AS INTEGER ) AS user_rank FROM ( SELECT istar_user, user_points, total_points, CAST ( (user_points * 100) / total_points AS INTEGER ) AS perc FROM ( SELECT T1.istar_user, SUM (T1.points) AS user_points, SUM (T1.max_points) AS total_points FROM ( WITH summary AS ( SELECT P .istar_user, P .skill_objective, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as user_points, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.max_points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as max_points, ROW_NUMBER () OVER ( PARTITION BY P .istar_user, P .skill_objective ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P WHERE item_type IN ('QUESTION', 'LESSON') AND batch_group_id = ( SELECT batch_group. ID FROM batch_students, batch_group WHERE batch_students.batch_group_id = batch_group. ID AND batch_students.student_id = "+istarUserId+" AND batch_group.is_primary = 't' LIMIT 1 ) AND course_id = "+courseId+" ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 GROUP BY istar_user HAVING (SUM(T1.max_points) > 0) ) T2 ORDER BY  user_points DESC, perc DESC, total_points DESC ) T3 ) T4 WHERE istar_user = "+istarUserId+"";
+			String getRankPointsForUser="SELECT * FROM ( SELECT istar_user, user_points, total_points, perc, CAST ( Rank () OVER (order by user_points desc) AS INTEGER ) AS user_rank FROM ( SELECT istar_user, user_points, total_points, CAST ( (user_points * 100) / total_points AS INTEGER ) AS perc FROM ( SELECT T1.istar_user, SUM (T1.user_points) AS user_points, SUM (T1.max_points) AS total_points FROM ( WITH summary AS ( SELECT P .istar_user, P .skill_objective, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as user_points, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.max_points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as max_points, ROW_NUMBER () OVER ( PARTITION BY P .istar_user, P .skill_objective, P.item_id ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P WHERE item_type IN ('QUESTION', 'LESSON') AND batch_group_id = ( SELECT batch_group. ID FROM batch_students, batch_group WHERE batch_students.batch_group_id = batch_group. ID AND batch_students.student_id = "+istarUserId+" AND batch_group.is_primary = 't' LIMIT 1 ) AND course_id = "+courseId+" ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 GROUP BY istar_user HAVING (SUM(T1.max_points) > 0) ) T2 ORDER BY  user_points DESC, perc DESC, total_points DESC ) T3 ) T4 WHERE istar_user = "+istarUserId+"";
+			System.out.println("getRankPointsForUser>>>>>>>>>>"+getRankPointsForUser);
 			List<HashMap<String, Object>> rankPointsData = util.executeQuery(getRankPointsForUser);
 			int rank = 0;
 			double userPoints = 0;
@@ -97,6 +98,9 @@ public class AppCourseServices {
 				userPoints = (double) rankPointsData.get(0).get("user_points");
 				totalPoints= (double) rankPointsData.get(0).get("total_points");
 			}
+			
+			System.out.println("userPoints>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+userPoints);
+			System.out.println("totalPoints>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+totalPoints);
 			coursePOJO.setUserPoints(userPoints);
 			coursePOJO.setRank(rank);
 			coursePOJO.setTotalPoints(totalPoints);
@@ -333,237 +337,7 @@ public class AppCourseServices {
 				System.err.println("in filled sms tree "+" "+ll.getUserPoints()+" "+ll.getTotalPoints()+" "+ll.getPercentage());
 			}
 		}
-		/*String sql = "select skill_objective,cmsession_id,module_id,course_id, sum(points) as user_points, sum(max_points) as total_points from  (select user_gamification.skill_objective, user_gamification.cmsession_id, user_gamification.module_id, user_gamification.course_id, user_gamification.item_id, cast(user_gamification.points as numeric), cast(assessment_benchmark.max_points as numeric), count(student_playlist.lesson_id)  from user_gamification inner join student_playlist on user_gamification.cmsession_id=student_playlist.cmsession_id and user_gamification.module_id=student_playlist.module_id and user_gamification.course_id=student_playlist.course_id inner join assessment_benchmark on user_gamification.item_id=assessment_benchmark.assessment_id and user_gamification.item_type='ASSESSMENT' and user_gamification.skill_objective=assessment_benchmark.skill_objective_id where timestamp in (select max(timestamp) from user_gamification where istar_user="+istarUserId+" and course_id="+courseId+" and item_type='ASSESSMENT' group by item_id) group by user_gamification.skill_objective, user_gamification.cmsession_id, user_gamification.module_id, user_gamification.course_id, cast(user_gamification.points as numeric),cast(assessment_benchmark.max_points as numeric), user_gamification.item_id) as temptable group by skill_objective,cmsession_id,module_id,course_id";
 		
-		System.out.println("Course Skill Report->"+sql);
-		
-		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
-		Session session = baseHibernateDAO.getSession();
-		
-		SQLQuery query = session.createSQLQuery(sql);		
-		List<Object[]> result = query.list();
-		
-		String lessonsStatusSQL = "select cmsession_id,cast(count(case when status='COMPLETED' then 1 end) as integer) as completed_lessons, cast(count(*) as integer) as total_lessons from student_playlist where student_id="+istarUserId+" and course_id="+courseId+" group by cmsession_id";
-		
-		SQLQuery sessionQuery = session.createSQLQuery(lessonsStatusSQL);		
-		List<Object[]> sessionStatusResult = sessionQuery.list();
-		
-		HashMap<Integer, Module> modulesOfAssessment = new HashMap<Integer, Module>();
-		HashMap<Integer, SkillObjective> cmsessionSkillObjectiveOfAssessment= new HashMap<Integer, SkillObjective>();
-		
-		HashMap<Integer, HashMap<String, Integer>> courseStatus = new HashMap<Integer, HashMap<String, Integer>>();
-		Double benchmark = getBenchmark();
-		System.out.println("benchmark->" + benchmark);
-		AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
-		if(result.size()>0 && sessionStatusResult.size()>0){
-					
-			for(Object[] sessionRow: sessionStatusResult){
-				Integer cmsessionId = (Integer) sessionRow[0];
-				Integer completedLessons = (Integer) sessionRow[1];
-				Integer totalLessons = (Integer) sessionRow[2];
-				
-				HashMap<String, Integer> sessionStatus = new HashMap<String, Integer>();
-				sessionStatus.put("completedLessons", completedLessons);
-				sessionStatus.put("totalLessons", totalLessons);
-				
-				courseStatus.put(cmsessionId, sessionStatus);
-			}
-			
-			
-			
-			for(Object[] row : result){
-				Integer cmsessionSkillObjectiveId = (Integer) row[0];
-				Integer cmsessionId = (Integer) row[1];
-				Integer moduleId = (Integer) row[2];				
-				Double userPoints = ((BigDecimal) row[4]).doubleValue();
-				Double totalPoints = ((BigDecimal) row[5]).doubleValue();
-
-				SkillObjective cmsessionSkillObjective = appAssessmentServices.getSkillObjective(cmsessionSkillObjectiveId);
-				SkillReportPOJO moduleSkillReportPOJO = null;
-				SkillReportPOJO cmsessionSkillReportPOJO = null;
-
-				if (modulesOfAssessment.containsKey(moduleId)) {
-					for (SkillReportPOJO tempModuleSkillReport : skillsReport) {
-						if (tempModuleSkillReport.getId() == moduleId) {
-							moduleSkillReportPOJO = tempModuleSkillReport;
-							break;
-						}
-					}
-
-					if(cmsessionSkillObjectiveOfAssessment.containsKey(cmsessionSkillObjectiveId)){
-						for(SkillReportPOJO tempCmsessionSkillReport : moduleSkillReportPOJO.getSkills()){
-							if(tempCmsessionSkillReport.getId()==cmsessionSkillObjectiveId){
-								cmsessionSkillReportPOJO=tempCmsessionSkillReport;
-								break;
-							}
-						}
-					}
-					
-					if(cmsessionSkillReportPOJO==null){
-						//System.out.println("New Skill-->"+ cmsessionSkillObjective.getName()+"-->"+cmsessionSkillObjective.getId());
-					cmsessionSkillReportPOJO = new SkillReportPOJO();
-					cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
-					cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
-					cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
-					cmsessionSkillObjectiveOfAssessment.put(cmsessionSkillObjectiveId, cmsessionSkillObjective);
-					
-					if(courseStatus.containsKey(cmsessionId)){
-						cmsessionSkillReportPOJO.setTotalPoints(totalPoints + (benchmark*courseStatus.get(cmsessionId).get("totalLessons")));
-						cmsessionSkillReportPOJO.setUserPoints(userPoints + (benchmark*courseStatus.get(cmsessionId).get("completedLessons")));						
-					}else{
-						cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
-						cmsessionSkillReportPOJO.setUserPoints(userPoints);
-					}
-					
-					moduleSkillReportPOJO.getSkills().add(cmsessionSkillReportPOJO);
-					}else{
-						//System.out.println("Old Skill-->"+ cmsessionSkillObjective.getName()+"-->"+cmsessionSkillObjective.getId());
-						cmsessionSkillReportPOJO.setTotalPoints(cmsessionSkillReportPOJO.getTotalPoints()+totalPoints);
-						cmsessionSkillReportPOJO.setUserPoints(cmsessionSkillReportPOJO.getUserPoints()+userPoints);
-					}
-					cmsessionSkillReportPOJO.calculatePercentage();
-					moduleSkillReportPOJO.calculateTotalPoints();
-					moduleSkillReportPOJO.calculateUserPoints();
-					moduleSkillReportPOJO.calculatePercentage();
-					moduleSkillReportPOJO.generateMessage();
-					
-				} else {
-					Module module = getModule(moduleId);
-					if (module != null) {
-						modulesOfAssessment.put(moduleId, module);
-
-						moduleSkillReportPOJO = new SkillReportPOJO();
-						moduleSkillReportPOJO.setId(module.getId());
-						moduleSkillReportPOJO.setName(module.getModuleName());
-						moduleSkillReportPOJO.setDescription(module.getModule_description());
-						moduleSkillReportPOJO.setImageURL(module.getImage_url());
-
-						List<SkillReportPOJO> cmsessionSkillsReport = new ArrayList<SkillReportPOJO>();
-						cmsessionSkillObjectiveOfAssessment.put(cmsessionSkillObjectiveId, cmsessionSkillObjective);
-
-						cmsessionSkillReportPOJO = new SkillReportPOJO();
-						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
-						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
-						cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
-
-						if(courseStatus.containsKey(cmsessionId)){
-							cmsessionSkillReportPOJO.setTotalPoints(totalPoints + (benchmark*courseStatus.get(cmsessionId).get("totalLessons")));
-							cmsessionSkillReportPOJO.setUserPoints(userPoints + (benchmark*courseStatus.get(cmsessionId).get("completedLessons")));						
-						}else{
-							cmsessionSkillReportPOJO.setTotalPoints(totalPoints);
-							cmsessionSkillReportPOJO.setUserPoints(userPoints);
-						}
-
-						cmsessionSkillsReport.add(cmsessionSkillReportPOJO);
-						moduleSkillReportPOJO.setSkills(cmsessionSkillsReport);
-						
-						cmsessionSkillReportPOJO.calculatePercentage();
-						moduleSkillReportPOJO.calculateTotalPoints();
-						moduleSkillReportPOJO.calculateUserPoints();
-						moduleSkillReportPOJO.calculatePercentage();
-						moduleSkillReportPOJO.generateMessage();
-						skillsReport.add(moduleSkillReportPOJO);
-					}else{
-						System.out.println("Module is null with id->"+moduleId);
-					}
-				}
-			}
-		}else{
-			String sqlLessonsFromStudentPlaylist = "with temptable as (select student_playlist.lesson_id, student_playlist.status, student_playlist.cmsession_id,student_playlist.module_id, skill_objective.parent_skill from student_playlist inner join lesson_skill_objective on student_playlist.lesson_id=lesson_skill_objective.lessonid and student_playlist.course_id=lesson_skill_objective.context_id inner join skill_objective on lesson_skill_objective.learning_objectiveid=skill_objective.id where student_id="+istarUserId+" and course_id="+courseId+" group by student_playlist.lesson_id, student_playlist.status, student_playlist.module_id, student_playlist.cmsession_id, skill_objective.parent_skill order by student_playlist.lesson_id,student_playlist.cmsession_id, student_playlist.module_id) select parent_skill as cmsession_skill_objective, module_id, cast(count(lesson_id) as integer) as total_lessons, cast(count(case when status='COMPLETED' then 1 end) as integer) as completed_lessons  from temptable group by parent_skill, module_id";
-						
-			SQLQuery lessonsFromStudentPlaylistQuery = session.createSQLQuery(sqlLessonsFromStudentPlaylist);		
-			List<Object[]> lessonsFromStudentPlaylistResult = lessonsFromStudentPlaylistQuery.list();
-			
-			if(lessonsFromStudentPlaylistResult.size()>0){
-
-				for(Object[] sessionRow: lessonsFromStudentPlaylistResult){
-					Integer cmsessionSkillObjectiveId = (Integer) sessionRow[0];
-					Integer moduleId = (Integer) sessionRow[1];
-					Integer totalLessons = (Integer) sessionRow[2];
-					Integer completedLessons = (Integer) sessionRow[3];
-					
-					
-					SkillObjective cmsessionSkillObjective = appAssessmentServices.getSkillObjective(cmsessionSkillObjectiveId);
-					SkillReportPOJO moduleSkillReportPOJO = null;
-					SkillReportPOJO cmsessionSkillReportPOJO = null;
-					
-					if(modulesOfAssessment.containsKey(moduleId)){
-
-						for (SkillReportPOJO tempModuleSkillReport : skillsReport) {
-							if (tempModuleSkillReport.getId() == moduleId) {
-								moduleSkillReportPOJO = tempModuleSkillReport;
-								break;
-							}
-						}
-
-						if(cmsessionSkillObjectiveOfAssessment.containsKey(cmsessionSkillObjectiveId)){
-							for(SkillReportPOJO tempCmsessionSkillReport : moduleSkillReportPOJO.getSkills()){
-								if(tempCmsessionSkillReport.getId()==cmsessionSkillObjectiveId){
-									cmsessionSkillReportPOJO=tempCmsessionSkillReport;
-									break;
-								}
-							}
-						}
-						
-						if(cmsessionSkillReportPOJO==null){
-							//System.out.println("New Skill-->"+ cmsessionSkillObjective.getName()+"-->"+cmsessionSkillObjective.getId());
-						cmsessionSkillReportPOJO = new SkillReportPOJO();
-						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
-						cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
-						cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
-						cmsessionSkillObjectiveOfAssessment.put(cmsessionSkillObjectiveId, cmsessionSkillObjective);
-						cmsessionSkillReportPOJO.setTotalPoints(benchmark*totalLessons);
-						cmsessionSkillReportPOJO.setUserPoints(benchmark*completedLessons);												
-						moduleSkillReportPOJO.getSkills().add(cmsessionSkillReportPOJO);
-						}else{
-							cmsessionSkillReportPOJO.setTotalPoints(cmsessionSkillReportPOJO.getTotalPoints()+(benchmark*totalLessons));
-							cmsessionSkillReportPOJO.setUserPoints(cmsessionSkillReportPOJO.getUserPoints()+(benchmark*completedLessons));
-						}
-						cmsessionSkillReportPOJO.calculatePercentage();
-						moduleSkillReportPOJO.calculateTotalPoints();
-						moduleSkillReportPOJO.calculateUserPoints();
-						moduleSkillReportPOJO.calculatePercentage();
-						moduleSkillReportPOJO.generateMessage();
-					}else{
-						Module module = getModule(moduleId);
-						if (module != null) {
-							modulesOfAssessment.put(moduleId, module);
-
-							moduleSkillReportPOJO = new SkillReportPOJO();
-							moduleSkillReportPOJO.setId(module.getId());
-							moduleSkillReportPOJO.setName(module.getModuleName());
-							moduleSkillReportPOJO.setDescription(module.getModule_description());
-							moduleSkillReportPOJO.setImageURL(module.getImage_url());
-
-							List<SkillReportPOJO> cmsessionSkillsReport = new ArrayList<SkillReportPOJO>();
-							cmsessionSkillObjectiveOfAssessment.put(cmsessionSkillObjectiveId, cmsessionSkillObjective);
-
-							cmsessionSkillReportPOJO = new SkillReportPOJO();
-							cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
-							cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
-							cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
-							cmsessionSkillReportPOJO.setTotalPoints(benchmark*totalLessons);
-							cmsessionSkillReportPOJO.setUserPoints(benchmark*completedLessons);												
-							cmsessionSkillReportPOJO.setTotalPoints(cmsessionSkillReportPOJO.getTotalPoints()+(benchmark*totalLessons));
-							cmsessionSkillReportPOJO.setUserPoints(cmsessionSkillReportPOJO.getUserPoints()+(benchmark*completedLessons));
-							
-							cmsessionSkillsReport.add(cmsessionSkillReportPOJO);
-							moduleSkillReportPOJO.setSkills(cmsessionSkillsReport);
-							
-							cmsessionSkillReportPOJO.calculatePercentage();
-							moduleSkillReportPOJO.calculateTotalPoints();
-							moduleSkillReportPOJO.calculateUserPoints();
-							moduleSkillReportPOJO.calculatePercentage();
-							moduleSkillReportPOJO.generateMessage();
-							skillsReport.add(moduleSkillReportPOJO);
-						}else{
-							System.out.println("Module is null with id->"+moduleId);
-						}
-					}
-				}
-				
-			}
-		}	*/	
 		return skillReportForCourse;
 	}
 	
@@ -595,8 +369,8 @@ public class AppCourseServices {
 			
 		}
 		
-		String getDataForTree="SELECT * FROM ( SELECT T1. ID, T1.skill_objective, T1.points, T1.max_points, cmsession_module.module_id FROM ( WITH summary AS ( SELECT P . ID, P .skill_objective, custom_eval( cast (replace(replace(replace(COALESCE(P .points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"') as text)) as points, custom_eval( cast (replace(replace(replace(COALESCE(P .max_points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"') as text)) as max_points, ROW_NUMBER () OVER ( PARTITION BY P .skill_objective ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P WHERE P .course_id = "+courseId+" AND P .item_type = 'QUESTION' ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 JOIN cmsession_skill_objective ON ( T1.skill_objective = cmsession_skill_objective.skill_objective_id ) JOIN cmsession_module ON ( cmsession_module.cmsession_id = cmsession_skill_objective.cmsession_id ) ) LT UNION  SELECT QT. ID, QT.skill_objective, QT.points, QT.max_points, QT.module_id FROM  ( WITH summary AS ( SELECT P . ID, P .skill_objective, custom_eval( cast (replace(replace(replace(P .points,':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"') as text)) as points, custom_eval( cast (replace(replace(replace(P .max_points,':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"') as text)) as max_points, P .module_id, ROW_NUMBER () OVER ( PARTITION BY P .skill_objective ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P WHERE P .course_id = "+courseId+" AND P .item_type = 'LESSON' ) SELECT s.* FROM summary s WHERE s.rk = 1 ) QT";
-		System.out.println("getDataForTree"+getDataForTree);
+		String getDataForTree="SELECT * FROM ( SELECT T1. ID, T1.skill_objective, T1.points, T1.max_points, cmsession_module.module_id FROM ( WITH summary AS ( SELECT P . ID, P .skill_objective, custom_eval( cast (replace(replace(replace(COALESCE(P .points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"') as text)) as points, custom_eval( cast (replace(replace(replace(COALESCE(P .max_points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"') as text)) as max_points, ROW_NUMBER () OVER ( PARTITION BY P .skill_objective,  P.item_id ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P WHERE P .course_id = "+courseId+" AND P .item_type = 'QUESTION' ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 JOIN cmsession_skill_objective ON ( T1.skill_objective = cmsession_skill_objective.skill_objective_id ) JOIN cmsession_module ON ( cmsession_module.cmsession_id = cmsession_skill_objective.cmsession_id ) ) LT UNION  SELECT QT. ID, QT.skill_objective, QT.points, QT.max_points, QT.module_id FROM  ( WITH summary AS ( SELECT P . ID, P .skill_objective, custom_eval( cast (replace(replace(replace(P .points,':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"') as text)) as points, custom_eval( cast (replace(replace(replace(P .max_points,':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"') as text)) as max_points, P .module_id, ROW_NUMBER () OVER ( PARTITION BY P .skill_objective ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P WHERE P .course_id = "+courseId+" AND P .item_type = 'LESSON' ) SELECT s.* FROM summary s WHERE s.rk = 1 ) QT";
+		System.out.println("getDataForTree in course"+getDataForTree);
 		DBUTILS util = new DBUTILS();
 		List<HashMap<String, Object>> data = util.executeQuery(getDataForTree);
 		for(HashMap<String, Object> row: data)
@@ -615,8 +389,27 @@ public class AppCourseServices {
 					{
 						if(cmsSkill.getId()== skillId)
 						{
-							cmsSkill.setUserPoints(Math.ceil(userPoints));
-							cmsSkill.setTotalPoints(Math.ceil(maxPoints));						
+							
+							if(cmsSkill.getAccessedFirstTime()==true)
+							{
+								
+								cmsSkill.setUserPoints(Math.ceil(userPoints));
+								cmsSkill.setTotalPoints(Math.ceil(maxPoints));				
+								cmsSkill.setAccessedFirstTime(false);
+							}
+							else
+							{
+								System.err.println(cmsSkill.getId()+" is accessed for the second time"+cmsSkill.getAccessedFirstTime());
+								double oldUserPoint = cmsSkill.getUserPoints()!=null?cmsSkill.getUserPoints() : 0d;
+								double userPoints1 = userPoints+oldUserPoint;
+								double oldTotalPoint = cmsSkill.getTotalPoints()!=null?cmsSkill.getTotalPoints() : 0d;
+								double maxPoints1 = maxPoints+oldTotalPoint;
+								
+								cmsSkill.setUserPoints(Math.ceil(userPoints1));
+								cmsSkill.setTotalPoints(Math.ceil(maxPoints1));		
+							}
+							
+									
 							cmsSkill.calculatePercentage();
 							//cmsSkills.add(cmsSkill);
 							break;
@@ -630,6 +423,7 @@ public class AppCourseServices {
 				}
 			}
 		}
+		
 		return shellTree;
 	}
 

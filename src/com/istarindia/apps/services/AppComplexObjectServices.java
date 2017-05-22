@@ -103,32 +103,7 @@ public class AppComplexObjectServices {
 			complexObject.setTasks(allTaskSummary);
 			System.err.println("complexObject allTaskSummary->" + allTaskSummary.size() + "Time->" + (System.currentTimeMillis()-previousTime));
 			
-			//Assessments			
-/*			List<AssessmentPOJO> allAssessmentsOfUser = new ArrayList<AssessmentPOJO>();	
-			for (Task task : allTaskOfUser) {
-				if (task.getItemType().equals("ASSESSMENT")) {
-					Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());
-					if (assessment != null && assessment.getAssessmentQuestions()!=null && assessment.getAssessmentQuestions().size() > 0) {
-						AssessmentPOJO assessmentPOJO = appPOJOUtility.getAssessmentPOJO(assessment);
-						allAssessmentsOfUser.add(assessmentPOJO);
-					}
-				}
-			}
-			complexObject.setAssessments(allAssessmentsOfUser);
-			System.err.println("complexObject allAssessmentsOfUser->" + allAssessmentsOfUser.size() + "Time->" + (System.currentTimeMillis()-previousTime));
-	*/		
-		/*	//Assessment Responses
-			List<AssessmentResponsePOJO> allResponse = new ArrayList<AssessmentResponsePOJO>();
-			List<Integer> allAssessmentIds = studentAssessmentServices.getAllAssessmentsAttemptedByUser(userId);
-			for (Integer assessmentId : allAssessmentIds) {
-				AssessmentResponsePOJO response = appAssessmentServices.getAssessmentResponseOfUser(assessmentId,
-						userId);
-				if (response != null) {
-					allResponse.add(response);
-				}
-			}
-			complexObject.setAssessmentResponses(allResponse);*/
-			//System.err.println("complexObject allResponse->" + allResponse.size() + "Time->" + (System.currentTimeMillis()-previousTime));
+		
 			
 			//Assessment Reports			
 			List<AssessmentReportPOJO> allAssessmentReport = appAssessmentServices.getAllAssessmentReportsOfUser(userId);

@@ -185,8 +185,8 @@ public class AppAssessmentServices {
 		}
 		
 		
-		String getDataForTree="SELECT T1. ID, T1.skill_objective, T1.points, T1.max_points, cmsession_module.module_id FROM ( WITH summary AS ( SELECT P . ID, P .skill_objective, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as points, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.max_points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as max_points, ROW_NUMBER () OVER ( PARTITION BY P .skill_objective ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P, assessment_question, question WHERE P .course_id = "+assessment.getCourse()+" AND P .item_id = assessment_question.questionid AND assessment_question.assessmentid = "+assessment.getId()+" AND assessment_question.questionid = question. ID AND question.context_id = "+assessment.getCourse()+" AND P .item_type = 'QUESTION' ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 JOIN cmsession_skill_objective ON ( T1.skill_objective = cmsession_skill_objective.skill_objective_id ) JOIN cmsession_module ON ( cmsession_module.cmsession_id = cmsession_skill_objective.cmsession_id )";
-		System.out.println("getDataForTree"+getDataForTree);
+		String getDataForTree="SELECT T1. ID, T1.skill_objective, T1.points, T1.max_points, cmsession_module.module_id FROM ( WITH summary AS ( SELECT P . ID, P .skill_objective, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as points, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.max_points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as max_points, ROW_NUMBER () OVER ( PARTITION BY P .skill_objective, P.item_id  ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P, assessment_question, question WHERE P .course_id = "+assessment.getCourse()+" AND P .item_id = assessment_question.questionid AND assessment_question.assessmentid = "+assessment.getId()+" AND assessment_question.questionid = question. ID AND question.context_id = "+assessment.getCourse()+" AND P .item_type = 'QUESTION' ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 JOIN cmsession_skill_objective ON ( T1.skill_objective = cmsession_skill_objective.skill_objective_id ) JOIN cmsession_module ON ( cmsession_module.cmsession_id = cmsession_skill_objective.cmsession_id )";
+		System.out.println("getDataForTree in assessment "+getDataForTree);
 		DBUTILS util = new DBUTILS();
 		List<HashMap<String, Object>> data = util.executeQuery(getDataForTree);
 		for(HashMap<String, Object> row: data)
@@ -205,13 +205,31 @@ public class AppAssessmentServices {
 					{
 						if(cmsSkill.getId()== skillId)
 						{
+														
+							if(cmsSkill.getAccessedFirstTime()==true)
+							{
+								System.err.println(cmsSkill.getId()+" is accessed for the first time"+cmsSkill.getAccessedFirstTime());
+								
+								cmsSkill.setAccessedFirstTime(false);
+							}
+							else
+							{
+								double oldUserPoint = cmsSkill.getUserPoints()!=null?cmsSkill.getUserPoints() : 0d;
+								userPoints = userPoints+oldUserPoint;
+								double oldTotalPoint = cmsSkill.getTotalPoints()!=null?cmsSkill.getTotalPoints() : 0d;
+								maxPoints = maxPoints+oldTotalPoint;
+							}
+							
 							cmsSkill.setUserPoints(Math.ceil(userPoints));
-							cmsSkill.setTotalPoints(Math.ceil(maxPoints));						
+							cmsSkill.setTotalPoints(Math.ceil(maxPoints));	
 							cmsSkill.calculatePercentage();
 							//cmsSkills.add(cmsSkill);
 							break;
 						}
+						
 					}
+					
+					
 					mod.calculateUserPoints();
 					mod.calculateTotalPoints();
 					mod.calculatePercentage();
@@ -311,7 +329,7 @@ public class AppAssessmentServices {
 				SkillReportPOJO sessionSkill = new SkillReportPOJO();
 				sessionSkill.setId(skillId);
 				sessionSkill.setName(skillName);
-				sessionSkill.setUserPoints((double)0);
+				//sessionSkill.setUserPoints((double)0);
 				sessionSkill.setTotalPoints(maxPoints);				
 				List<SkillReportPOJO> sessionsSkills = modPojo.getSkills();
 				sessionsSkills.add(sessionSkill);
@@ -967,17 +985,9 @@ public class AppAssessmentServices {
 
 	public Double getMaxPointsOfAssessment(Integer assessmentId) {
 
-		String sql = "select COALESCE(sum(max_points),0) from assessment_benchmark where assessment_id= :assessmentId";
+		
 
-		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
-		Session session = baseHibernateDAO.getSession();
-
-		SQLQuery query = session.createSQLQuery(sql);
-		query.setParameter("assessmentId", assessmentId);
-
-		Double totalPoints = (Double) query.list().get(0);
-
-		return totalPoints;
+		return 0d;
 	}
 
 	public Assessment getAssessment(int assessmentId) {

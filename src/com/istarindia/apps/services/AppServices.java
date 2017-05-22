@@ -128,7 +128,8 @@ public class AppServices {
 				courseSkillPOJO.calculateUserPoints();
 				courseSkillPOJO.calculateTotalPoints();
 				courseSkillPOJO.calculatePercentage();
-				
+				System.err.println("courseSkillPOJO.gettotal points"+courseSkillPOJO.getTotalPoints());
+				System.err.println("courseSkillPOJO.getUserPoints points"+courseSkillPOJO.getUserPoints());
 				allSkills.add(courseSkillPOJO);
 			}
 		}

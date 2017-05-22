@@ -5,6 +5,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement(name = "skillReport")
 public class SkillReportPOJO{
@@ -20,6 +21,7 @@ public class SkillReportPOJO{
 	private Double percentage = 0.0;
 	private String message;
 	private List<SkillReportPOJO> skills;
+	private Boolean accessedFirstTime = true;
 	
 	public SkillReportPOJO(){
 		
@@ -129,7 +131,7 @@ public class SkillReportPOJO{
 		for(SkillReportPOJO temp : this.skills){
 			totalPoints = totalPoints + temp.getTotalPoints();
 		}		
-		this.totalPoints = Math.round(totalPoints*100.0)/100.0;
+		this.totalPoints = Math.ceil(totalPoints*100.0)/100.0;
 	}
 	
 	public void calculateUserPoints() {
@@ -138,7 +140,7 @@ public class SkillReportPOJO{
 		for(SkillReportPOJO temp : this.skills){
 			userPoints = userPoints + temp.getUserPoints();
 		}		
-		this.userPoints = Math.round(userPoints*100.0)/100.0;
+		this.userPoints = Math.ceil(userPoints*100.0)/100.0;
 	}
 	
 	public void calculatePercentage() {
@@ -149,4 +151,17 @@ public class SkillReportPOJO{
 			this.percentage = 0.0;
 		}
 	}
+
+	@XmlTransient
+	public Boolean getAccessedFirstTime() {
+		return accessedFirstTime;
+	}
+
+	public void setAccessedFirstTime(Boolean accessedFirstTime) {
+		this.accessedFirstTime = accessedFirstTime;
+	}
+	
+	
+	
+	
 }
