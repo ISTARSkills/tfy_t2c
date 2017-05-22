@@ -55,6 +55,12 @@ public class AppPOJOUtility {
 	public StudentProfile getStudentProfile(IstarUser student) {
 		System.out.println("POJO service");
 		String mediaUrlPath ="";
+		int per_assessment_points=5,
+				per_lesson_points=5,
+				per_question_points=1,
+				per_assessment_coins=5,
+				per_lesson_coins=5,
+				per_question_coins=1;
 		try{
 			Properties properties = new Properties();
 			String propertyFileName = "app.properties";
@@ -62,6 +68,12 @@ public class AppPOJOUtility {
 				if (inputStream != null) {
 					properties.load(inputStream);
 					mediaUrlPath =  properties.getProperty("media_url_path");
+					per_assessment_points = Integer.parseInt(properties.getProperty("per_assessment_points"));
+					per_lesson_points = Integer.parseInt(properties.getProperty("per_lesson_points"));
+					per_question_points = Integer.parseInt(properties.getProperty("per_question_points"));
+					per_assessment_coins = Integer.parseInt(properties.getProperty("per_assessment_coins"));
+					per_lesson_coins = Integer.parseInt(properties.getProperty("per_lesson_coins"));
+					per_question_coins = Integer.parseInt(properties.getProperty("per_question_coins"));
 					System.out.println("media_url_path"+mediaUrlPath);
 				}
 			} catch (IOException e) {
@@ -104,9 +116,10 @@ public class AppPOJOUtility {
 			studentProfile.setResumeURL(student.getProfessionalProfile().getResumeUrl());
 			studentProfile.setUnderGraduationYear(student.getProfessionalProfile().getUnderGraduationYear());
 		}
-
+		
+		
 		DBUTILS util = new DBUTILS(); 
-		String getRankPointsForUser="select * from (select istar_user, user_points, total_points, cast (coins as integer) as coins, perc ,cast (row_number() over() as integer) as user_rank from (select istar_user, user_points, total_points, coins, cast ((user_points*100)/total_points as integer) as perc from (select T1.istar_user, sum(T1.points) as user_points, sum(T1.max_points) as total_points , sum (T1.coins) as coins from ( WITH summary AS (     SELECT p.istar_user, 					p.skill_objective,	            p.points, 						p.coins, 						p.max_points,   p.item_id ,         ROW_NUMBER() OVER(PARTITION BY p.istar_user, p.skill_objective ,p.item_id                                 ORDER BY p.timestamp DESC) AS rk       FROM  user_gamification p where item_type in ('QUESTION', 'LESSON') and batch_group_id=(select batch_group.id from batch_students, batch_group  where batch_students.batch_group_id = batch_group.id and batch_students.student_id = "+student.getId()+" and batch_group.is_primary ='t' limit 1)			 ) SELECT s.*   FROM summary s  WHERE s.rk = 1 )T1 group by istar_user having (sum(T1.max_points) >0) )T2 order by perc desc, total_points desc , total_points desc )T3 )T4 where istar_user = "+student.getId()+"";
+		String getRankPointsForUser="SELECT * FROM ( SELECT istar_user, user_points, total_points, CAST (coins AS INTEGER) AS coins, perc, CAST ( Rank () OVER (order by user_points desc) AS INTEGER ) AS user_rank FROM ( SELECT istar_user, user_points, total_points, coins, CAST ( (user_points * 100) / total_points AS INTEGER ) AS perc FROM ( SELECT T1.istar_user, SUM (T1.points) AS user_points, SUM (T1.max_points) AS total_points, SUM (T1.coins) AS coins FROM (WITH summary AS ( SELECT P .istar_user, P .skill_objective, custom_eval(CAST ( REPLACE ( REPLACE ( REPLACE ( COALESCE(P .points,'0'), ':per_lesson_points', '"+per_lesson_points+"' ), ':per_assessment_points', '"+per_assessment_points+"' ), ':per_question_points', '"+per_question_points+"' ) AS text ) ) AS points, custom_eval(CAST ( REPLACE ( REPLACE ( REPLACE ( COALESCE(P .coins,'0'), ':per_lesson_coins', '"+per_lesson_coins+"' ), ':per_assessment_coins', '"+per_assessment_coins+"' ), ':per_question_coins', '"+per_assessment_coins+"' ) AS text) ) AS coins, custom_eval(CAST ( REPLACE ( REPLACE ( REPLACE ( COALESCE(P .max_points,'0'), ':per_lesson_points', '"+per_lesson_points+"' ), ':per_assessment_points', '"+per_assessment_points+"' ), ':per_question_points', '"+per_question_points+"' ) AS text ))   AS max_points, P .item_id, ROW_NUMBER () OVER ( PARTITION BY P .istar_user, P .skill_objective, P .item_id ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P WHERE item_type IN ('QUESTION', 'LESSON') AND batch_group_id = ( SELECT batch_group. ID FROM batch_students, batch_group WHERE batch_students.batch_group_id = batch_group. ID AND batch_students.student_id = "+student.getId()+" AND batch_group.is_primary = 't' LIMIT 1 ) ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 GROUP BY istar_user HAVING (SUM(T1.max_points) > 0) ) T2 ORDER BY user_points DESC, perc DESC, total_points DESC ) T3 ) T4 WHERE istar_user = "+student.getId()+"";
 		System.out.println("get getRankPointsForUser"+getRankPointsForUser);
 		List<HashMap<String, Object>> rankPointsData = util.executeQuery(getRankPointsForUser);
 		int rank = 0;

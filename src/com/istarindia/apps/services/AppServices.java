@@ -119,10 +119,8 @@ public class AppServices {
 				SkillReportPOJO courseSkillPOJO = new SkillReportPOJO();
 				courseSkillPOJO.setId(course.getId());
 				courseSkillPOJO.setName(course.getCourseName());
-
 				String imageURL = mediaUrlPath+course.getImage_url();
 				courseSkillPOJO.setImageURL(imageURL);
-
 				List<SkillReportPOJO> moduleLevelSkillReport = appCourseServices
 						.getSkillsReportForCourseOfUser(istarUserId, courseId);
 

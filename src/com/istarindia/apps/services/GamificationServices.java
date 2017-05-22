@@ -36,7 +36,7 @@ public class GamificationServices {
 			 cmsessionId = (int)lessonRow.get("cmsession_id");
 		}
 		
-		String per_assessment_points="",
+		/*String per_assessment_points="",
 				per_lesson_points="",
 				per_question_points ="",per_lesson_coins="";
 		try{
@@ -53,7 +53,7 @@ public class GamificationServices {
 				}
 			} catch (IOException e) {
 				e.printStackTrace();			
-		}
+		}*/
 		
 		
 		String findPrimaryGroupsOfUser = "SELECT distinct	batch_group.id, batch_group.college_id FROM 	batch_students, 	batch_group WHERE 	batch_group. ID = batch_students.batch_group_id AND batch_students.student_id = 4972 and batch_group.is_primary='t'";
@@ -70,21 +70,21 @@ public class GamificationServices {
 			for(HashMap<String, Object> skills : skillsData)
 			{
 				int skillObjectiveId = (int)skills.get("skill_objective_id");
-				double maxPoints = (double)skills.get("max_points");				
-				double coins = Double.parseDouble(per_lesson_coins);
-				String getPreviousCoins="select * from user_gamification where item_id ='"+lesson.getId()+"' and item_type='LESSON' and istar_user='"+istarUser.getId()+"' and batch_group_id="+groupId+" and skill_objective="+skillObjectiveId+"  order by timestamp desc limit 1";
+				String maxPoints = (String)skills.get("max_points");				
+				//double coins = Double.parseDouble(per_lesson_coins);
+				String coins = "( :per_lesson_coins )";
+				String getPreviousCoins="select * from user_gamification where item_id ='"+lesson.getId()+"' and item_type='LESSON' and "
+						+ "istar_user='"+istarUser.getId()+"' and batch_group_id="+groupId+" and skill_objective="+skillObjectiveId+"  order by timestamp desc limit 1";
 				System.out.println("getPreviousCoins"+getPreviousCoins);
 				List<HashMap<String, Object>> coinsData = util.executeQuery(getPreviousCoins);
 				if(coinsData.size()>0)
 				{
-					double prevCoins = (double)coinsData.get(0).get("coins");
-					coins= coins+prevCoins;
- 				}
-				
-				
+					String prevCoins = (String)coinsData.get(0).get("coins");
+					coins= coins+" + "+prevCoins;
+ 				}								
 				
 				String insertIntoGamification="INSERT INTO user_gamification (id,istar_user, skill_objective, points, coins, created_at, updated_at, item_id, item_type,  course_id,cmsession_id, module_id, batch_group_id, org_id, timestamp, max_points) VALUES "
-						+ "((SELECT COALESCE(MAX(ID),0)+1 FROM user_gamification),"+istarUser.getId()+", "+skillObjectiveId+","+maxPoints+" , "+coins+", now(), now(), "+lesson.getId()+", 'LESSON', "+courseId+","+cmsessionId+","+moduleId+", "+groupId+", "+orgId+", now(), "+maxPoints+");";
+						+ "((SELECT COALESCE(MAX(ID),0)+1 FROM user_gamification),"+istarUser.getId()+", "+skillObjectiveId+",'"+maxPoints+"' , '"+coins+"', now(), now(), "+lesson.getId()+", 'LESSON', "+courseId+","+cmsessionId+","+moduleId+", "+groupId+", "+orgId+", now(), '"+maxPoints+"');";
 				System.out.println("insertIntoGamification>>>>"+insertIntoGamification);
 				util.executeUpdate(insertIntoGamification);
 			}			
@@ -94,7 +94,7 @@ public class GamificationServices {
 	
 	private void updatePointsAndCoinsForAssessment(IstarUser istarUser, Assessment assessment) {
 		//here we will update points and coins for IstarUser for a particular assessment.
-		String per_assessment_points="",
+	/*	String per_assessment_points="",
 				per_lesson_points="",
 				per_question_points ="",per_assessment_coins="";
 		try{
@@ -111,7 +111,7 @@ public class GamificationServices {
 				}
 			} catch (IOException e) {
 				e.printStackTrace();			
-		}
+		}*/
 		DBUTILS util = new DBUTILS();
 		String findPrimaryGroupsOfUser = "SELECT distinct	batch_group.id, batch_group.college_id FROM 	batch_students, 	batch_group WHERE 	batch_group. ID = batch_students.batch_group_id AND batch_students.student_id = 4972 and batch_group.is_primary='t'";
 		System.out.println("findPrimaryGroupsOfUser>>"+findPrimaryGroupsOfUser);
@@ -128,18 +128,19 @@ public class GamificationServices {
 			for(HashMap<String, Object> skills : skillsData)
 			{
 				int skillObjectiveId = (int)skills.get("skill_objective_id");
-				double maxPoints = (double)skills.get("max_points");				
-				double coins = Double.parseDouble(per_assessment_coins);
-				String getPreviousCoins="select * from user_gamification where item_id ='"+assessment.getId()+"' and item_type='ASSESSMENT' and istar_user='"+istarUser.getId()+"' and batch_group_id="+groupId+" and skill_objective="+skillObjectiveId+"  order by timestamp desc limit 1";
+				String maxPoints = (String)skills.get("max_points");				
+				String coins = "( :per_assessment_coins )";
+				String getPreviousCoins="select * from user_gamification where item_id ='"+assessment.getId()+"' and item_type='ASSESSMENT' and "
+						+ "istar_user='"+istarUser.getId()+"' and batch_group_id="+groupId+" and skill_objective="+skillObjectiveId+"  order by timestamp desc limit 1";
 				System.out.println("getPreviousCoins"+getPreviousCoins);
 				List<HashMap<String, Object>> coinsData = util.executeQuery(getPreviousCoins);
 				if(coinsData.size()>0)
 				{
-					double prevCoins = (double)coinsData.get(0).get("coins");
-					coins= coins+prevCoins;
+					String prevCoins = (String)coinsData.get(0).get("coins");
+					coins= coins+" + "+prevCoins;
  				}				
 				String insertIntoGamification="INSERT INTO user_gamification (id,istar_user, skill_objective, points, coins, created_at, updated_at, item_id, item_type,  course_id, batch_group_id, org_id, timestamp,max_points) VALUES "
-						+ "((SELECT COALESCE(MAX(ID),0)+1 FROM user_gamification),"+istarUser.getId()+", "+skillObjectiveId+","+maxPoints+" , "+coins+", now(), now(), "+assessment.getId()+", 'ASSESSMENT', "+assessment.getCourse()+", "+groupId+", "+orgId+", now(),"+maxPoints+");";
+						+ "((SELECT COALESCE(MAX(ID),0)+1 FROM user_gamification),"+istarUser.getId()+", "+skillObjectiveId+",'"+maxPoints+"' , '"+coins+"', now(), now(), "+assessment.getId()+", 'ASSESSMENT', "+assessment.getCourse()+", "+groupId+", "+orgId+", now(),'"+maxPoints+"');";
 				System.out.println("insertIntoGamification>>>>"+insertIntoGamification);
 				util.executeUpdate(insertIntoGamification);
 			}			
@@ -153,24 +154,7 @@ public class GamificationServices {
 	}
 
 	private void updatePointsAndCoinsForQuestion(IstarUser istarUser, Assessment assessment) {
-		String per_assessment_points="",
-				per_lesson_points="",
-				per_question_points ="",per_question_coins="";
-		try{
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-				if (inputStream != null) {
-					properties.load(inputStream);
-					per_assessment_points =  properties.getProperty("per_assessment_points");
-					per_lesson_points =  properties.getProperty("per_lesson_points");
-					per_question_points =  properties.getProperty("per_question_points");
-					per_question_coins = properties.getProperty("per_assessment_coins");
-					System.out.println("per_assessment_points"+per_assessment_points);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();			
-		}
+		
 		
 		DBUTILS util = new DBUTILS();
 		String findPrimaryGroupsOfUser = "SELECT distinct	batch_group.id, batch_group.college_id FROM 	batch_students, 	batch_group WHERE 	batch_group. ID = batch_students.batch_group_id AND batch_students.student_id = 4972 and batch_group.is_primary='t'";
@@ -202,9 +186,9 @@ public class GamificationServices {
 				for(HashMap<String, Object> skills : skillsData)
 				{
 					int skillObjectiveId = (int)skills.get("skill_objective_id");
-					double maxPoints = (double)skills.get("max_points");
-					double pointsScored = maxPoints;
-					double coins = Double.parseDouble(per_question_coins);
+					String maxPoints = (String)skills.get("max_points");
+					String pointsScored = maxPoints;
+					String coins = "( :per_question_coins )";
 					
 											
 					String getPreviousCoins="select * from user_gamification where item_id ='"+questionId+"' and item_type='QUESTION' and istar_user='"+istarUser.getId()+"' and batch_group_id="+groupId+" and skill_objective="+skillObjectiveId+"  order by timestamp desc limit 1";
@@ -212,23 +196,28 @@ public class GamificationServices {
 					List<HashMap<String, Object>> coinsData = util.executeQuery(getPreviousCoins);
 					if(coinsData.size()>0)
 					{
-						double prevCoins = (double)coinsData.get(0).get("coins");
+						String prevCoins = (String)coinsData.get(0).get("coins");
 						coins= coins+prevCoins;
-						pointsScored = (double)coinsData.get(0).get("points");
+						pointsScored = (String)coinsData.get(0).get("points");
+						if(assessment.getRetryAble())
+						{
+							pointsScored = maxPoints;
+						}
 	 				}
 					else
 					{
 						//user has not answerd thos question previously 
 						if(!questionAnsweredCorrectly.contains(questionId))
 						{
-							pointsScored=0;						
+							pointsScored="0";
+							
 						}
 					}	
 					
 					
 					
 					String insertIntoGamification="INSERT INTO user_gamification (id,istar_user, skill_objective, points, coins, created_at, updated_at, item_id, item_type,  course_id, batch_group_id, org_id, timestamp,max_points) VALUES "
-							+ "((SELECT COALESCE(MAX(ID),0)+1 FROM user_gamification),"+istarUser.getId()+", "+skillObjectiveId+","+pointsScored+" , "+coins+", now(), now(), "+questionId+", 'QUESTION', "+assessment.getCourse()+", "+groupId+", "+orgId+", now(),"+maxPoints+");";
+							+ "((SELECT COALESCE(MAX(ID),0)+1 FROM user_gamification),"+istarUser.getId()+", "+skillObjectiveId+",'"+pointsScored+"' , '"+coins+"', now(), now(), "+questionId+", 'QUESTION', "+assessment.getCourse()+", "+groupId+", "+orgId+", now(),'"+maxPoints+"');";
 					System.out.println("insertIntoGamification>>>>"+insertIntoGamification);
 					util.executeUpdate(insertIntoGamification);
 				}

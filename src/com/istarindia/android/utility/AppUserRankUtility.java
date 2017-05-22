@@ -75,6 +75,12 @@ public class AppUserRankUtility {
 	
 	public CourseRankPOJO getLeaderboardForCourseOfUser(int istarUserId, int courseId) {
 		String mediaUrlPath ="";
+		int per_assessment_points=5,
+				per_lesson_points=5,
+				per_question_points=1,
+				per_assessment_coins=5,
+				per_lesson_coins=5,
+				per_question_coins=1;
 		try{
 		Properties properties = new Properties();
 		String propertyFileName = "app.properties";
@@ -82,6 +88,12 @@ public class AppUserRankUtility {
 		if (inputStream != null) {
 		properties.load(inputStream);
 		mediaUrlPath =  properties.getProperty("media_url_path");
+		per_assessment_points = Integer.parseInt(properties.getProperty("per_assessment_points"));
+		per_lesson_points = Integer.parseInt(properties.getProperty("per_lesson_points"));
+		per_question_points = Integer.parseInt(properties.getProperty("per_question_points"));
+		per_assessment_coins = Integer.parseInt(properties.getProperty("per_assessment_coins"));
+		per_lesson_coins = Integer.parseInt(properties.getProperty("per_lesson_coins"));
+		per_question_coins = Integer.parseInt(properties.getProperty("per_question_coins"));
 		System.out.println("media_url_path"+mediaUrlPath);
 		}
 		} catch (IOException e) {
@@ -100,16 +112,14 @@ public class AppUserRankUtility {
 			courseRankPOJO.setName(course.getCourseName());
 			DBUTILS util = new DBUTILS();
 			
-			String findRankPoinsCoins = "select * from (select istar_user, user_points, total_points, cast (coins as integer) as coins, perc ,"
-					+ "cast (row_number() over() as integer) as user_rank "
-					+ "from (select istar_user, user_points, total_points, coins, cast ((user_points*100)/total_points as integer) as perc from (select T1.istar_user, sum(T1.points) as user_points, sum(T1.max_points) as total_points , sum (T1.coins) as coins from (  WITH summary AS (     SELECT p.istar_user, 					p.skill_objective,	            p.points, 						p.coins, 						p.max_points,  p.item_id,          ROW_NUMBER() OVER(PARTITION BY p.istar_user, p.skill_objective,p.item_id    ORDER BY p.timestamp DESC) AS rk   FROM  user_gamification p where item_type in ('QUESTION', 'LESSON') and course_id="+courseId+" and batch_group_id=(select batch_group.id from batch_students, batch_group  where batch_students.batch_group_id = batch_group.id and batch_students.student_id = "+istarUserId+" and batch_group.is_primary ='t' limit 1)) SELECT s.*   FROM summary s  WHERE s.rk = 1 )T1 group by istar_user having (sum(T1.max_points) >0) )T2 order by perc desc, total_points desc , total_points desc )T3 )T4";
-			List<HashMap<String, Object>> rankData= util.executeQuery(findRankPoinsCoins);
+			String findRankPoinsCoins = "SELECT * FROM ( SELECT student_id, user_points, total_points, CAST (coins AS INTEGER) AS coins, perc, CAST ( Rank () OVER (order by user_points desc) AS INTEGER ) AS user_rank FROM ( SELECT student_id, user_points, total_points, coins, case  when total_points =0 then 0 else CAST ( (user_points * 100) / total_points AS INTEGER ) end  AS perc FROM ( SELECT T1.student_id, COALESCE(SUM (T1.points),0) AS user_points, COALESCE(SUM (T1.max_points),0) AS total_points, COALESCE(SUM (T1.coins),0) AS coins FROM ( WITH summary AS ( SELECT TX .student_id, P .skill_objective, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.coins,'0'),':per_lesson_coins','"+per_lesson_coins+"'),':per_assessment_coins','"+per_assessment_coins+"'),':per_question_coins','"+per_question_coins+"'))  as text)) as coins, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as points, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.max_points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as max_points, P .item_id, ROW_NUMBER () OVER ( PARTITION BY TX .student_id, P .skill_objective, P .item_id ORDER BY P . TIMESTAMP DESC ) AS rk FROM ( select student_id from batch_students where batch_group_id in (( SELECT batch_group. ID FROM batch_students, batch_group WHERE batch_students.batch_group_id = batch_group. ID AND batch_students.student_id = "+istarUserId+" AND batch_group.is_primary = 't' LIMIT 1 )) )TX left join user_gamification P on (p.istar_user = TX.student_id and item_type IN ('QUESTION', 'LESSON') AND batch_group_id = ( SELECT batch_group. ID FROM batch_students, batch_group WHERE batch_students.batch_group_id = batch_group. ID AND batch_students.student_id = "+istarUserId+" AND batch_group.is_primary = 't' LIMIT 1 ) and course_id ="+courseId+")  ) SELECT s.* FROM summary s WHERE s.rk = 1) T1 GROUP BY student_id ) T2 ORDER BY  total_points DESC, perc DESC, total_points DESC ) T3 ) T4";
+					List<HashMap<String, Object>> rankData= util.executeQuery(findRankPoinsCoins);
 			if(rankData.size()>0)
 			{
 				List<StudentRankPOJO> allStudentRanksOfABatch = new ArrayList<StudentRankPOJO>();
 				for(HashMap<String, Object> stuData : rankData)
 				{
-					int stuId = (int)stuData.get("istar_user");
+					int stuId = (int)stuData.get("student_id");
 					double userPoints = (double)stuData.get("user_points");;
 					
 					int coins = (int)stuData.get("coins");
@@ -333,6 +343,12 @@ public class AppUserRankUtility {
 	
 public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 	String mediaUrlPath ="";
+	int per_assessment_points=5,
+			per_lesson_points=5,
+			per_question_points=1,
+			per_assessment_coins=5,
+			per_lesson_coins=5,
+			per_question_coins=1;
 	try{
 		Properties properties = new Properties();
 		String propertyFileName = "app.properties";
@@ -340,19 +356,25 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 			if (inputStream != null) {
 				properties.load(inputStream);
 				mediaUrlPath =  properties.getProperty("media_url_path");
+				per_assessment_points = Integer.parseInt(properties.getProperty("per_assessment_points"));
+				per_lesson_points = Integer.parseInt(properties.getProperty("per_lesson_points"));
+				per_question_points = Integer.parseInt(properties.getProperty("per_question_points"));
+				per_assessment_coins = Integer.parseInt(properties.getProperty("per_assessment_coins"));
+				per_lesson_coins = Integer.parseInt(properties.getProperty("per_lesson_coins"));
+				per_question_coins = Integer.parseInt(properties.getProperty("per_question_coins"));	
 				System.out.println("media_url_path"+mediaUrlPath);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();		
 	}
 	
+	
+	
 		CourseRankPOJO overallRankPOJO = null;
 		DBUTILS util = new DBUTILS();
 		
-		String findRankPoinsCoins = "select * from (select istar_user, user_points, total_points, cast (coins as integer) as coins, perc ,"
-				+ "cast (row_number() over() as integer) as user_rank "
-				+ "from (select istar_user, user_points, total_points, coins, cast ((user_points*100)/total_points as integer) as perc from (select T1.istar_user, sum(T1.points) as user_points, sum(T1.max_points) as total_points , sum (T1.coins) as coins from (  WITH summary AS (     SELECT p.istar_user, 					p.skill_objective,	            p.points, 						p.coins, 						p.max_points, p.item_id,           ROW_NUMBER() OVER(PARTITION BY p.istar_user, p.skill_objective,p.item_id    ORDER BY p.timestamp DESC) AS rk   FROM  user_gamification p where item_type in ('QUESTION', 'LESSON') and batch_group_id=(select batch_group.id from batch_students, batch_group  where batch_students.batch_group_id = batch_group.id and batch_students.student_id = "+istarUserId+" and batch_group.is_primary ='t' limit 1)) SELECT s.*   FROM summary s  WHERE s.rk = 1 )T1 group by istar_user having (sum(T1.max_points) >0) )T2 order by perc desc, total_points desc , total_points desc )T3 )T4";
-		System.err.println("findRankPoinsCoins  "+findRankPoinsCoins);
+		String findRankPoinsCoins ="SELECT * FROM ( SELECT student_id, user_points, total_points, CAST (coins AS INTEGER) AS coins, perc, CAST ( Rank () OVER (order by user_points desc) AS INTEGER ) AS user_rank FROM ( SELECT student_id, user_points, total_points, coins, case  when total_points =0 then 0 else CAST ( (user_points * 100) / total_points AS INTEGER ) end  AS perc FROM ( SELECT T1.student_id, COALESCE(SUM (T1.points),0) AS user_points, COALESCE(SUM (T1.max_points),0) AS total_points, COALESCE(SUM (T1.coins),0) AS coins FROM ( WITH summary AS ( SELECT TX .student_id, P .skill_objective, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.coins,'0'),':per_lesson_coins','"+per_lesson_coins+"'),':per_assessment_coins','"+per_assessment_coins+"'),':per_question_coins','"+per_question_coins+"'))  as text)) as coins, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as points, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.max_points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as max_points, P .item_id, ROW_NUMBER () OVER ( PARTITION BY TX .student_id, P .skill_objective, P .item_id ORDER BY P . TIMESTAMP DESC ) AS rk FROM ( select student_id from batch_students where batch_group_id in (( SELECT batch_group. ID FROM batch_students, batch_group WHERE batch_students.batch_group_id = batch_group. ID AND batch_students.student_id = "+istarUserId+" AND batch_group.is_primary = 't' LIMIT 1 )) )TX left join user_gamification P on (p.istar_user = TX.student_id and item_type IN ('QUESTION', 'LESSON') AND batch_group_id = ( SELECT batch_group. ID FROM batch_students, batch_group WHERE batch_students.batch_group_id = batch_group. ID AND batch_students.student_id = "+istarUserId+" AND batch_group.is_primary = 't' LIMIT 1 ))  ) SELECT s.* FROM summary s WHERE s.rk = 1) T1 GROUP BY student_id ) T2 ORDER BY  total_points DESC, perc DESC, total_points DESC ) T3 ) T4";
+				System.err.println("findRankPoinsCoins  "+findRankPoinsCoins);
 		List<HashMap<String, Object>> rankData= util.executeQuery(findRankPoinsCoins);
 		if(rankData.size()>0)
 		{
@@ -363,7 +385,7 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 			List<StudentRankPOJO> allStudentRanksOfABatch = new ArrayList<StudentRankPOJO>();
 			for(HashMap<String, Object> stuData : rankData)
 			{
-				int stuId = (int)stuData.get("istar_user");
+				int stuId = (int)stuData.get("student_id");
 				double userPoints = (double)stuData.get("user_points");;
 				
 				int coins = (int)stuData.get("coins");
