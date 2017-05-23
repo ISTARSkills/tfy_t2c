@@ -4,8 +4,10 @@
 package com.istarindia.android.pojo.task;
 
 import java.sql.Time;
+import java.util.ArrayList;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 import com.istarindia.android.pojo.TaskSummaryPOJO;
 
@@ -23,6 +25,9 @@ public class ClassRoomSessionTask extends TaskSummaryPOJO {
 	Integer classRoomId;
 	String classRoomName;
 	String time;
+	
+	
+	
 	public ClassRoomSessionTask() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -86,7 +91,8 @@ public class ClassRoomSessionTask extends TaskSummaryPOJO {
 	}
 	public void setTime(String time) {
 		this.time = time;
-	}		
+	}
+	
 	
 	
 	

@@ -9,6 +9,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
@@ -16,8 +17,10 @@ import java.util.Properties;
 import com.istarindia.android.pojo.TaskSummaryPOJO;
 import com.istarindia.android.pojo.task.AssessmentTask;
 import com.istarindia.android.pojo.task.ClassRoomSessionTask;
+import com.istarindia.android.pojo.trainerworkflow.GroupStudentPojo;
 import com.istarindia.apps.services.AppAssessmentServices;
 import com.istarindia.apps.services.AppCourseServices;
+import com.istarindia.apps.services.TrainerWorkflowServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.Lesson;
@@ -133,12 +136,11 @@ public class TaskSummaryPojoCreator {
 			
 		}
 		
-		ClassRoomSessionTask taskSummaryPOJO = null;
-		
+		ClassRoomSessionTask taskSummaryPOJO = null;		
 		AppCourseServices appCourseServices= new AppCourseServices();
 		//Lesson lesson = appCourseServices.getLesson(task.getItemId());
 		DBUTILS util = new DBUTILS();
-		String getEventdetails="select T1.*, pincode.lattiude, pincode.longitude from  (select batch_schedule_event.eventhour, batch_schedule_event.eventminute, batch_group.name as group_name, classroom_details.id as classroom_id, classroom_details.classroom_identifier  as classroom_name, organization.address_id as address_id, organization.name as org_name, course.course_name as course_name, batch_schedule_event.eventdate, course.image_url   from task, batch_schedule_event, classroom_details, organization, course	, batch_group where task.item_id = batch_schedule_event.id and batch_schedule_event.classroom_id = classroom_details.id and classroom_details.organization_id = organization.id and batch_schedule_event.batch_group_id = batch_group.id and batch_schedule_event.course_id = course.id and task.item_type ='CLASSROOM_SESSION' and task.id = "+task.getId()+" )T1 left join address on (address.id = T1.address_id) join pincode on (address.pincode_id = pincode.id)";		
+		String getEventdetails="select T1.*, pincode.lattiude, pincode.longitude from  (select batch_schedule_event.eventhour, batch_schedule_event.eventminute, batch_group.name as group_name, batch_group.id as group_id, classroom_details.id as classroom_id, classroom_details.classroom_identifier  as classroom_name, organization.address_id as address_id, organization.name as org_name, course.course_name as course_name, batch_schedule_event.eventdate, course.image_url   from task, batch_schedule_event, classroom_details, organization, course	, batch_group where task.item_id = batch_schedule_event.id and batch_schedule_event.classroom_id = classroom_details.id and classroom_details.organization_id = organization.id and batch_schedule_event.batch_group_id = batch_group.id and batch_schedule_event.course_id = course.id and task.item_type ='CLASSROOM_SESSION' and task.id = "+task.getId()+" )T1 left join address on (address.id = T1.address_id) join pincode on (address.pincode_id = pincode.id)";		
 		List<HashMap<String, Object>> eventData = util.executeQuery(getEventdetails);
 		if(eventData.size()>0)
 		{
@@ -166,12 +168,15 @@ public class TaskSummaryPojoCreator {
 					lattitude = (double)row.get("lattiude");
 				}
 				
+				Integer groupId = (int)row.get("group_id");
 				Timestamp eventDate = (Timestamp)row.get("eventdate");
 				DateFormat writeFormat = new SimpleDateFormat( "HH:mm:ss");
 				taskSummaryPOJO.setTime(writeFormat.format(eventDate));			
 				String groupName = row.get("group_name").toString();
 				String classRoomName = row.get("classroom_name").toString();
 				Integer classRoomId = (int)row.get("classroom_id");
+				
+				
 				taskSummaryPOJO.setClassRoomId(classRoomId);
 				taskSummaryPOJO.setClassRoomName(classRoomName);
 				taskSummaryPOJO.setDurationHours(durationHours);
@@ -196,7 +201,7 @@ public class TaskSummaryPojoCreator {
 				taskSummaryPOJO.setDescription(null);
 				taskSummaryPOJO.setImageURL(mediaUrlPath+taskImage);
 				taskSummaryPOJO.setDuration(totalduration);
-				
+			
 			}
 		}
 		
