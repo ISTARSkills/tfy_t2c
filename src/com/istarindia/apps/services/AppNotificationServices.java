@@ -18,7 +18,7 @@ import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.notification.IstarNotificationServices;
 import com.viksitpro.core.utilities.NotificationType;
-import com.viksitpro.core.utilities.TaskCategory;
+import com.viksitpro.core.utilities.TaskItemCategory;
 
 public class AppNotificationServices {
 
@@ -60,10 +60,10 @@ public class AppNotificationServices {
 
 		if (task != null) {
 			switch (task.getItemType()) {
-			case TaskCategory.LESSON:
+			case TaskItemCategory.LESSON:
 				notificationPOJO = getNotificationPOJOForLesson(istarNotification);
 				break;
-			case TaskCategory.ASSESSMENT:
+			case TaskItemCategory.ASSESSMENT:
 				notificationPOJO = getNotificationPOJOForAssessment(istarNotification);
 				break;
 

@@ -19,12 +19,11 @@ import com.istarindia.android.pojo.TaskSummaryPOJO;
 import com.istarindia.android.utility.AppDashboardUtility;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.android.utility.AppUserRankUtility;
-import com.viksitpro.core.dao.entities.Assessment;
+import com.istarindia.apps.factories.TaskFactory;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
-import com.viksitpro.core.utilities.TaskCategory;
 
 public class AppComplexObjectServices {
 
@@ -70,18 +69,10 @@ public class AppComplexObjectServices {
 			List<Task> allTaskOfUser = taskServices.getAllTaskOfActorForToday(istarUser);
 			List<TaskSummaryPOJO> allTaskSummary = new ArrayList<TaskSummaryPOJO>();
 			int completedTasks = 0;
+			TaskFactory factory = new TaskFactory();
 			for (Task task : allTaskOfUser) {
-				TaskSummaryPOJO taskSummaryPOJO = null;
-				String itemType = task.getItemType();
-
-				switch (itemType) {
-				case TaskCategory.ASSESSMENT:
-					taskSummaryPOJO = dashboardUtility.getTaskSummaryPOJOForAssessment(task);
-					break;
-				case TaskCategory.LESSON:
-					taskSummaryPOJO = dashboardUtility.getTaskSummaryPOJOForLesson(task);
-					break;
-				}
+				TaskSummaryPOJO taskSummaryPOJO = null;				
+				taskSummaryPOJO = factory.getTaskSummary(task);
 				if (taskSummaryPOJO != null) {
 					if (taskSummaryPOJO.getStatus().equals("COMPLETED")) {
 						completedTasks++;

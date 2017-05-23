@@ -20,42 +20,7 @@ import com.viksitpro.core.dao.entities.Task;
 
 public class AppDashboardUtility {
 
-	public TaskSummaryPOJO getTaskSummaryPOJOForAssessment(Task task){
 	
-		TaskSummaryPOJO taskSummaryPOJO = null;
-		
-		AppAssessmentServices appAssessmentServices= new AppAssessmentServices();
-		Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());
-		AppCourseServices appCourseServices = new AppCourseServices();
-
-		if(assessment!=null && assessment.getAssessmentQuestions().size()>0){
-			Course course = appCourseServices.getCourse(assessment.getCourse());
-			taskSummaryPOJO = new TaskSummaryPOJO();
-			
-			taskSummaryPOJO.setId(task.getId());
-			taskSummaryPOJO.setItemId(task.getItemId());
-			taskSummaryPOJO.setItemType(task.getItemType());
-			if(task.getIsActive()){
-				taskSummaryPOJO.setStatus("INCOMPLETE");
-				taskSummaryPOJO.setDate(task.getEndDate());
-			}else{
-				taskSummaryPOJO.setStatus("COMPLETED");
-				taskSummaryPOJO.setDate(task.getUpdatedAt());
-			}
-			taskSummaryPOJO.setTitle(assessment.getAssessmenttitle());
-			taskSummaryPOJO.setImageURL(null);
-			taskSummaryPOJO.setHeader(assessment.getAssessmentType());
-			taskSummaryPOJO.setItemPoints(appAssessmentServices.getMaxPointsOfAssessment(assessment.getId()).intValue());
-			taskSummaryPOJO.setNumberOfQuestions(assessment.getAssessmentQuestions().size());
-			taskSummaryPOJO.setDuration(assessment.getAssessmentdurationminutes());
-			if(assessment.getDescription()==null){
-				taskSummaryPOJO.setDescription(course.getCourseDescription());
-			}else{
-				taskSummaryPOJO.setDescription(assessment.getDescription());
-			}
-		}
-		return taskSummaryPOJO;
-	}
 	
 	public TaskSummaryPOJO getTaskSummaryPOJOForLesson(Task task){
 		String mediaUrlPath ="";

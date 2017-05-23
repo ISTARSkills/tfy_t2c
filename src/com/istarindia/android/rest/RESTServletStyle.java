@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
-import com.viksitpro.core.utilities.TaskCategory;
+import com.viksitpro.core.utilities.TaskItemCategory;
 
 @Path("get_lesson_details")
 public class RESTServletStyle {
@@ -33,12 +33,12 @@ public class RESTServletStyle {
 			System.out.println(uriInfo.getBaseUri());
 			System.out.println(uriInfo.getAbsolutePath());
 			switch(task.getItemType()){
-			case TaskCategory.LESSON:
+			case TaskItemCategory.LESSON:
 				System.out.println("Task is Video");
 				URI uri = new URI(uriInfo.getBaseUri()+"lessons/user/"+userId+"/"+task.getItemId());
 				ResponseBuilder builder =  Response.seeOther(uri);
 				return builder.build();
-			case TaskCategory.ASSESSMENT:
+			case TaskItemCategory.ASSESSMENT:
 				System.out.println("Task is Assessment");
 				URI uriAssessment = new URI(uriInfo.getBaseUri()+"assessments/user/"+userId+"/"+task.getItemId());
 				ResponseBuilder builderAssessment =  Response.seeOther(uriAssessment);

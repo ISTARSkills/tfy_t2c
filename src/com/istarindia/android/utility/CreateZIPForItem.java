@@ -29,7 +29,8 @@ import com.viksitpro.core.cms.lesson.VideoLesson;
 import com.viksitpro.core.cms.oldcontent.CMSPresentation;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Task;
-import com.viksitpro.core.utilities.TaskCategory;
+
+import com.viksitpro.core.utilities.TaskItemCategory;
 
 public class CreateZIPForItem {
 
@@ -73,7 +74,7 @@ public class CreateZIPForItem {
 		String itemType = task.getItemType();
 
 		switch (itemType) {
-		case TaskCategory.LESSON:
+		case TaskItemCategory.LESSON:
 			System.out.println("Lesson ID" + task.getItemId());
 			object = generateXMLForLesson(task.getItemId());
 			break;

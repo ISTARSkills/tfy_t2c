@@ -16,6 +16,7 @@ import com.google.gson.GsonBuilder;
 import com.istarindia.android.pojo.AssessmentPOJO;
 import com.istarindia.android.pojo.TaskSummaryPOJO;
 import com.istarindia.android.utility.AppDashboardUtility;
+import com.istarindia.apps.factories.TaskFactory;
 import com.istarindia.apps.services.GamificationServices;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Lesson;
@@ -23,7 +24,7 @@ import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
-import com.viksitpro.core.utilities.TaskCategory;
+import com.viksitpro.core.utilities.TaskItemCategory;
 
 @Path("tasks/user/{userId}")
 public class RESTDashboardService {
@@ -39,21 +40,12 @@ public class RESTDashboardService {
 			TaskServices taskServices = new TaskServices();
 			List<Task> allTaskOfUser = taskServices.getAllTaskOfActorForToday(istarUser);
 			List<TaskSummaryPOJO> allTaskSummary = new ArrayList<TaskSummaryPOJO>();
-
+			TaskFactory factory = new TaskFactory();
 			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
 			int completedTasks = 0;
 			for (Task task : allTaskOfUser) {
 				TaskSummaryPOJO taskSummaryPOJO = null;
-				String itemType = task.getItemType();
-
-				switch (itemType) {
-				case TaskCategory.ASSESSMENT:
-					taskSummaryPOJO = dashboardUtility.getTaskSummaryPOJOForAssessment(task);
-					break;
-				case TaskCategory.LESSON:
-					taskSummaryPOJO = dashboardUtility.getTaskSummaryPOJOForLesson(task);
-					break;
-				}
+				taskSummaryPOJO = factory.getTaskSummary(task);
 				if (taskSummaryPOJO != null) {
 					if (taskSummaryPOJO.getStatus().equals("COMPLETED")) {
 						completedTasks++;
@@ -105,10 +97,10 @@ public class RESTDashboardService {
 				String itemType = task.getItemType();
 
 				switch (itemType) {
-				case TaskCategory.ASSESSMENT:
+				case TaskItemCategory.ASSESSMENT:
 					result = (AssessmentPOJO) dashboardUtility.getAssessmentForTask(task);
 					return Response.ok(result).build();
-				case TaskCategory.LESSON:
+				case TaskItemCategory.LESSON:
 					result = (String) dashboardUtility.getLessonForTask(task);
 					return Response.ok(gson.toJson(result)).build();
 				}
@@ -133,20 +125,13 @@ public class RESTDashboardService {
 			if(task==null){
 				throw new Exception("Invlaid Task ID");
 			}
-			
+			TaskFactory factory = new TaskFactory();
 			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
 
 				TaskSummaryPOJO taskSummaryPOJO = null;
 				String itemType = task.getItemType();
 
-				switch (itemType) {
-				case TaskCategory.ASSESSMENT:
-					taskSummaryPOJO = dashboardUtility.getTaskSummaryPOJOForAssessment(task);
-					break;
-				case TaskCategory.LESSON:
-					taskSummaryPOJO = dashboardUtility.getTaskSummaryPOJOForLesson(task);
-					break;
-				}
+				taskSummaryPOJO = factory.getTaskSummary(task);
 
 				if(taskSummaryPOJO==null){
 					throw new Exception("Invlaid Task ID");
@@ -185,10 +170,10 @@ public class RESTDashboardService {
 				String itemType = task.getItemType();
 
 				switch (itemType) {
-				case TaskCategory.ASSESSMENT:
+				case TaskItemCategory.ASSESSMENT:
 					result = (AssessmentPOJO) dashboardUtility.getAssessmentForTask(task);
 					return Response.ok(result).build();
-				case TaskCategory.LESSON:
+				case TaskItemCategory.LESSON:
 					result = (String) dashboardUtility.getLessonForTask(task);
 					return Response.ok(gson.toJson(result)).build();
 				}
@@ -216,7 +201,7 @@ public class RESTDashboardService {
 
 			Task task = taskServices.getTask(taskId);
 			
-			if(task.getItemType().equals(TaskCategory.LESSON)){
+			if(task.getItemType().equals(TaskItemCategory.LESSON)){
 				AppDashboardUtility appDashboardUtility = new AppDashboardUtility();
 				appDashboardUtility.updateStudentPlaylistStatus(task.getItemId(), userId, "COMPLETED");
 				GamificationServices gmService = new GamificationServices();
@@ -250,7 +235,7 @@ public class RESTDashboardService {
 	 * 
 	 * for(Task task : allTaskOfUser){ if(task.getIsActive()){ String itemType =
 	 * task.getItemType(); Integer itemId = task.getItemId();
-	 * if(itemType.equals(TaskCategory.ASSESSMENT)){ AppAssessmentServices
+	 * if(itemType.equals(TaskItemCategory.ASSESSMENT)){ AppAssessmentServices
 	 * appAssessmentServices = new AppAssessmentServices(); Assessment
 	 * assessment = appAssessmentServices.getAssessment(itemId); if (assessment
 	 * != null && assessment.getAssessmentQuestions().size() > 0) {
@@ -321,10 +306,10 @@ public class RESTDashboardService {
 	 * task.getIstarUserByActor().getId()==istarUser.getId()) { String itemType
 	 * = task.getItemType(); Integer itemId = task.getItemId();
 	 * 
-	 * switch (itemType) { case TaskCategory.ASSESSMENT: dashboardCard =
-	 * dashboardUtility.getAssessment(task); break; case TaskCategory.LESSON:
+	 * switch (itemType) { case TaskItemCategory.ASSESSMENT: dashboardCard =
+	 * dashboardUtility.getAssessment(task); break; case TaskItemCategory.LESSON:
 	 * //dashboardCard = dashboardUtility.getDashboardCardForLesson(task);
-	 * break; case TaskCategory.JOB: dashboardCard =
+	 * break; case TaskItemCategory.JOB: dashboardCard =
 	 * dashboardUtility.getDashboardCardForJob(task); break; } }else{ return
 	 * Response.status(Response.Status.BAD_REQUEST).build(); }
 	 * 
@@ -357,11 +342,11 @@ public class RESTDashboardService {
 	 * task.getIstarUserByActor().getId()==istarUser.getId()) { String itemType
 	 * = task.getItemType();
 	 * 
-	 * switch (itemType) { case TaskCategory.ASSESSMENT: dashboardCard =
+	 * switch (itemType) { case TaskItemCategory.ASSESSMENT: dashboardCard =
 	 * dashboardUtility.getDashboardCardForAssessment(task); break; case
-	 * TaskCategory.LESSON: dashboardCard =
+	 * TaskItemCategory.LESSON: dashboardCard =
 	 * dashboardUtility.getDashboardCardForLessonTest(task); break; case
-	 * TaskCategory.JOB: dashboardCard =
+	 * TaskItemCategory.JOB: dashboardCard =
 	 * dashboardUtility.getDashboardCardForJob(task); break; } }else{ return
 	 * Response.status(Response.Status.BAD_REQUEST).build(); }
 	 * 

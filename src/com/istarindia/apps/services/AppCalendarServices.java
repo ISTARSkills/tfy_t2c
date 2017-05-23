@@ -11,8 +11,7 @@ import com.istarindia.android.pojo.DailyTaskPOJO;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Task;
-import com.viksitpro.core.dao.utils.task.TaskServices;
-import com.viksitpro.core.utilities.TaskCategory;
+import com.viksitpro.core.utilities.TaskItemCategory;
 
 public class AppCalendarServices {
 
@@ -59,7 +58,7 @@ public class AppCalendarServices {
 				dailyTaskPOJO.setCompletedAt(completedAt);
 			}
 			
-			if(itemType.equals(TaskCategory.LESSON)){
+			if(itemType.equals(TaskItemCategory.LESSON)){
 				AppCourseServices appCourseServices = new AppCourseServices();
 				Lesson lesson = appCourseServices.getLesson(itemId);
 				dailyTaskPOJO.setItemType(itemType+"_"+lesson.getType());
@@ -109,7 +108,7 @@ public class AppCalendarServices {
 			dailyTaskPOJO.setEndDate(endDate);
 			dailyTaskPOJO.setItemId(itemId);
 			
-			if(itemType.equals(TaskCategory.LESSON)){
+			if(itemType.equals(TaskItemCategory.LESSON)){
 				AppCourseServices appCourseServices = new AppCourseServices();
 				Lesson lesson = appCourseServices.getLesson(itemId);
 				dailyTaskPOJO.setItemType(itemType+"_"+lesson.getType());
@@ -160,7 +159,7 @@ public class AppCalendarServices {
 			dailyTaskPOJO.setEndDate(endDate);
 			dailyTaskPOJO.setItemId(itemId);
 			
-			if(itemType.equals(TaskCategory.LESSON)){
+			if(itemType.equals(TaskItemCategory.LESSON)){
 				AppCourseServices appCourseServices = new AppCourseServices();
 				Lesson lesson = appCourseServices.getLesson(itemId);
 				dailyTaskPOJO.setItemType(itemType+"_"+lesson.getType());
@@ -210,7 +209,7 @@ public class AppCalendarServices {
 			dailyTaskPOJO.setEndDate(endDate);
 			dailyTaskPOJO.setItemId(itemId);
 			
-			if(itemType.equals(TaskCategory.LESSON)){
+			if(itemType.equals(TaskItemCategory.LESSON)){
 				AppCourseServices appCourseServices = new AppCourseServices();
 				Lesson lesson = appCourseServices.getLesson(itemId);
 				dailyTaskPOJO.setItemType(itemType+"_"+lesson.getType());
@@ -238,7 +237,7 @@ public class AppCalendarServices {
 			dailyTaskPOJO.setEndDate(task.getEndDate());
 			dailyTaskPOJO.setItemId(task.getItemId());
 
-			if (task.getItemType().equals(TaskCategory.LESSON)) {
+			if (task.getItemType().equals(TaskItemCategory.LESSON)) {
 				AppCourseServices appCourseServices = new AppCourseServices();
 				Lesson lesson = appCourseServices.getLesson(task.getItemId());
 				dailyTaskPOJO.setItemType(task.getItemType() + "_" + lesson.getType());

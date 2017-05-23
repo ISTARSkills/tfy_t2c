@@ -12,9 +12,7 @@ public class TaskSummaryPOJO {
 	private String header;
 	private String title;
 	private String description;
-	private Integer numberOfQuestions;
-	private Integer itemPoints;
-	private Integer itemCoins;
+	
 	private String itemType;
 	private Integer itemId;
 	private Integer duration;
@@ -68,35 +66,7 @@ public class TaskSummaryPOJO {
 		this.description = description;
 	}
 
-	@XmlAttribute(name = "numberOfQuestions", required = false)
-	public Integer getNumberOfQuestions() {
-		return numberOfQuestions;
-	}
-
-
-	public void setNumberOfQuestions(Integer numberOfQuestions) {
-		this.numberOfQuestions = numberOfQuestions;
-	}
-
-	@XmlAttribute(name = "itemPoints", required = false)
-	public Integer getItemPoints() {
-		return itemPoints;
-	}
-
-
-	public void setItemPoints(Integer itemPoints) {
-		this.itemPoints = itemPoints;
-	}
-
-	@XmlAttribute(name = "itemCoins", required = false)
-	public Integer getItemCoins() {
-		return itemCoins;
-	}
-
-
-	public void setItemCoins(Integer itemCoins) {
-		this.itemCoins = itemCoins;
-	}
+	
 
 	@XmlAttribute(name = "itemType", required = false)
 	public String getItemType() {
