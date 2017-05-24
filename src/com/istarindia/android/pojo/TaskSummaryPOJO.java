@@ -37,6 +37,7 @@ public class TaskSummaryPOJO {
 	private Integer classRoomId;
 	private String classRoomName;
 	private String time;
+	private String event_address;
 	/*related to classroom task ends here*/
 	public TaskSummaryPOJO(){
 		
@@ -256,6 +257,16 @@ public class TaskSummaryPOJO {
 
 	public void setMessageForIncompleteTasks(String messageForIncompleteTasks) {
 		this.messageForIncompleteTasks = messageForIncompleteTasks;
+	}
+
+
+	public String getEvent_address() {
+		return event_address;
+	}
+
+
+	public void setEvent_address(String event_address) {
+		this.event_address = event_address;
 	}
 
 	
