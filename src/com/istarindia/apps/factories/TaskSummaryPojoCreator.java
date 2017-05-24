@@ -140,8 +140,9 @@ public class TaskSummaryPojoCreator {
 		AppCourseServices appCourseServices= new AppCourseServices();
 		//Lesson lesson = appCourseServices.getLesson(task.getItemId());
 		DBUTILS util = new DBUTILS();
-		String getEventdetails="select T1.*, pincode.lattiude, pincode.longitude from  (select batch_schedule_event.eventhour, batch_schedule_event.eventminute, batch_group.name as group_name, batch_group.id as group_id, classroom_details.id as classroom_id, classroom_details.classroom_identifier  as classroom_name, organization.address_id as address_id, organization.name as org_name, course.course_name as course_name, batch_schedule_event.eventdate, course.image_url   from task, batch_schedule_event, classroom_details, organization, course	, batch_group where task.item_id = batch_schedule_event.id and batch_schedule_event.classroom_id = classroom_details.id and classroom_details.organization_id = organization.id and batch_schedule_event.batch_group_id = batch_group.id and batch_schedule_event.course_id = course.id and task.item_type ='CLASSROOM_SESSION' and task.id = "+task.getId()+" )T1 left join address on (address.id = T1.address_id) join pincode on (address.pincode_id = pincode.id)";		
+		String getEventdetails="select T1.*, pincode.lattiude, pincode.longitude,address.addressline1|| ' ' ||address.addressline2 as address from  (select batch_schedule_event.eventhour, batch_schedule_event.eventminute, batch_group.name as group_name, batch_group.id as group_id, classroom_details.id as classroom_id, classroom_details.classroom_identifier  as classroom_name, organization.address_id as address_id, organization.name as org_name, course.course_name as course_name, batch_schedule_event.eventdate, course.image_url   from task, batch_schedule_event, classroom_details, organization, course	, batch_group where task.item_id = batch_schedule_event.id and batch_schedule_event.classroom_id = classroom_details.id and classroom_details.organization_id = organization.id and batch_schedule_event.batch_group_id = batch_group.id and batch_schedule_event.course_id = course.id and task.item_type ='CLASSROOM_SESSION' and task.id = "+task.getId()+" )T1 left join address on (address.id = T1.address_id) join pincode on (address.pincode_id = pincode.id)";		
 		List<HashMap<String, Object>> eventData = util.executeQuery(getEventdetails);
+		
 		if(eventData.size()>0)
 		{
 			for(HashMap<String, Object> row: eventData)
@@ -184,7 +185,7 @@ public class TaskSummaryPojoCreator {
 				taskSummaryPOJO.setGroupName(groupName);
 				taskSummaryPOJO.setLattitude(lattitude);
 				taskSummaryPOJO.setLongitude(longitude);
-				
+				taskSummaryPOJO.setEvent_address(row.get("address").toString());
 				
 				taskSummaryPOJO.setId(task.getId());
 				taskSummaryPOJO.setItemId(task.getItemId());
