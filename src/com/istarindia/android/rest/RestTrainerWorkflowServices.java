@@ -3,10 +3,13 @@
  */
 package com.istarindia.android.rest;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -121,62 +124,18 @@ public class RestTrainerWorkflowServices {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try{
 			
+			
+			CourseContent courseContent = new CourseContent();
 			TrainerWorkflowServices service = new TrainerWorkflowServices();
 			DBUTILS util = new DBUTILS();
-			
-			Integer prevItemOrderId = null;
-			Integer curentItemOrderId = null;
-			Integer nextItemOrderId = null;
-			Integer currentItemId = null;
-			String getCurrentPrevAndNextItemForCourse = "select lesson_id from slide_change_log , batch_schedule_event, task where task.item_id = batch_schedule_event.id and batch_schedule_event.course_id= slide_change_log.course_id and slide_change_log.batch_group_id = batch_schedule_event.batch_group_id and task.id = "+taskId+" order by slide_change_log.id desc  limit 1";
-			System.err.println("getCurrentPrevAndNextItemForCourse>>>>>>"+getCurrentPrevAndNextItemForCourse);			
-			List<HashMap<String, Object>> itemStats = util.executeQuery(getCurrentPrevAndNextItemForCourse);
-			if(itemStats.size()>0)
+			Integer courseId= null;
+			String GetCourseId ="select course_id from task,batch_schedule_event where batch_schedule_event.id = task.item_id and item_type ='"+TaskItemCategory.CLASSROOM_SESSION+"' and task.id = "+taskId;
+			System.out.println("getCourseId-------------"+GetCourseId);
+			List<HashMap<String, Object>> courseIdData = util.executeQuery(GetCourseId);
+			if(courseIdData.size()>0)
 			{
-				currentItemId = (int)itemStats.get(0).get("lesson_id");
-			}
-			
-			String getCourseId ="select lesson.id , lesson.title,  cast (row_number() over()  as integer ) -1 as order_id from module_course, cmsession_module, lesson_cmsession, lesson where module_course.course_id = (select course_id from task,batch_schedule_event where batch_schedule_event.id = task.item_id and item_type ='"+TaskItemCategory.CLASSROOM_SESSION+"' and task.id = "+taskId+") and cmsession_module.module_id = module_course.module_id and lesson_cmsession.cmsession_id = cmsession_module.cmsession_id and lesson_cmsession.lesson_id = lesson.id and lesson.is_published ='t' and lesson.category in ('ILT','BOTH') order by module_course.oid, cmsession_module.oid , lesson_cmsession.oid";
-			System.err.println("getCourseId>>>"+getCourseId);
-			List<HashMap<String, Object>> courseData = util.executeQuery(getCourseId);
-			CourseContent courseContent = new CourseContent();
-			
-			if(courseData.size()>0)
-			{
-				ArrayList<CourseItem> courseItems = new ArrayList<>();
-				for(HashMap<String, Object> row: courseData)
-				{
-					CourseItem item = new CourseItem();
-					int itemId = (int)row.get("id");
-					String itemName = row.get("title").toString().trim();
-					int orderId = (int)row.get("order_id");
-					item.setItemId(itemId);
-					item.setItemName(itemName);
-					item.setItemType(TaskItemCategory.LESSON);
-					item.setOrderId(orderId);
-					if(itemId==currentItemId)
-					{
-						curentItemOrderId = orderId;
-						if(orderId+1<courseData.size())
-						{
-							nextItemOrderId = orderId+1;
-						}
-						if(orderId-1 >=0)
-						{
-							prevItemOrderId = orderId-1;
-						}
-					}
-					courseItems.add(item);
-				}
-				if(curentItemOrderId==null)
-				{
-					curentItemOrderId = 0;
-				}
-				courseContent.setCurrentItemOrderId(curentItemOrderId);
-				courseContent.setNextItemOrderId(nextItemOrderId);
-				courseContent.setPreviousItemOrderId(prevItemOrderId);				
-				courseContent.setItems(courseItems);							
-				
+				courseId = (int)courseIdData.get(0).get("course_id");
+				courseContent = service.getCourseContent(courseId, taskId);	
 				HashMap<String, Object> jsonMap = new HashMap<String, Object>();				
 				jsonMap.put("course_content", courseContent);
 	
@@ -185,11 +144,10 @@ public class RestTrainerWorkflowServices {
 			}
 			else
 			{
-
 				HashMap<String, Object> jsonMap = new HashMap<String, Object>();
 				String result = gson.toJson(jsonMap);				
 				return Response.ok(result).build();
-			}											
+			}	
 			
 			
 		}catch(Exception e){

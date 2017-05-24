@@ -31,7 +31,6 @@ import com.istarindia.apps.services.GamificationServices;
 import com.istarindia.apps.services.StudentPlaylistServices;
 import com.viksitpro.core.cms.interactive.InteractiveContent;
 import com.viksitpro.core.cms.lesson.VideoLesson;
-import com.viksitpro.core.cms.oldcontent.CMSPresentation;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
@@ -39,7 +38,6 @@ import com.viksitpro.core.dao.entities.Task;
 
 @Path("lessons/user/{userId}")
 public class RESTLessonService {
-
 	@GET
 	@Path("{lessonId}")
 	@Produces(MediaType.APPLICATION_XML)
@@ -64,7 +62,7 @@ public class RESTLessonService {
 			Serializer serializer = new Persister();
 			Object object = null;
 			if (!file.exists()) {
-				String lessonXML = lesson.getLessonXml();
+				
 				System.out.println("Creating New Zip file");
 				object = createZIPForItem.generateXMLForLesson(lessonId);		
 			} else {

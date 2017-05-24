@@ -18,6 +18,18 @@ public class CourseContent {
 	Integer nextItemOrderId;
 	Integer previousItemOrderId;
 	ArrayList<CourseItem> items;
+	String contentUrl;
+	Integer courseId;
+	
+	@XmlAttribute(name = "course_id", required = false)
+	public Integer getCourseId() {
+		return courseId;
+	}
+
+	public void setCourseId(Integer courseId) {
+		this.courseId = courseId;
+	}
+
 	public CourseContent() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -60,6 +72,15 @@ public class CourseContent {
 	}
 	public void setItems(ArrayList<CourseItem> items) {
 		this.items = items;
+	}
+
+	@XmlAttribute(name = "content_url", required = false)
+	public String getContentUrl() {
+		return contentUrl;
+	}
+
+	public void setContentUrl(String contentUrl) {
+		this.contentUrl = contentUrl;
 	}
 	
 	

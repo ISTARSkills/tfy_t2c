@@ -15,6 +15,7 @@ public class CourseItem {
 	String itemName;
 	Integer orderId;
 	String itemType;
+	String itemUrl;
 	public CourseItem() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -51,6 +52,15 @@ public class CourseItem {
 
 	public void setItemType(String itemType) {
 		this.itemType = itemType;
+	}
+
+	@XmlAttribute(name = "item_url", required = false)
+	public String getItemUrl() {
+		return itemUrl;
+	}
+
+	public void setItemUrl(String itemUrl) {
+		this.itemUrl = itemUrl;
 	}
 	
 	

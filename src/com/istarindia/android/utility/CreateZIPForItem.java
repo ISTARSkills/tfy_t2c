@@ -26,7 +26,6 @@ import com.viksitpro.core.cms.interactive.EntityOption;
 import com.viksitpro.core.cms.interactive.InfoCard;
 import com.viksitpro.core.cms.interactive.InteractiveContent;
 import com.viksitpro.core.cms.lesson.VideoLesson;
-import com.viksitpro.core.cms.oldcontent.CMSPresentation;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Task;
 
@@ -98,19 +97,26 @@ public class CreateZIPForItem {
 			object = createZIPForVideoLesson(lesson);
 			break;
 		case "PRESENTATION":
-			object = createZIPForPresentationLesson(lesson);
-			
+			object = createZIPForPresentationLesson(lesson);			
 			break;
 		}
 		return object;
 	}
 
 	private Object createZIPForPresentationLesson(Lesson lesson) {
-		String mediaPath = getMediaPath();
-		String mediaURLPath = getMediaURLPath();
-		String xml_object = lesson.getLessonXml();
-		
-		
+		String mediaPath = "";
+		try {
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+			if (inputStream != null) {
+				properties.load(inputStream);
+				mediaPath = properties.getProperty("mediaPath");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String xml_object = mediaPath+"/lessonXMLs/"+lesson.getId()+".xml";				
 		return xml_object;
 	}
 
