@@ -35,7 +35,7 @@ public class TaskSummaryPojoCreator {
 
 	public TaskSummaryPOJO getAssessmentTask(Task task) {
 		
-		AssessmentTask taskSummaryPOJO = null;
+		TaskSummaryPOJO taskSummaryPOJO = null;
 		
 		AppAssessmentServices appAssessmentServices= new AppAssessmentServices();
 		Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());
@@ -43,7 +43,7 @@ public class TaskSummaryPojoCreator {
 
 		if(assessment!=null && assessment.getAssessmentQuestions().size()>0){
 			Course course = appCourseServices.getCourse(assessment.getCourse());
-			taskSummaryPOJO = new AssessmentTask();
+			taskSummaryPOJO = new TaskSummaryPOJO();
 			
 			taskSummaryPOJO.setId(task.getId());
 			taskSummaryPOJO.setItemId(task.getItemId());
@@ -136,7 +136,7 @@ public class TaskSummaryPojoCreator {
 			
 		}
 		
-		ClassRoomSessionTask taskSummaryPOJO = null;		
+		TaskSummaryPOJO taskSummaryPOJO = null;		
 		AppCourseServices appCourseServices= new AppCourseServices();
 		//Lesson lesson = appCourseServices.getLesson(task.getItemId());
 		DBUTILS util = new DBUTILS();
@@ -146,7 +146,7 @@ public class TaskSummaryPojoCreator {
 		{
 			for(HashMap<String, Object> row: eventData)
 			{
-				taskSummaryPOJO = new ClassRoomSessionTask();
+				taskSummaryPOJO = new TaskSummaryPOJO();
 				String header = row.get("org_name").toString().trim();
 				String title = row.get("course_name").toString().trim();
 				String taskImage = "/course_images/"+title.charAt(0)+".png";				

@@ -11,8 +11,7 @@ public class TaskSummaryPOJO {
 	private Integer id;
 	private String header;
 	private String title;
-	private String description;
-	
+	private String description;	
 	private String itemType;
 	private Integer itemId;
 	private Integer duration;
@@ -22,10 +21,123 @@ public class TaskSummaryPOJO {
 	private String messageForCompletedTasks;
 	private String messageForIncompleteTasks;
 	
+	
+	/*related to assessment task starts here*/
+	private Integer numberOfQuestions;
+	private Integer itemPoints;
+	private Integer itemCoins;
+	/*related to assessment task ends here*/
+	
+	/*related to classroom task starts here*/
+	private Double lattitude;
+	private Double longitude;
+	private Integer durationHours;
+	private Integer durationMinutes;
+	private String groupName;
+	private Integer classRoomId;
+	private String classRoomName;
+	private String time;
+	/*related to classroom task ends here*/
 	public TaskSummaryPOJO(){
 		
 	}
 
+	
+	@XmlAttribute(name = "lattitude", required = false)
+	public Double getLattitude() {
+		return lattitude;
+	}
+	public void setLattitude(Double lattitude) {
+		this.lattitude = lattitude;
+	}
+	
+	@XmlAttribute(name = "longitude", required = false)
+	public Double getLongitude() {
+		return longitude;
+	}
+	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+	
+	@XmlAttribute(name = "duration_hours", required = false)
+	public Integer getDurationHours() {
+		return durationHours;
+	}
+	public void setDurationHours(Integer durationHours) {
+		this.durationHours = durationHours;
+	}
+	
+	@XmlAttribute(name = "duration_minutes", required = false)
+	public Integer getDurationMinutes() {
+		return durationMinutes;
+	}
+	public void setDurationMinutes(Integer durationMinutes) {
+		this.durationMinutes = durationMinutes;
+	}
+	@XmlAttribute(name = "group_name", required = false)
+	public String getGroupName() {
+		return groupName;
+	}
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+	@XmlAttribute(name = "class_room_id", required = false)
+	public Integer getClassRoomId() {
+		return classRoomId;
+	}
+	public void setClassRoomId(Integer classRoomId) {
+		this.classRoomId = classRoomId;
+	}
+	@XmlAttribute(name = "class_room_name", required = false)
+	public String getClassRoomName() {
+		return classRoomName;
+	}
+	public void setClassRoomName(String classRoomName) {
+		this.classRoomName = classRoomName;
+	}
+	
+	@XmlAttribute(name = "time", required = false)
+	public String getTime() {
+		return time;
+	}
+	public void setTime(String time) {
+		this.time = time;
+	}
+	
+	
+
+	@XmlAttribute(name = "numberOfQuestions", required = false)
+	public Integer getNumberOfQuestions() {
+		return numberOfQuestions;
+	}
+
+
+	public void setNumberOfQuestions(Integer numberOfQuestions) {
+		this.numberOfQuestions = numberOfQuestions;
+	}
+
+	@XmlAttribute(name = "itemPoints", required = false)
+	public Integer getItemPoints() {
+		return itemPoints;
+	}
+
+
+	public void setItemPoints(Integer itemPoints) {
+		this.itemPoints = itemPoints;
+	}
+
+	@XmlAttribute(name = "itemCoins", required = false)
+	public Integer getItemCoins() {
+		return itemCoins;
+	}
+
+
+	public void setItemCoins(Integer itemCoins) {
+		this.itemCoins = itemCoins;
+	}
+
+	
+	
 	@XmlAttribute(name = "id", required = false)
 	public Integer getId() {
 		return id;
