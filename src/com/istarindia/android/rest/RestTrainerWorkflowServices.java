@@ -136,7 +136,7 @@ public class RestTrainerWorkflowServices {
 				currentItemId = (int)itemStats.get(0).get("lesson_id");
 			}
 			
-			String getCourseId ="select lesson.id , lesson.title,  cast (row_number() over()  as integer ) -1 as order_id from module_course, cmsession_module, lesson_cmsession, lesson where module_course.course_id = (select course_id from task,batch_schedule_event where batch_schedule_event.id = task.item_id and item_type ='"+TaskItemCategory.CLASSROOM_SESSION+"' and task.id = "+taskId+") and cmsession_module.module_id = module_course.module_id and lesson_cmsession.cmsession_id = cmsession_module.cmsession_id and lesson_cmsession.lesson_id = lesson.id and lesson.is_published ='t' order by module_course.oid, cmsession_module.oid , lesson_cmsession.oid";
+			String getCourseId ="select lesson.id , lesson.title,  cast (row_number() over()  as integer ) -1 as order_id from module_course, cmsession_module, lesson_cmsession, lesson where module_course.course_id = (select course_id from task,batch_schedule_event where batch_schedule_event.id = task.item_id and item_type ='"+TaskItemCategory.CLASSROOM_SESSION+"' and task.id = "+taskId+") and cmsession_module.module_id = module_course.module_id and lesson_cmsession.cmsession_id = cmsession_module.cmsession_id and lesson_cmsession.lesson_id = lesson.id and lesson.is_published ='t' and lesson.category in ('ILT','BOTH') order by module_course.oid, cmsession_module.oid , lesson_cmsession.oid";
 			System.err.println("getCourseId>>>"+getCourseId);
 			List<HashMap<String, Object>> courseData = util.executeQuery(getCourseId);
 			CourseContent courseContent = new CourseContent();

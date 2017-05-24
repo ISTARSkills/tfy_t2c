@@ -66,13 +66,10 @@ public class RESTLessonService {
 			if (!file.exists()) {
 				String lessonXML = lesson.getLessonXml();
 				System.out.println("Creating New Zip file");
-				object = createZIPForItem.generateXMLForLesson(lessonId);
-				
-				
+				object = createZIPForItem.generateXMLForLesson(lessonId);		
 			} else {
 				String lessonXML = getLessonXML(lesson.getId());
 				System.out.println("Zip file exists");
-
 				if (lessonXML != null && !lessonXML.trim().isEmpty()) {
 					if (lesson.getType().equals("INTERACTIVE")) {
 						InteractiveContent interactiveContent = serializer.read(InteractiveContent.class, lessonXML);

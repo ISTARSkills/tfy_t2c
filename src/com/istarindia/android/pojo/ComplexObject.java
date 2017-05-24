@@ -6,13 +6,19 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.istarindia.android.pojo.task.AssessmentTask;
+import com.istarindia.android.pojo.task.ClassRoomSessionTask;
+
 @XmlRootElement(name = "module")
 public class ComplexObject {
 
 	private Integer id;
 	private StudentProfile studentProfile;
 	private List<SkillReportPOJO> skills;
-	private List<TaskSummaryPOJO> tasks;
+	private List<AssessmentTask> assessmentTasks;
+	private List<ClassRoomSessionTask> classRoomTasks;
+	private List<TaskSummaryPOJO> lessonTasks;
+	
 	private List<AssessmentPOJO> assessments;
 	private List<AssessmentReportPOJO> assessmentReports;
 	//private List<AssessmentResponsePOJO> assessmentResponses;
@@ -52,14 +58,7 @@ public class ComplexObject {
 		this.skills = skills;
 	}
 
-	@XmlElement(name = "tasks", required = false)
-	public List<TaskSummaryPOJO> getTasks() {
-		return tasks;
-	}
-
-	public void setTasks(List<TaskSummaryPOJO> tasks) {
-		this.tasks = tasks;
-	}
+	
 
 	@XmlElement(name = "assessments", required = false)
 	public List<AssessmentPOJO> getAssessments() {
@@ -123,4 +122,34 @@ public class ComplexObject {
 	public void setNotifications(List<NotificationPOJO> notifications) {
 		this.notifications = notifications;
 	}
+
+	@XmlElement(name = "assessment_tasks", required = false)
+	public List<AssessmentTask> getAssessmentTasks() {
+		return assessmentTasks;
+	}
+
+	public void setAssessmentTasks(List<AssessmentTask> assessmentTasks) {
+		this.assessmentTasks = assessmentTasks;
+	}
+
+	@XmlElement(name = "classroom_tasks", required = false)
+	public List<ClassRoomSessionTask> getClassRoomTasks() {
+		return classRoomTasks;
+	}
+
+	public void setClassRoomTasks(List<ClassRoomSessionTask> classRoomTasks) {
+		this.classRoomTasks = classRoomTasks;
+	}
+
+	@XmlElement(name = "lesson_tasks", required = false)
+	public List<TaskSummaryPOJO> getLessonTasks() {
+		return lessonTasks;
+	}
+
+	public void setLessonTasks(List<TaskSummaryPOJO> lessonTasks) {
+		this.lessonTasks = lessonTasks;
+	}
+	
+	
+	
 }

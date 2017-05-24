@@ -16,6 +16,8 @@ import com.istarindia.android.pojo.NotificationPOJO;
 import com.istarindia.android.pojo.SkillReportPOJO;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.pojo.TaskSummaryPOJO;
+import com.istarindia.android.pojo.task.AssessmentTask;
+import com.istarindia.android.pojo.task.ClassRoomSessionTask;
 import com.istarindia.android.utility.AppDashboardUtility;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.android.utility.AppUserRankUtility;
@@ -24,6 +26,7 @@ import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
+import com.viksitpro.core.utilities.TaskItemCategory;
 
 public class AppComplexObjectServices {
 
@@ -67,32 +70,56 @@ public class AppComplexObjectServices {
 			
 			//Tasks		
 			List<Task> allTaskOfUser = taskServices.getAllTaskOfActorForToday(istarUser);
-			List<TaskSummaryPOJO> allTaskSummary = new ArrayList<TaskSummaryPOJO>();
+			List<TaskSummaryPOJO> lessonTask = new ArrayList<TaskSummaryPOJO>();
+			List<AssessmentTask> assessmentTask = new ArrayList<AssessmentTask>();
+			List<ClassRoomSessionTask> classRoomTask = new ArrayList<ClassRoomSessionTask>();
 			int completedTasks = 0;
 			TaskFactory factory = new TaskFactory();
 			for (Task task : allTaskOfUser) {
-				TaskSummaryPOJO taskSummaryPOJO = null;				
+				TaskSummaryPOJO taskSummaryPOJO = null;								
 				taskSummaryPOJO = factory.getTaskSummary(task);
+				if(task.getItemType().equalsIgnoreCase(TaskItemCategory.ASSESSMENT))
+				{
+					assessmentTask.add((AssessmentTask)taskSummaryPOJO);
+				}
+				else if(task.getItemType().equalsIgnoreCase(TaskItemCategory.CLASSROOM_SESSION))
+				{
+					classRoomTask.add((ClassRoomSessionTask)taskSummaryPOJO);
+				}
+				else if(task.getItemType().equalsIgnoreCase(TaskItemCategory.LESSON))
+				{
+					lessonTask.add(taskSummaryPOJO);
+				}	
 				if (taskSummaryPOJO != null) {
 					if (taskSummaryPOJO.getStatus().equals("COMPLETED")) {
 						completedTasks++;
-					}
-					allTaskSummary.add(taskSummaryPOJO);
+					}					
 				}
 			}
-
-			if (allTaskSummary.size() > 0) {
+			int totalTaskSize =  lessonTask.size()+assessmentTask.size()+classRoomTask.size();
+			if (totalTaskSize > 0) {
 				String messageForCompletedTasks = completedTasks + " Tasks Completed";
-				String messageForIncompleteTasks = (allTaskSummary.size() - completedTasks)
+				String messageForIncompleteTasks = (totalTaskSize - completedTasks)
 						+ " tasks remaining for the day";
 
-				for (TaskSummaryPOJO taskSummaryPOJO : allTaskSummary) {
+				for (TaskSummaryPOJO taskSummaryPOJO : lessonTask) {
+					taskSummaryPOJO.setMessageForCompletedTasks(messageForCompletedTasks);
+					taskSummaryPOJO.setMessageForIncompleteTasks(messageForIncompleteTasks);
+				}
+				for (TaskSummaryPOJO taskSummaryPOJO : classRoomTask) {
+					taskSummaryPOJO.setMessageForCompletedTasks(messageForCompletedTasks);
+					taskSummaryPOJO.setMessageForIncompleteTasks(messageForIncompleteTasks);
+				}
+				for (TaskSummaryPOJO taskSummaryPOJO : assessmentTask) {
 					taskSummaryPOJO.setMessageForCompletedTasks(messageForCompletedTasks);
 					taskSummaryPOJO.setMessageForIncompleteTasks(messageForIncompleteTasks);
 				}
 			}
-			complexObject.setTasks(allTaskSummary);
-			System.err.println("complexObject allTaskSummary->" + allTaskSummary.size() + "Time->" + (System.currentTimeMillis()-previousTime));
+			
+			complexObject.setAssessmentTasks(assessmentTask);
+			complexObject.setClassRoomTasks(classRoomTask);
+			complexObject.setLessonTasks(lessonTask);
+			System.err.println("complexObject allTaskSummary->" + totalTaskSize + "Time->" + (System.currentTimeMillis()-previousTime));
 			
 		
 			
