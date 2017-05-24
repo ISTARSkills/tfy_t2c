@@ -71,9 +71,8 @@ public class RestTrainerWorkflowServices {
 				
 				HashMap<String, Object> jsonMap = new HashMap<String, Object>();
 				
-				jsonMap.put("group_details", group);
 	
-				String result = gson.toJson(jsonMap);
+				String result = gson.toJson(group);
 				return Response.ok(result).build();
 			}
 			else
