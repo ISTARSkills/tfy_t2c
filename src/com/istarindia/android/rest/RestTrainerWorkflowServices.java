@@ -135,17 +135,13 @@ public class RestTrainerWorkflowServices {
 			{
 				courseId = (int)courseIdData.get(0).get("course_id");
 				courseContent = service.getCourseContent(courseId, taskId);	
-				HashMap<String, Object> jsonMap = new HashMap<String, Object>();				
-				jsonMap.put("course_content", courseContent);
-	
-				String result = gson.toJson(jsonMap);
+				
+				String result = gson.toJson(courseContent);
 				return Response.ok(result).build();
 			}
 			else
 			{
-				HashMap<String, Object> jsonMap = new HashMap<String, Object>();
-				String result = gson.toJson(jsonMap);				
-				return Response.ok(result).build();
+				throw new Exception();
 			}	
 			
 			

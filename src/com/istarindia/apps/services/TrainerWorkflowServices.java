@@ -107,7 +107,7 @@ public class TrainerWorkflowServices {
 			for(HashMap<String, Object> row: courseData)
 			{
 				CourseItem item = new CourseItem();
-				int itemId = (int)row.get("id");
+				Integer itemId = (int)row.get("id");
 				String itemName = row.get("title").toString().trim();
 				int orderId = (int)row.get("order_id");
 				item.setItemId(itemId);
@@ -115,7 +115,7 @@ public class TrainerWorkflowServices {
 				item.setItemType(TaskItemCategory.LESSON);
 				item.setOrderId(orderId);
 				item.setItemUrl(mediaPath+"/lessonXMLs/"+itemId+".xml");
-				if(itemId==currentItemId)
+				if(currentItemId!=null  && itemId==currentItemId)
 				{
 					curentItemOrderId = orderId;
 					if(orderId+1<courseData.size())
@@ -127,6 +127,7 @@ public class TrainerWorkflowServices {
 						prevItemOrderId = orderId-1;
 					}
 				}
+					
 				courseItems.add(item);
 			}
 			if(curentItemOrderId==null)
