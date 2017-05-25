@@ -43,6 +43,11 @@ public class RESTServletStyle {
 				URI uriAssessment = new URI(uriInfo.getBaseUri()+"assessments/user/"+userId+"/"+task.getItemId());
 				ResponseBuilder builderAssessment =  Response.seeOther(uriAssessment);
 				return builderAssessment.build();
+			case TaskItemCategory.JOB_STUDENT:
+				System.out.println("Task is Job");
+				URI uriJob = new URI(uriInfo.getBaseUri()+"jobs/user/"+userId+"/"+task.getId());
+				ResponseBuilder builderJob =  Response.seeOther(uriJob);
+				return builderJob.build();				
 			}
 			return null;
 	}
