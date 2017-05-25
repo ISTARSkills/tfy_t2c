@@ -115,6 +115,22 @@ public class RestTrainerWorkflowServices {
 		return Response.ok(result).build();
 	}
 	
+	@POST
+	@Path("{taskId}/submit_feedback/{userId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response submitFeedback(@PathParam("userId") int istarUserId,
+			@PathParam("taskId") int taskId,
+			@FormParam("response") String FeedbackResponsesString) {
+	
+		System.out.println("attendanceResponsesString-->" + FeedbackResponsesString);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		Type listType = new TypeToken<GroupStudentPojo>() {}.getType();
+		Gson gsonRequest = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		/**/	
+		HashMap<String, Object> jsonMap = new HashMap<String, Object>();
+		String result = gson.toJson(jsonMap);				
+		return Response.ok(result).build();
+	}
 	
 	@GET
 	@Path("{taskId}/get_course_contents")
