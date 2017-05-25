@@ -15,6 +15,7 @@ public class LessonPOJO implements Comparable<LessonPOJO>{
 	private Integer orderId;
 	private Integer duration;
 	private String status;
+	private String lessonUrl;
 	
 	public LessonPOJO(){
 		
@@ -95,4 +96,16 @@ public class LessonPOJO implements Comparable<LessonPOJO>{
 	public int compareTo(LessonPOJO o) {
 		return this.orderId -o.orderId;
 	}
+
+	@XmlAttribute(name = "lessonUrl", required = false)
+	public String getLessonUrl() {
+		return lessonUrl;
+	}
+
+	public void setLessonUrl(String lessonUrl) {
+		this.lessonUrl = lessonUrl;
+	}
+	
+	
+	
 }

@@ -152,6 +152,7 @@ public class AppCourseServices {
 					lessonPOJO.setSubject(lesson.getSubject());
 					lessonPOJO.setType(lesson.getType());
 					lessonPOJO.setOrderId(studentPlaylist.getId());
+					lessonPOJO.setLessonUrl(mediaUrlPath+"/lessonXMLs/"+lesson.getId()+".zip");
 					
 					ConcreteItemPOJO.setId(lesson.getId());
 					ConcreteItemPOJO.setType("LESSON_"+lesson.getType());

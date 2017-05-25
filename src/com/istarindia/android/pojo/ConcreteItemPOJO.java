@@ -14,6 +14,7 @@ public class ConcreteItemPOJO implements Comparable<ConcreteItemPOJO>{
 	private Integer orderId = 0;
 	private Integer taskId;
 	
+	
 	public ConcreteItemPOJO(){
 		
 	}
