@@ -48,6 +48,10 @@ public class RESTJobServices {
 			
 			Object object = appJobServices.getTaskOfJobForUser(taskId);
 
+			if(object==null){
+				throw new Exception();
+			}
+			
 			String result = gson.toJson(object);
 			return Response.ok(result).build();
 		} catch (Exception e) {

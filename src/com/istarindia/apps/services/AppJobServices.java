@@ -11,7 +11,9 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 
 import com.istarindia.android.pojo.AppActivityPOJO;
+import com.istarindia.android.pojo.AppInterviewPOJO;
 import com.istarindia.android.pojo.AppJobPOJO;
+import com.istarindia.android.pojo.AppJobStagePOJO;
 import com.istarindia.android.pojo.AssessmentPOJO;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.viksitpro.core.dao.entities.Assessment;
@@ -138,8 +140,48 @@ public class AppJobServices {
 					return null;
 				}
 		}else if(stageLog.getStageType().equals("interview")){
-			System.out.println("Yet to be implemented");
-		}		
+			try{
+				AppInterviewPOJO appInterviewPOJO = new AppInterviewPOJO();
+				
+				appInterviewPOJO.setId(stageLog.getId());
+				appInterviewPOJO.setStatus(stageLog.getStatus());
+				appInterviewPOJO.setInterviewURL(stageLog.getUrl1());
+				appInterviewPOJO.setMeetingId(stageLog.getActionId());
+				appInterviewPOJO.setMeetingPassword(stageLog.getActionPassword());
+				appInterviewPOJO.setStageName(stageLog.getStageName());
+				appInterviewPOJO.setTaskId(stageLog.getTask().getId());
+				
+				return appInterviewPOJO;
+			}catch(Exception e){
+				return null;
+			}
+		}else{
+			try{
+				AppJobStagePOJO appJobStagePOJO = new AppJobStagePOJO();
+				
+				appJobStagePOJO.setId(stageLog.getId());
+				appJobStagePOJO.setTaskId(stageLog.getTask().getId());
+				appJobStagePOJO.setStatus(stageLog.getStatus());
+				appJobStagePOJO.setType(stageLog.getStageType());
+				
+				String description = "No description avaialble for this task. A recruiter will contact you for the details of this round.";
+				
+				if(stageLog.getTask().getTaskType()!=null && stageLog.getTask().getTaskType().getWorkflow()!=null && stageLog.getTask().getTaskType().getWorkflow().getStages().size()>0){
+					List<PMStage> allPmStage = stageLog.getTask().getTaskType().getWorkflow().getStages();
+					
+					for(PMStage pmStage: allPmStage){
+						if(pmStage.getName().equals(stageLog.getStageName()) && pmStage.getType().equals(stageLog.getStageType())){
+							description = pmStage.getDescription();
+						}
+					}
+				}
+				
+				appJobStagePOJO.setDescription(description);
+				
+			}catch(Exception e){
+				return null;
+			}
+		}	
 		return null;
 	}
 	
@@ -217,6 +259,8 @@ public class AppJobServices {
 					appActivityPOJO.setType(type);
 					appActivityPOJO.setMessage(message);
 					appActivityPOJO.setTime(notification.getCreatedAt());
+					appActivityPOJO.setUserEmail(sender.getEmail());
+					appActivityPOJO.setUserPhone(sender.getMobile()+"");
 					
 					allActivities.add(appActivityPOJO);
 				}
