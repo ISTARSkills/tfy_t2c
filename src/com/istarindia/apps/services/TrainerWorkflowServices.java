@@ -10,8 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import com.istarindia.android.pojo.trainerworkflow.ClassFeedbackByTrainer;
 import com.istarindia.android.pojo.trainerworkflow.CourseContent;
 import com.istarindia.android.pojo.trainerworkflow.CourseItem;
+import com.istarindia.android.pojo.trainerworkflow.FeedbackPojo;
+import com.istarindia.android.pojo.trainerworkflow.GroupPojo;
 import com.istarindia.android.pojo.trainerworkflow.GroupStudentPojo;
 import com.viksitpro.core.utilities.DBUTILS;
 import com.viksitpro.core.utilities.TaskItemCategory;
@@ -63,9 +66,20 @@ public class TrainerWorkflowServices {
 		return students;
 	}
 
-	public void submitAttendance(int taskId, int istarUserId, GroupStudentPojo attendanceResponse) {
+	public void submitAttendance(int taskId, int istarUserId, GroupPojo attendanceResponse) {
 		
-		
+		DBUTILS util = new DBUTILS();
+		for(GroupStudentPojo stu :attendanceResponse.getStudents())
+		{
+			String status ="ABSENT";
+			if(stu.getStatus())
+			{
+				status="PRESENT";
+			}
+			String insertIntoAttendance ="INSERT INTO attendance (id, taken_by, user_id, status, created_at, updated_at, event_id) "
+					+ "VALUES ((select COALESCE(max(id),0)+1 from attendance), '"+istarUserId+"', '"+stu.getStudentId()+"', '"+status+"', 'now()', 'now()', (select item_id from task where id="+taskId+"));";
+			util.executeUpdate(insertIntoAttendance);
+		}
 		
 	}
 
@@ -143,5 +157,18 @@ public class TrainerWorkflowServices {
 		
 	}
 		return courseContent;
+	}
+
+	public void submitFeedbackByTrainer(int taskId, int istarUserId, ClassFeedbackByTrainer feedbackResponse) {
+		
+		HashMap<String, String> feedbackData= new HashMap<>(); 
+		
+		for(FeedbackPojo pojo : feedbackResponse.getFeedbacks())
+		{
+			feedbackData.put(pojo.getName().toLowerCase(), pojo.getRating());
+		}
+		
+		//for(String key : feedbackData.)
+		
 	}
 }

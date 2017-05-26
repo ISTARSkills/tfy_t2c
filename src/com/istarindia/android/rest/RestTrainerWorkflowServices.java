@@ -26,6 +26,7 @@ import com.google.gson.reflect.TypeToken;
 import com.istarindia.android.pojo.DailyTaskPOJO;
 import com.istarindia.android.pojo.NotificationPOJO;
 import com.istarindia.android.pojo.QuestionResponsePOJO;
+import com.istarindia.android.pojo.trainerworkflow.ClassFeedbackByTrainer;
 import com.istarindia.android.pojo.trainerworkflow.CourseContent;
 import com.istarindia.android.pojo.trainerworkflow.CourseItem;
 import com.istarindia.android.pojo.trainerworkflow.GroupPojo;
@@ -105,9 +106,9 @@ public class RestTrainerWorkflowServices {
 	
 		System.out.println("attendanceResponsesString-->" + attendanceResponsesString);
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-		Type listType = new TypeToken<GroupStudentPojo>() {}.getType();
+		Type listType = new TypeToken<GroupPojo>() {}.getType();
 		Gson gsonRequest = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-		GroupStudentPojo attendanceResponse = (GroupStudentPojo) gsonRequest.fromJson(attendanceResponsesString, listType);
+		GroupPojo attendanceResponse = (GroupPojo) gsonRequest.fromJson(attendanceResponsesString, listType);
 		TrainerWorkflowServices serv = new TrainerWorkflowServices();
 		serv.submitAttendance(taskId, istarUserId, attendanceResponse);		
 		HashMap<String, Object> jsonMap = new HashMap<String, Object>();
@@ -126,7 +127,9 @@ public class RestTrainerWorkflowServices {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		Type listType = new TypeToken<GroupStudentPojo>() {}.getType();
 		Gson gsonRequest = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-		/**/	
+		ClassFeedbackByTrainer feedbackResponse = (ClassFeedbackByTrainer) gsonRequest.fromJson(FeedbackResponsesString, listType);
+		TrainerWorkflowServices serv = new TrainerWorkflowServices();
+		serv.submitFeedbackByTrainer(taskId, istarUserId, feedbackResponse);	
 		HashMap<String, Object> jsonMap = new HashMap<String, Object>();
 		String result = gson.toJson(jsonMap);				
 		return Response.ok(result).build();
