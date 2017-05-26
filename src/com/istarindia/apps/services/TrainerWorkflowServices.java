@@ -151,7 +151,8 @@ public class TrainerWorkflowServices {
 			courseContent.setCurrentItemOrderId(curentItemOrderId);
 			courseContent.setNextItemOrderId(nextItemOrderId);
 			courseContent.setPreviousItemOrderId(prevItemOrderId);				
-			courseContent.setItems(courseItems);							
+			courseContent.setItems(courseItems);
+			courseContent.setCourseId(courseId);
 			courseContent.setContentUrl(mediaPath+"/courseZIPs/"+courseId+".zip");
 		
 		
