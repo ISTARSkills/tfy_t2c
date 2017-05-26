@@ -55,6 +55,7 @@ public class RESTCourseService {
 			AppCourseServices appCourseServices = new AppCourseServices();
 			for(Integer courseId : allCourseId){
 				CoursePOJO coursePOJO = appCourseServices.getCourseOfUser(istarUserId, courseId);
+				coursePOJO.setImageURL(coursePOJO.getImageURL().replaceAll("/video//video/", "/video/"));
 				coursePOJO.setSkillObjectives(appCourseServices.getSkillsReportForCourseOfUser(istarUserId, courseId));
 				allCoursePOJO.add(coursePOJO);
 			}

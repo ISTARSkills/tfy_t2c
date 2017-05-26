@@ -138,7 +138,8 @@ public class GamificationServices {
 				{
 					String prevCoins = (String)coinsData.get(0).get("coins");
 					coins= coins+" + "+prevCoins;
- 				}				
+ 				}
+				
 				String insertIntoGamification="INSERT INTO user_gamification (id,istar_user, skill_objective, points, coins, created_at, updated_at, item_id, item_type,  course_id, batch_group_id, org_id, timestamp,max_points) VALUES "
 						+ "((SELECT COALESCE(MAX(ID),0)+1 FROM user_gamification),"+istarUser.getId()+", "+skillObjectiveId+",'"+maxPoints+"' , '"+coins+"', now(), now(), "+assessment.getId()+", 'ASSESSMENT', "+assessment.getCourse()+", "+groupId+", "+orgId+", now(),'"+maxPoints+"');";
 				System.out.println("insertIntoGamification>>>>"+insertIntoGamification);
@@ -167,9 +168,11 @@ public class GamificationServices {
 			int orgId = (int)primaryG.get("college_id");
 			ArrayList<Integer> questionAnsweredCorrectly = new ArrayList<>();
 			String findQueAnsweredCorrectly= "select distinct question_id from student_assessment where assessment_id ="+assessment.getId()+" and student_id="+istarUser.getId()+" and correct='t'";
+			System.out.println("correct que id "+findQueAnsweredCorrectly );
 			List<HashMap<String, Object>> correctQueAnsweredData = util.executeQuery(findQueAnsweredCorrectly);
 			for(HashMap<String, Object> qro : correctQueAnsweredData)
 			{
+				System.out.println("correct que id"+(int)qro.get("question_id"));
 				questionAnsweredCorrectly.add((int)qro.get("question_id"));
 			}
 			
@@ -197,12 +200,23 @@ public class GamificationServices {
 					if(coinsData.size()>0)
 					{
 						String prevCoins = (String)coinsData.get(0).get("coins");
-						coins= coins+prevCoins;
+						coins= coins+" + "+prevCoins;
 						pointsScored = (String)coinsData.get(0).get("points");
-						if(assessment.getRetryAble())
+						if(assessment.getRetryAble()!= null && assessment.getRetryAble())
 						{
-							pointsScored = maxPoints;
+							if(questionAnsweredCorrectly.contains(questionId))
+							{
+								System.out.println("questionAnsweredCorrectly contains "+ questionId);
+								pointsScored = maxPoints;
+							}
+							else
+							{
+								System.out.println("questionAnsweredCorrectl do not  contains "+ questionId);
+								pointsScored = "0";
+							}	
+							
 						}
+						
 	 				}
 					else
 					{
