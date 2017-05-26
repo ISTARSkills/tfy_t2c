@@ -56,7 +56,7 @@ public class GamificationServices {
 		}*/
 		
 		
-		String findPrimaryGroupsOfUser = "SELECT distinct	batch_group.id, batch_group.college_id FROM 	batch_students, 	batch_group WHERE 	batch_group. ID = batch_students.batch_group_id AND batch_students.student_id = 4972 and batch_group.is_primary='t'";
+		String findPrimaryGroupsOfUser = "SELECT distinct	batch_group.id, batch_group.college_id FROM 	batch_students, 	batch_group WHERE 	batch_group. ID = batch_students.batch_group_id AND batch_students.student_id = "+istarUser.getId()+" and batch_group.is_primary='t'";
 		System.out.println("findPrimaryGroupsOfUser>>"+findPrimaryGroupsOfUser);
 		List<HashMap<String, Object>> primaryBG = util.executeQuery(findPrimaryGroupsOfUser);
 		
