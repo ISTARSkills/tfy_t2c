@@ -103,20 +103,9 @@ public class CreateZIPForItem {
 		return object;
 	}
 
-	private Object createZIPForPresentationLesson(Lesson lesson) {
-		String mediaPath = "";
-		try {
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-			if (inputStream != null) {
-				properties.load(inputStream);
-				mediaPath = properties.getProperty("mediaPath");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		String xml_object = mediaPath+"/lessonXMLs/"+lesson.getId()+".xml";				
+	private String createZIPForPresentationLesson(Lesson lesson) {
+		
+		String xml_object = getMediaURLPath()+"/lessonXMLs/"+lesson.getId()+".zip";				
 		return xml_object;
 	}
 

@@ -14,9 +14,11 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.istarindia.android.pojo.AssessmentPOJO;
+import com.istarindia.android.pojo.ComplexObject;
 import com.istarindia.android.pojo.TaskSummaryPOJO;
 import com.istarindia.android.utility.AppDashboardUtility;
 import com.istarindia.apps.factories.TaskFactory;
+import com.istarindia.apps.services.AppComplexObjectServices;
 import com.istarindia.apps.services.GamificationServices;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Lesson;
@@ -209,7 +211,17 @@ public class RESTDashboardService {
 				gmService.updatePointsAndCoinsOnLessonComplete(istarUser, lesson);
 			}
 			
-			String result = gson.toJson("DONE");
+			
+			
+			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
+			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(userId);
+
+			if (complexObject == null) {
+				throw new Exception();
+			}
+			String result = gson.toJson(complexObject);
+			
+			
 			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();

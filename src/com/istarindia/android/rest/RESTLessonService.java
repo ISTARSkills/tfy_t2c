@@ -79,9 +79,8 @@ public class RESTLessonService {
 						object = videoLesson;
 					}
 					else if(lesson.getType().equalsIgnoreCase("PRESENTATION"))
-					{
-						//zip creation code will come here
-						
+					{						
+							object = mediaURLPath+"/lessonXMLs/"+lesson.getId()+".zip";
 					}
 				}
 			}
