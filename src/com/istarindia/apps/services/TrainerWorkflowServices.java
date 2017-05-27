@@ -102,12 +102,14 @@ public class TrainerWorkflowServices {
 		Integer curentItemOrderId = null;
 		Integer nextItemOrderId = null;
 		Integer currentItemId = null;
-		String getCurrentPrevAndNextItemForCourse = "select lesson_id from slide_change_log , batch_schedule_event, task where task.item_id = batch_schedule_event.id and batch_schedule_event.course_id= slide_change_log.course_id and slide_change_log.batch_group_id = batch_schedule_event.batch_group_id and task.id = "+taskId+" order by slide_change_log.id desc  limit 1";
+		Integer currentItemSlideId=null;
+		String getCurrentPrevAndNextItemForCourse = "select lesson_id , slide_id from slide_change_log , batch_schedule_event, task where task.item_id = batch_schedule_event.id and batch_schedule_event.course_id= slide_change_log.course_id and slide_change_log.batch_group_id = batch_schedule_event.batch_group_id and task.id = "+taskId+" order by slide_change_log.id desc  limit 1";
 		System.err.println("getCurrentPrevAndNextItemForCourse>>>>>>"+getCurrentPrevAndNextItemForCourse);			
 		List<HashMap<String, Object>> itemStats = util.executeQuery(getCurrentPrevAndNextItemForCourse);
 		if(itemStats.size()>0)
 		{
 			currentItemId = (int)itemStats.get(0).get("lesson_id");
+			currentItemSlideId = (int)itemStats.get(0).get("slide_id");
 		}
 		
 		String getCourseId ="select lesson.id , lesson.title,  cast (row_number() over()  as integer ) -1 as order_id from module_course, cmsession_module, lesson_cmsession, lesson where module_course.course_id = "+courseId+" and cmsession_module.module_id = module_course.module_id and lesson_cmsession.cmsession_id = cmsession_module.cmsession_id and lesson_cmsession.lesson_id = lesson.id and lesson.is_published ='t' and lesson.category in ('ILT','BOTH') order by module_course.oid, cmsession_module.oid , lesson_cmsession.oid";
@@ -153,6 +155,7 @@ public class TrainerWorkflowServices {
 			courseContent.setPreviousItemOrderId(prevItemOrderId);				
 			courseContent.setItems(courseItems);
 			courseContent.setCourseId(courseId);
+			courseContent.setCurrentItemSlideId(currentItemSlideId);
 			courseContent.setContentUrl(mediaPath+"/courseZIPs/"+courseId+".zip");
 		
 		

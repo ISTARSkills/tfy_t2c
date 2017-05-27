@@ -20,6 +20,8 @@ public class CourseContent {
 	ArrayList<CourseItem> items;
 	String contentUrl;
 	Integer courseId;
+	Integer currentItemSlideId;
+	
 	
 	@XmlAttribute(name = "course_id", required = false)
 	public Integer getCourseId() {
@@ -30,6 +32,16 @@ public class CourseContent {
 		this.courseId = courseId;
 	}
 
+	@XmlAttribute(name = "current_slide_id", required = false)
+	public Integer getCurrentItemSlideId() {
+		return currentItemSlideId;
+	}
+
+	public void setCurrentItemSlideId(Integer currentItemSlideId) {
+		this.currentItemSlideId = currentItemSlideId;
+	}
+	
+	
 	public CourseContent() {
 		super();
 		// TODO Auto-generated constructor stub
