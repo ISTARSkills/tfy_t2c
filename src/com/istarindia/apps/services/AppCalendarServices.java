@@ -208,7 +208,7 @@ public class AppCalendarServices {
 			dailyTaskPOJO.setStartDate(startDate);
 			dailyTaskPOJO.setEndDate(endDate);
 			dailyTaskPOJO.setItemId(itemId);
-			
+			try{
 			if(itemType.equals(TaskItemCategory.LESSON)){
 				AppCourseServices appCourseServices = new AppCourseServices();
 				Lesson lesson = appCourseServices.getLesson(itemId);
@@ -221,6 +221,11 @@ public class AppCalendarServices {
 				dailyTaskPOJO.setCompletedAt(completedAt);
 			}
 			allTasks.add(dailyTaskPOJO);
+			}catch(Exception e){
+				e.printStackTrace();
+				System.out.println("erooro oror ");
+				
+			}
 		}
 		return allTasks;
 	}
