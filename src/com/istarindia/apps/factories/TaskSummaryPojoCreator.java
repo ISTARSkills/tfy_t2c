@@ -50,7 +50,7 @@ public class TaskSummaryPojoCreator {
 			taskSummaryPOJO.setItemType(task.getItemType());
 			if(task.getIsActive()){
 				taskSummaryPOJO.setStatus("INCOMPLETE");
-				taskSummaryPOJO.setDate(task.getEndDate());
+				taskSummaryPOJO.setDate(task.getStartDate());
 			}else{
 				taskSummaryPOJO.setStatus("COMPLETED");
 				taskSummaryPOJO.setDate(task.getUpdatedAt());
@@ -100,7 +100,7 @@ public class TaskSummaryPojoCreator {
 			taskSummaryPOJO.setItemType(task.getItemType()+"_"+lesson.getType());
 			if(task.getIsActive()){
 				taskSummaryPOJO.setStatus("INCOMPLETE");
-				taskSummaryPOJO.setDate(task.getEndDate());
+				taskSummaryPOJO.setDate(task.getStartDate());
 			}else{
 				taskSummaryPOJO.setStatus("COMPLETED");
 				taskSummaryPOJO.setDate(task.getUpdatedAt());
@@ -192,7 +192,7 @@ public class TaskSummaryPojoCreator {
 				taskSummaryPOJO.setItemType(task.getItemType());
 				if(task.getIsActive()){
 					taskSummaryPOJO.setStatus("INCOMPLETE");
-					taskSummaryPOJO.setDate(task.getEndDate());
+					taskSummaryPOJO.setDate(task.getStartDate());
 				}else{
 					taskSummaryPOJO.setStatus("COMPLETED");
 					taskSummaryPOJO.setDate(task.getUpdatedAt());

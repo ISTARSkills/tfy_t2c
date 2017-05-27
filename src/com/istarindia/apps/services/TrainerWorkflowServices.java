@@ -75,12 +75,14 @@ public class TrainerWorkflowServices {
 		for(GroupStudentPojo stu :attendanceResponse.getStudents())
 		{
 			String status ="ABSENT";
-			if(stu.getStatus())
+			if(stu.getStatus()!=null && stu.getStatus() )
 			{
 				status="PRESENT";
 			}
-			
-			
+			else
+			{
+				status="ABSENT";
+			}	
 			String insertIntoAttendance ="INSERT INTO attendance (id, taken_by, user_id, status, created_at, updated_at, event_id) "
 					+ "VALUES ((select COALESCE(max(id),0)+1 from attendance), '"+istarUserId+"', '"+stu.getStudentId()+"', '"+status+"', 'now()', 'now()', (select item_id from task where id="+taskId+"));";
 			util.executeUpdate(insertIntoAttendance);
