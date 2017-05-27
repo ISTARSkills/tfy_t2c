@@ -69,6 +69,9 @@ public class TrainerWorkflowServices {
 	public void submitAttendance(int taskId, int istarUserId, GroupPojo attendanceResponse) {
 		
 		DBUTILS util = new DBUTILS();
+		
+		String deleteOldEntry = "delete from attendance where event_id = (select item_id from task where id = "+taskId+")";
+		util.executeUpdate(deleteOldEntry);
 		for(GroupStudentPojo stu :attendanceResponse.getStudents())
 		{
 			String status ="ABSENT";
@@ -76,6 +79,8 @@ public class TrainerWorkflowServices {
 			{
 				status="PRESENT";
 			}
+			
+			
 			String insertIntoAttendance ="INSERT INTO attendance (id, taken_by, user_id, status, created_at, updated_at, event_id) "
 					+ "VALUES ((select COALESCE(max(id),0)+1 from attendance), '"+istarUserId+"', '"+stu.getStudentId()+"', '"+status+"', 'now()', 'now()', (select item_id from task where id="+taskId+"));";
 			util.executeUpdate(insertIntoAttendance);
@@ -171,8 +176,14 @@ public class TrainerWorkflowServices {
 		{
 			feedbackData.put(pojo.getName().toLowerCase(), pojo.getRating());
 		}
+		DBUTILS util = new DBUTILS();
+		String checkIfExist ="delete from trainer_feedback where event_id = (select item_id from task where id = "+taskId+")";
+		util.executeUpdate(checkIfExist);
+		String insertFeedback="INSERT INTO trainer_feedback (id, user_id, rating, comments, event_id, noise, attendance, sick, content, assignment, internals, internet, electricity, time) "
+				+ "VALUES ((select COALESCE(max(id),0)+1 from trainer_feedback), "+istarUserId+", "+Float.parseFloat(feedbackData.get("rating"))+", '"+feedbackData.get("comments")+"', ( select item_id from task where id="+taskId+")), "+Float.parseFloat(feedbackData.get("noise"))+", "+Float.parseFloat(feedbackData.get("attendance"))+", "+Float.parseFloat(feedbackData.get("sick"))+", "+Float.parseFloat(feedbackData.get("content"))+", "+Float.parseFloat(feedbackData.get("assignment"))+", "+Float.parseFloat(feedbackData.get("internals"))+", "+Float.parseFloat(feedbackData.get("internet"))+", "+Float.parseFloat(feedbackData.get("electricity"))+", "+Float.parseFloat(feedbackData.get("time"))+");";
+		util.executeUpdate(insertFeedback);
 		
-		//for(String key : feedbackData.)
+		
 		
 	}
 }
