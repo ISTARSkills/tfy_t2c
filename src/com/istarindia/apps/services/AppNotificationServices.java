@@ -3,12 +3,15 @@ package com.istarindia.apps.services;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
 import com.istarindia.android.pojo.NotificationPOJO;
+import com.istarindia.android.pojo.trainerworkflow.CourseContent;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.Course;
+import com.viksitpro.core.dao.entities.CourseDAO;
 import com.viksitpro.core.dao.entities.IstarNotification;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.IstarUserDAO;
@@ -17,6 +20,7 @@ import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.notification.IstarNotificationServices;
+import com.viksitpro.core.utilities.DBUTILS;
 import com.viksitpro.core.utilities.NotificationType;
 import com.viksitpro.core.utilities.TaskItemCategory;
 
@@ -66,6 +70,9 @@ public class AppNotificationServices {
 			case TaskItemCategory.ASSESSMENT:
 				notificationPOJO = getNotificationPOJOForAssessment(istarNotification);
 				break;
+			case TaskItemCategory.CLASSROOM_SESSION:
+				notificationPOJO = getNotificationPOJOForClassroomSession(istarNotification);
+				break;
 
 			}
 		} else if (istarNotification.getAction() != null && istarNotification.getType() != null) {
@@ -93,6 +100,61 @@ public class AppNotificationServices {
 				notificationPOJO.setImageURL(mediaUrlPath+"users/"+sender.getEmail().charAt(0)+".png");
 			}	
 		}
+		return notificationPOJO;
+	}
+
+	private NotificationPOJO getNotificationPOJOForClassroomSession(IstarNotification istarNotification) {
+		NotificationPOJO notificationPOJO = null;
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+					System.out.println("media_url_path"+mediaUrlPath);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
+		
+		String getCourseIdEventIt ="select batch_schedule_event.id, batch_schedule_event.course_id from batch_schedule_event, task where task.item_id = batch_schedule_event.id and task.item_type ='CLASSROOM_SESSION' and task.id = "+istarNotification.getTaskId();
+		DBUTILS util = new DBUTILS();
+		List<HashMap<String, Object>> ddd = util.executeQuery(getCourseIdEventIt);
+		if(ddd.size()>0)
+		{
+			int itemId = (int)ddd.get(0).get("id");
+			int course_id = (int)ddd.get(0).get("course_id");
+			Course c = new CourseDAO().findById(course_id);
+			TaskServices taskServices = new TaskServices();
+			Task task = taskServices.getTask(istarNotification.getTaskId());
+			notificationPOJO = new NotificationPOJO();
+			notificationPOJO.setId(istarNotification.getId());
+			notificationPOJO.setMessage(istarNotification.getDetails());
+			notificationPOJO.setStatus(istarNotification.getStatus());
+			notificationPOJO.setTime(istarNotification.getCreatedAt());
+			notificationPOJO.setImageURL(mediaUrlPath+c.getImage_url());
+			notificationPOJO.setItemType(NotificationType.CLASSROOM_SESSION);
+			notificationPOJO.setItemId(itemId);
+			
+			CourseContent content = new TrainerWorkflowServices().getCourseContent(course_id, istarNotification.getTaskId());
+			if(content!=null && content.getItems()!=null && content.getItems().size()>0)
+			{
+				notificationPOJO.getItem().put("lessonId", content.getItems().get(content.getCurrentItemOrderId()));
+				
+				notificationPOJO.getItem().put("courseId", course_id);
+				
+				
+			}
+			if(task!=null){
+				notificationPOJO.getItem().put("taskId", task.getId());
+			}
+
+		}
+				
+
 		return notificationPOJO;
 	}
 
