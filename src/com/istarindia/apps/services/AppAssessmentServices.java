@@ -272,7 +272,7 @@ public class AppAssessmentServices {
 		Assessment assessment = new AssessmentDAO().findById(assessmentId);
 		List<SkillReportPOJO> shellTree = new ArrayList<>();
 		DBUTILS util = new DBUTILS();
-		String shelltreeData = "SELECT T1.skill_objective_id, T1.max_points, T1. NAME AS skill_name, MODULE . ID AS module_id, MODULE .module_name, COALESCE ( MODULE .module_description, ' ' ) AS module_description, MODULE .image_url FROM ( SELECT assessment.course_id, skill_objective_id, custom_eval(cast (trim (replace(replace(replace( COALESCE(max_points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as max_points,  skill_objective. NAME FROM assessment_benchmark, assessment, skill_objective WHERE assessment_benchmark.item_id = assessment. ID AND assessment_benchmark.item_type = 'ASSESSMENT' AND assessment. ID = "+assessmentId+" AND assessment_benchmark.context_id = assessment.course_id AND assessment_benchmark.skill_objective_id = skill_objective. ID ) T1 JOIN cmsession_skill_objective ON ( cmsession_skill_objective.skill_objective_id = T1.skill_objective_id ) JOIN cmsession_module ON ( cmsession_skill_objective.cmsession_id = cmsession_module.cmsession_id ) JOIN MODULE ON ( MODULE . ID = cmsession_module.module_id ) JOIN module_course ON ( MODULE . ID = module_course.module_id ) WHERE module_course.course_id = T1.course_id";
+		String shelltreeData = "SELECT T1.skill_objective_id, T1.max_points, T1. NAME AS skill_name, module_skill . ID AS module_id, module_skill .name as module_name FROM ( SELECT assessment.course_id, skill_objective_id, custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (max_points, '0'), ':per_lesson_points', '"+per_lesson_points+"' ), ':per_assessment_points', '"+per_assessment_points+"' ), ':per_question_points', '"+per_question_points+"' ) ) AS TEXT ) ) AS max_points, skill_objective. NAME FROM assessment_benchmark, assessment, skill_objective WHERE assessment_benchmark.item_id = assessment. ID AND assessment_benchmark.item_type = 'ASSESSMENT' AND assessment. ID = "+assessmentId+" AND assessment_benchmark.context_id = assessment.course_id AND assessment_benchmark.skill_objective_id = skill_objective. ID ) T1 JOIN skill_objective cmsession_skill ON ( cmsession_skill.id = T1.skill_objective_id ) JOIN skill_objective module_skill ON ( module_skill .id = cmsession_skill.parent_skill ) WHERE module_skill.context  = T1.course_id and  cmsession_skill.context = T1.course_id  ";
 		List<HashMap<String, Object>> assessmentData = util.executeQuery(shelltreeData);
 		for(HashMap<String, Object> row: assessmentData)
 		{
@@ -281,12 +281,8 @@ public class AppAssessmentServices {
 			String skillName = (String)row.get("skill_name");
 			int moduleId = (int)row.get("module_id");
 			String moduleName = (String)row.get("module_name");
-			String moduleDesc = (String)row.get("module_description");
-			String moduleImage = mediaUrlPath+"course_images/"+moduleName.trim().charAt(0)+".png";
-			if(row.get("image_url")!=null)
-			{
-				moduleImage = mediaUrlPath+ row.get("image_url").toString();
-			}
+			String moduleDesc = null;
+			String moduleImage = null;
 			
 			SkillReportPOJO modPojo = new SkillReportPOJO();
 			modPojo.setName(moduleName.trim());
