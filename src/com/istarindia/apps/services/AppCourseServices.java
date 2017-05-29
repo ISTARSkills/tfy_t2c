@@ -458,19 +458,16 @@ public class AppCourseServices {
 		
 		List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();
 		DBUTILS utils = new DBUTILS();
-		String getEmptyTreeStructure ="SELECT * FROM ( SELECT MODULE . ID AS module_id, MODULE .module_name, COALESCE ( MODULE .module_description, ' ' ) AS module_description, MODULE .image_url, skill_objective. ID AS cmsession_skill_id, skill_objective. NAME AS cmsession_skill_name FROM module_course, MODULE, cmsession_module, cmsession_skill_objective, skill_objective WHERE module_course.course_id = "+courseId+" AND module_course.module_id = MODULE . ID AND module_course.module_id = cmsession_module.module_id AND cmsession_module.cmsession_id = cmsession_skill_objective.cmsession_id AND cmsession_skill_objective.skill_objective_id = skill_objective. ID ) T1 JOIN ( SELECT skill_objective_id, sum(custom_eval(cast (trim (replace(replace(replace( COALESCE(max_points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text))) as max_points FROM assessment_benchmark WHERE context_id = "+courseId+" GROUP BY skill_objective_id ) AB ON ( AB.skill_objective_id = T1.cmsession_skill_id ) "; 		
+		String getEmptyTreeStructure ="select * from  (SELECT distinct module_skill.id as module_id, module_skill.name as module_name, cmsession_skill.id as cmsession_skill_id, cmsession_skill.name as cmsession_skill_name FROM skill_objective module_skill, skill_objective cmsession_skill WHERE module_skill.context = "+courseId+" AND module_skill.context = "+courseId+" AND module_skill.id = cmsession_skill.parent_skill AND cmsession_skill.skill_level_type ='CMSESSION' and module_skill.skill_level_type ='MODULE' order by module_id ) T1 JOIN ( SELECT skill_objective_id, SUM ( custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (max_points, '0'), ':per_lesson_points', '"+per_lesson_points+"' ), ':per_assessment_points', '"+per_assessment_points+"' ), ':per_question_points', '"+per_question_points+"' ) ) AS TEXT ) ) ) AS max_points FROM assessment_benchmark WHERE context_id = "+courseId+" GROUP BY skill_objective_id ) AB ON ( AB.skill_objective_id = T1.cmsession_skill_id )"; 		
 				System.out.println("getEmptyTreeStructure>>>"+getEmptyTreeStructure);
 		List<HashMap<String, Object>> treeStructure = utils.executeQuery(getEmptyTreeStructure);
 		for(HashMap<String, Object> treeRow: treeStructure)
 		{
 			int moduleId = (int)treeRow.get("module_id");
 			String module_name = (String)treeRow.get("module_name");
-			String moduleDesc = (String)treeRow.get("module_description");
-			String moduleImage =mediaUrlPath+"course_images/"+module_name.charAt(0)+".png";
-			if(treeRow.get("module_description")!=null)
-			{
-				moduleImage = mediaUrlPath+treeRow.get("module_description").toString();
-			}
+			String moduleDesc = "";
+			String moduleImage =null;
+			
 			String skillName = (String)treeRow.get("cmsession_skill_name");
 			int skillId = (int)treeRow.get("cmsession_skill_id");
 			double maxPoints = (double)treeRow.get("max_points");
