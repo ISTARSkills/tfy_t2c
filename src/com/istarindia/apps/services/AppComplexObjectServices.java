@@ -41,6 +41,20 @@ public class AppComplexObjectServices {
 		
 		
 		if(istarUser!=null){
+			complexObject = new ComplexObject();
+			
+			if(istarUser.getUserRoles()!=null && istarUser.getUserRoles().size()>0)
+			{
+				String role = istarUser.getUserRoles().iterator().next().getRole().getRoleName();
+				complexObject.setUserType(role);
+			}
+			String userCategory ="COLLEGE_STUDENT";
+			if(istarUser.getUserProfile()!=null && istarUser.getUserProfile().getUserCategory()!=null)
+			{
+				 userCategory = istarUser.getUserProfile().getUserCategory();				
+			}			
+			complexObject.setUserCategory(userCategory);
+			
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
@@ -52,7 +66,7 @@ public class AppComplexObjectServices {
 			
 			TaskServices taskServices = new TaskServices();
 
-			complexObject = new ComplexObject();
+			
 			//Id
 			complexObject.setId(userId);
 			long previousTime = System.currentTimeMillis();
