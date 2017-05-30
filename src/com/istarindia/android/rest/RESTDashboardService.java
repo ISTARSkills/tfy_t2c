@@ -125,7 +125,7 @@ public class RESTDashboardService {
 			Task task = taskServices.getTask(taskId);
 
 			if(task==null){
-				throw new Exception("Invlaid Task ID");
+				throw new Exception("Invlaid Task ID"+taskId);
 			}
 			TaskFactory factory = new TaskFactory();
 			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
@@ -136,7 +136,7 @@ public class RESTDashboardService {
 				taskSummaryPOJO = factory.getTaskSummary(task);
 
 				if(taskSummaryPOJO==null){
-					throw new Exception("Invlaid Task ID");
+					throw new Exception("Invlaid Task ID"+taskId);
 				}
 
 			String result = gson.toJson(taskSummaryPOJO);
