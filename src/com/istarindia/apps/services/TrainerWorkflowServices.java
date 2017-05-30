@@ -173,7 +173,7 @@ public class TrainerWorkflowServices {
 	public void submitFeedbackByTrainer(int taskId, int istarUserId, ClassFeedbackByTrainer feedbackResponse) {
 		
 		HashMap<String, String> feedbackData= new HashMap<>(); 
-		
+		feedbackData.put("", "0");
 		for(FeedbackPojo pojo : feedbackResponse.getFeedbacks())
 		{
 			feedbackData.put(pojo.getName().toLowerCase(), pojo.getRating());
@@ -181,8 +181,23 @@ public class TrainerWorkflowServices {
 		DBUTILS util = new DBUTILS();
 		String checkIfExist ="delete from trainer_feedback where event_id = (select item_id from task where id = "+taskId+")";
 		util.executeUpdate(checkIfExist);
+		float avgRating = 5;
+		float totalRating = Float.parseFloat(feedbackData.get("noise")) +Float.parseFloat(feedbackData.get("attendance")) +Float.parseFloat(feedbackData.get("sick")) +Float.parseFloat(feedbackData.get("content")) +Float.parseFloat(feedbackData.get("assignment")) +Float.parseFloat(feedbackData.get("internals")) +Float.parseFloat(feedbackData.get("internet")) +Float.parseFloat(feedbackData.get("electricity")) +Float.parseFloat(feedbackData.get("time"));
+			avgRating = totalRating/9;
 		String insertFeedback="INSERT INTO trainer_feedback (id, user_id, rating, comments, event_id, noise, attendance, sick, content, assignment, internals, internet, electricity, time) "
-				+ "VALUES ((select COALESCE(max(id),0)+1 from trainer_feedback), "+istarUserId+", "+Float.parseFloat(feedbackData.get("rating"))+", '"+feedbackData.get("comments")+"', ( select item_id from task where id="+taskId+")), "+Float.parseFloat(feedbackData.get("noise"))+", "+Float.parseFloat(feedbackData.get("attendance"))+", "+Float.parseFloat(feedbackData.get("sick"))+", "+Float.parseFloat(feedbackData.get("content"))+", "+Float.parseFloat(feedbackData.get("assignment"))+", "+Float.parseFloat(feedbackData.get("internals"))+", "+Float.parseFloat(feedbackData.get("internet"))+", "+Float.parseFloat(feedbackData.get("electricity"))+", "+Float.parseFloat(feedbackData.get("time"))+");";
+				+ "VALUES ((select COALESCE(max(id),0)+1 from trainer_feedback), "+istarUserId+","
+						+ " "+avgRating+", "
+								+ "'"+feedbackData.get("comments")+"',"
+										+ " ( select item_id from task where id="+taskId+"),"
+												+ " "+Float.parseFloat(feedbackData.get("noise"))+","
+														+ " "+Float.parseFloat(feedbackData.get("attendance"))+","
+																+ " "+Float.parseFloat(feedbackData.get("sick"))+","
+																		+ " "+Float.parseFloat(feedbackData.get("content"))+","
+																				+ " "+Float.parseFloat(feedbackData.get("assignment"))+","
+																						+ " "+Float.parseFloat(feedbackData.get("internals"))+", "
+																								+ ""+Float.parseFloat(feedbackData.get("internet"))+","
+																										+ " "+Float.parseFloat(feedbackData.get("electricity"))+", "
+																												+ ""+Float.parseFloat(feedbackData.get("time"))+");";
 		util.executeUpdate(insertFeedback);
 		
 		

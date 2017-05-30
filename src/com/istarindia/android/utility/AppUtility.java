@@ -57,6 +57,7 @@ public class AppUtility {
 				if(!rootUploadFolder.exists()){
 					System.out.println("RootUploadFolder does not exists, creating new one");
 					rootUploadFolder.mkdir();
+					Files.setPosixFilePermissions(Paths.get(rootUploadFolder.getAbsolutePath()), perms);
 				}				
 				if(context!=null){
 					subDirectory = subDirectory + context + "/";
@@ -68,6 +69,8 @@ public class AppUtility {
 		if(!uploadFolder.exists()){
 			System.out.println("Folder does not exists");
 			uploadFolder.mkdir();
+			Files.setPosixFilePermissions(Paths.get(uploadFolder.getAbsolutePath()), perms);
+			
 		}								
 		String fileName = UUID.randomUUID().toString()+"."+fileExtension;
 		String filePath = uploadFolder.getAbsolutePath()+"/"+fileName;

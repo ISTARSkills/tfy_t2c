@@ -125,7 +125,7 @@ public class RestTrainerWorkflowServices {
 	
 		System.out.println("attendanceResponsesString-->" + FeedbackResponsesString);
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-		Type listType = new TypeToken<GroupStudentPojo>() {}.getType();
+		Type listType = new TypeToken<ClassFeedbackByTrainer>() {}.getType();
 		Gson gsonRequest = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		ClassFeedbackByTrainer feedbackResponse = (ClassFeedbackByTrainer) gsonRequest.fromJson(FeedbackResponsesString, listType);
 		TrainerWorkflowServices serv = new TrainerWorkflowServices();
