@@ -41,8 +41,7 @@ public class AppComplexObjectServices {
 		
 		
 		if(istarUser!=null){
-			complexObject = new ComplexObject();
-			
+			complexObject = new ComplexObject();			
 			if(istarUser.getUserRoles()!=null && istarUser.getUserRoles().size()>0)
 			{
 				String role = istarUser.getUserRoles().iterator().next().getRole().getRoleName();
@@ -60,17 +59,12 @@ public class AppComplexObjectServices {
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
 			AppCourseServices appCourseServices = new AppCourseServices();
 			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
-			AppServices appServices= new AppServices();
-			
-			StudentPlaylistServices studentPlaylistServices= new StudentPlaylistServices();
-			
-			TaskServices taskServices = new TaskServices();
-
-			
+			AppServices appServices= new AppServices();			
+			StudentPlaylistServices studentPlaylistServices= new StudentPlaylistServices();			
+			TaskServices taskServices = new TaskServices();			
 			//Id
 			complexObject.setId(userId);
-			long previousTime = System.currentTimeMillis();
-			
+			long previousTime = System.currentTimeMillis();			
 			//Student Profile
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 			complexObject.setStudentProfile(studentProfile);
