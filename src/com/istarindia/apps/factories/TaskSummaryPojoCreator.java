@@ -53,7 +53,7 @@ public class TaskSummaryPojoCreator {
 				taskSummaryPOJO.setDate(task.getStartDate());
 			}else{
 				taskSummaryPOJO.setStatus("COMPLETED");
-				taskSummaryPOJO.setDate(task.getUpdatedAt());
+				taskSummaryPOJO.setDate(task.getStartDate());
 			}
 			taskSummaryPOJO.setTitle(assessment.getAssessmenttitle());
 			taskSummaryPOJO.setImageURL(null);
@@ -103,7 +103,7 @@ public class TaskSummaryPojoCreator {
 				taskSummaryPOJO.setDate(task.getStartDate());
 			}else{
 				taskSummaryPOJO.setStatus("COMPLETED");
-				taskSummaryPOJO.setDate(task.getUpdatedAt());
+				taskSummaryPOJO.setDate(task.getStartDate());
 			}
 			taskSummaryPOJO.setHeader(lesson.getSubject());
 			taskSummaryPOJO.setTitle(lesson.getTitle());
@@ -195,7 +195,7 @@ public class TaskSummaryPojoCreator {
 					taskSummaryPOJO.setDate(task.getStartDate());
 				}else{
 					taskSummaryPOJO.setStatus("COMPLETED");
-					taskSummaryPOJO.setDate(task.getUpdatedAt());
+					taskSummaryPOJO.setDate(task.getStartDate());
 				}
 				taskSummaryPOJO.setHeader(header);
 				taskSummaryPOJO.setTitle(title);
