@@ -129,6 +129,7 @@ public class RESTIstarUserService {
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
 			Gson requestGson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+			System.out.println("profule json---"+profile);
 			StudentProfile requestStudentProfile = requestGson.fromJson(profile, StudentProfile.class);
 
 			if (istarUser == null) {
