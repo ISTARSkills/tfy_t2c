@@ -90,7 +90,8 @@ public class AppPOJOUtility {
 		studentProfile.setAuthenticationToken(student.getAuthToken());
 		studentProfile.setIsVerified(student.getIsVerified());
 		studentProfile.setLoginType(student.getLoginType());
-
+				
+		
 		if (student.getUserProfile() != null) {
 			System.out.println("FIRST NAME POJO is->" + student.getUserProfile().getFirstName());
 			studentProfile.setFirstName(student.getUserProfile().getFirstName());
@@ -102,6 +103,19 @@ public class AppPOJOUtility {
 				studentProfile.setLocation(student.getUserProfile().getAddress().getPincode().getCity());
 			}
 			studentProfile.setProfileImage(mediaUrlPath+student.getUserProfile().getImage());
+			String userCategory ="COLLEGE_STUDENT";
+			if(student.getUserProfile().getUserCategory()!=null)
+			{
+				 userCategory = student.getUserProfile().getUserCategory();				
+			}
+			studentProfile.setUserCategory(userCategory);
+			
+			if(student.getUserRoles()!=null && student.getUserRoles().size()>0)
+			{
+				String role = student.getUserRoles().iterator().next().getRole().getRoleName();
+				studentProfile.setUserType(role);
+			}
+			
 		}
 
 		if (student.getProfessionalProfile() != null) {

@@ -35,6 +35,8 @@ public class StudentProfile {
 	private Integer postGraduationYear;
 	private List<String> preferredLocations;
 	private String resumeURL;
+	private String userType;
+	private String userCategory;
 
 	public StudentProfile(){
 		
@@ -273,5 +275,22 @@ public class StudentProfile {
 		this.preferredLocations = preferredLocations;
 	}
 	
+	@XmlAttribute(name = "user_type", required = false)
+	public String getUserType() {
+		return userType;
+	}
+
+	public void setUserType(String userType) {
+		this.userType = userType;
+	}
+
+	@XmlAttribute(name = "user_category", required = false)
+	public String getUserCategory() {
+		return userCategory;
+	}
+
+	public void setUserCategory(String userCategory) {
+		this.userCategory = userCategory;
+	}
 	
 }

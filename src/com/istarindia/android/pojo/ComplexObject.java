@@ -10,8 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ComplexObject {
 
 	private Integer id;
-	private String userType;
-	private String userCategory;
+	
 	private StudentProfile studentProfile;
 	private List<SkillReportPOJO> skills;
 	private List<TaskSummaryPOJO> tasks;
@@ -126,24 +125,7 @@ public class ComplexObject {
 		this.notifications = notifications;
 	}
 
-	@XmlAttribute(name = "user_type", required = false)
-	public String getUserType() {
-		return userType;
-	}
 
-	public void setUserType(String userType) {
-		this.userType = userType;
-	}
-
-	@XmlAttribute(name = "user_category", required = false)
-	public String getUserCategory() {
-		return userCategory;
-	}
-
-	public void setUserCategory(String userCategory) {
-		this.userCategory = userCategory;
-	}
-	
 	
 	
 	
