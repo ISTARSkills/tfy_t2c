@@ -20,7 +20,7 @@ public class CourseContent {
 	ArrayList<CourseItem> items;
 	String contentUrl;
 	Integer courseId;
-	Integer currentItemSlideId;
+	Long currentItemSlideId;
 	
 	
 	@XmlAttribute(name = "course_id", required = false)
@@ -33,11 +33,11 @@ public class CourseContent {
 	}
 
 	@XmlAttribute(name = "current_slide_id", required = false)
-	public Integer getCurrentItemSlideId() {
+	public Long getCurrentItemSlideId() {
 		return currentItemSlideId;
 	}
 
-	public void setCurrentItemSlideId(Integer currentItemSlideId) {
+	public void setCurrentItemSlideId(Long currentItemSlideId) {
 		this.currentItemSlideId = currentItemSlideId;
 	}
 	
