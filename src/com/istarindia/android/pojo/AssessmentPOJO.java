@@ -18,6 +18,7 @@ public class AssessmentPOJO {
 	private Integer durationInMinutes;
 	private Double points;
 	private List<QuestionPOJO> questions = new ArrayList<QuestionPOJO>();
+	private Boolean retryable;
 	
 	public AssessmentPOJO(){
 		
@@ -87,4 +88,19 @@ public class AssessmentPOJO {
 	public void setQuestions(List<QuestionPOJO> questions) {
 		this.questions = questions;
 	}
+
+	
+	@XmlAttribute(name = "retryable", required = false)
+	public Boolean getRetryable() {
+		return retryable;
+	}
+
+	public void setRetryable(Boolean retryable) {
+		this.retryable = retryable;
+	}
+	
+	
+	
+	
+	
 }

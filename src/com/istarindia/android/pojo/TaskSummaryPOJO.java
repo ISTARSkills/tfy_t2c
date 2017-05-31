@@ -26,6 +26,7 @@ public class TaskSummaryPOJO {
 	private Integer numberOfQuestions;
 	private Integer itemPoints;
 	private Integer itemCoins;
+	private Boolean retryable;
 	/*related to assessment task ends here*/
 	
 	/*related to classroom task starts here*/
@@ -267,6 +268,16 @@ public class TaskSummaryPOJO {
 
 	public void setEvent_address(String event_address) {
 		this.event_address = event_address;
+	}
+
+	@XmlAttribute(name = "retryable", required = false)
+	public Boolean getRetryable() {
+		return retryable;
+	}
+
+
+	public void setRetryable(Boolean retryable) {
+		this.retryable = retryable;
 	}
 
 	

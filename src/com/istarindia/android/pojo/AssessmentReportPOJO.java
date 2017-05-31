@@ -24,6 +24,7 @@ public class AssessmentReportPOJO {
 	private String messageDescription;
 	private List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();
 	private AssessmentResponsePOJO assessmentResponse;
+	private Boolean retryable;
 	
 	public AssessmentReportPOJO(){
 		
@@ -142,6 +143,19 @@ public class AssessmentReportPOJO {
 
 	public void setAssessmentResponse(AssessmentResponsePOJO assessmentResponse) {
 		this.assessmentResponse = assessmentResponse;
+	}
+
+	
+	
+	
+	
+	@XmlAttribute(name = "retryable", required = false)
+	public Boolean getRetryable() {
+		return retryable;
+	}
+
+	public void setRetryable(Boolean retryable) {
+		this.retryable = retryable;
 	}
 
 	public void generateMessageAndDescription(Integer cutOffMarks){

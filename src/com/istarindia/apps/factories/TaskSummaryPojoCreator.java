@@ -61,6 +61,15 @@ public class TaskSummaryPojoCreator {
 			taskSummaryPOJO.setItemPoints(appAssessmentServices.getMaxPointsOfAssessment(assessment.getId()).intValue());
 			taskSummaryPOJO.setNumberOfQuestions(assessment.getAssessmentQuestions().size());
 			taskSummaryPOJO.setDuration(assessment.getAssessmentdurationminutes());
+			if(assessment.getRetryAble()!=null && assessment.getRetryAble())
+			{
+				taskSummaryPOJO.setRetryable(true);
+			}
+			else
+			{
+				taskSummaryPOJO.setRetryable(false);
+			}	
+			
 			if(assessment.getDescription()==null){
 				taskSummaryPOJO.setDescription(course.getCourseDescription());
 			}else{

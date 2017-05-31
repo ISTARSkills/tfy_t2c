@@ -35,6 +35,7 @@ import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.dao.entities.Task;
+import com.viksitpro.core.utilities.DBUTILS;
 
 @Path("lessons/user/{userId}")
 public class RESTLessonService {
@@ -101,6 +102,23 @@ public class RESTLessonService {
 			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
+	
+	
+	@GET
+	@Path("{lessonId}/{status}")
+	@Produces(MediaType.APPLICATION_XML)
+	public void updateLessonstatus(@PathParam("userId") int istarUserId,@PathParam("lessonId") int lessonId, @PathParam("status") String status) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		try {
+			DBUTILS util = new DBUTILS();		
+			String updateLessonStatus ="update student_playlist set  status = '"+status+"' where student_id = "+istarUserId+" and lesson_id = "+lessonId;
+			util.executeUpdate(updateLessonStatus); 
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+		}
+	}
+	
 	
 	public String getLessonXML(int lessonId) {
 

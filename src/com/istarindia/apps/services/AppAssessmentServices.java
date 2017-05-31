@@ -66,6 +66,15 @@ public class AppAssessmentServices {
 		AssessmentReportPOJO assessmentReportPOJO = null;
 		if (assessment != null) {
 
+			if(assessment.getRetryAble()!=null && assessment.getRetryAble())
+			{
+				assessmentReportPOJO.setRetryable(true);
+			}
+			else
+			{
+				assessmentReportPOJO.setRetryable(false);
+			}	
+			
 			List<SkillReportPOJO> shellTree = getShellTreeForAssessment(assessmentId);
 			for(SkillReportPOJO dd : shellTree)
 			{
