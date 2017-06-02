@@ -65,7 +65,7 @@ public class AppAssessmentServices {
 		Assessment assessment = getAssessment(assessmentId);
 		AssessmentReportPOJO assessmentReportPOJO = null;
 		if (assessment != null) {
-
+			assessmentReportPOJO = new AssessmentReportPOJO();
 			if(assessment.getRetryAble()!=null && assessment.getRetryAble())
 			{
 				assessmentReportPOJO.setRetryable(true);
@@ -100,7 +100,7 @@ public class AppAssessmentServices {
 					System.err.println("skillReportForAssesssment in data tree "+" "+ll.getUserPoints()+" "+ll.getTotalPoints()+" "+ll.getPercentage());
 				}
 			}
-			assessmentReportPOJO = new AssessmentReportPOJO();
+			
 		
 			String getUserAverage ="SELECT CAST (AVG(user_average) AS float8) AS batch_average FROM ( SELECT CASE WHEN T2.total_points != 0 THEN T2.user_points * 100 / T2.total_points ELSE 0 END AS user_average FROM ( SELECT T1.istar_user, SUM (T1.points) AS user_points, SUM (T1.max_points) AS total_points FROM ( WITH summary AS ( SELECT P .istar_user, P .skill_objective, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as points, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.max_points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as max_points, ROW_NUMBER () OVER ( PARTITION BY P .istar_user, P .skill_objective ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P WHERE item_type = 'QUESTION' AND batch_group_id = ( SELECT batch_group. ID FROM batch_students, batch_group WHERE batch_students.batch_group_id = batch_group. ID AND batch_students.student_id = "+istarUserId+" AND batch_group.is_primary = 't' LIMIT 1 ) AND course_id = "+assessment.getCourse()+" AND item_id IN ( SELECT DISTINCT questionid FROM assessment_question, assessment, question WHERE assessment_question.assessmentid = assessment. ID AND assessment_question.questionid = question. ID AND question.context_id = assessment.course_id AND assessment. ID = "+assessmentId+" ) ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 GROUP BY T1.istar_user ) T2 ) T3 ";
 			System.out.println("getUserAverage"+getUserAverage);

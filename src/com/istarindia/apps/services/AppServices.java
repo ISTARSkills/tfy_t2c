@@ -107,7 +107,6 @@ public class AppServices {
 		}
 		
 		List<SkillReportPOJO> allSkills = new ArrayList<SkillReportPOJO>();
-
 		StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 		List<Integer> allCourseId = studentPlaylistServices.getCoursesforUser(istarUserId);
 

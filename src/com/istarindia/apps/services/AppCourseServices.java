@@ -358,8 +358,7 @@ public class AppCourseServices {
 					System.out.println("media_url_path"+mediaUrlPath);
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
-			
+				e.printStackTrace();			
 		}
 		
 		List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();
