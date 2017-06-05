@@ -204,5 +204,29 @@ public class TrainerWorkflowServices {
 		
 		
 		
+		
+	}
+
+	public void updateState(int taskId, int istarUserId, String state) {
+		
+		DBUTILS util = new DBUTILS();
+		String fineCourseBGeventId ="select batch_group_id, course_id, id from batch_schedule_event where id = (select item_id from task where id ="+taskId+")";
+		List<HashMap<String, Object>> detail = util.executeQuery(fineCourseBGeventId);		
+		if(detail.size()>0)
+		{
+			
+			String bgId = detail.get(0).get("batch_group_id").toString();
+			String courseId = detail.get(0).get("course_id").toString();
+			String id = detail.get(0).get("id").toString();			
+			String insertIntoLog="INSERT INTO status_change_log (id, trainer_id, course_id,  created_at, updated_at,  event_type, event_status, event_id, batch_group_id) "
+					+ "VALUES ((select COALESCE(max(id),0)+1 from status_change_log), "+istarUserId+", "+courseId+", now(),now(), 'STATUS_CHANGED', '"+state+"', "+id+",  "+bgId+");";
+			util.executeUpdate(insertIntoLog);
+			
+			String updateBSE="update batch_schedule_event set status ='"+state+"' where id=(select item_id from task where id ="+taskId+")";
+			util.executeUpdate(updateBSE);
+			
+		}	
+		
+		
 	}
 }

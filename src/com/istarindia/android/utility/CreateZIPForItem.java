@@ -105,7 +105,8 @@ public class CreateZIPForItem {
 
 	private String createZIPForPresentationLesson(Lesson lesson) {
 		
-		String xml_object = getMediaURLPath()+"/lessonXMLs/"+lesson.getId()+".zip";				
+		String xml_object = getMediaURLPath()+"/lessons/"+lesson.getId()+".zip";	
+		System.out.println("returning "+xml_object);
 		return xml_object;
 	}
 

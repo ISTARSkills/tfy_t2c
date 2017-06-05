@@ -62,14 +62,15 @@ public class RESTLessonService {
 			File file = new File(lessonZipFileActualPath);
 			Serializer serializer = new Persister();
 			Object object = null;
-			if (!file.exists()) {
-				
+			if (!file.exists()) {		
+				System.out.println("cannot find zip at "+lessonZipFileActualPath);
 				System.out.println("Creating New Zip file");
 				object = createZIPForItem.generateXMLForLesson(lessonId);		
 			} else {
 				String lessonXML = getLessonXML(lesson.getId());
 				System.out.println("Zip file exists");
-				if (lessonXML != null && !lessonXML.trim().isEmpty()) {
+				
+				try{
 					if (lesson.getType().equals("INTERACTIVE")) {
 						InteractiveContent interactiveContent = serializer.read(InteractiveContent.class, lessonXML);
 						interactiveContent.setZipFileURL(serverPath);
@@ -81,11 +82,19 @@ public class RESTLessonService {
 					}
 					else if(lesson.getType().equalsIgnoreCase("PRESENTATION"))
 					{						
-							object = mediaURLPath+"/lessonXMLs/"+lesson.getId()+".zip";
+							object = mediaURLPath+"/lessons/"+lesson.getId()+".zip";
+							System.out.println("oject string in case of lessonXML"+object.toString());
 					}
+					
+				}catch(Exception ex)
+				{
+					System.out.println("exception in lesson  id = "+lesson.getType()+" and type"+lesson.getType());
 				}
+				
 			}
 
+			
+			
 			if (object == null) {
 				throw new Exception();
 			}

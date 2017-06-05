@@ -40,6 +40,7 @@ import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.notification.IstarNotificationServices;
 import com.viksitpro.core.utilities.DBUTILS;
 import com.viksitpro.core.utilities.TaskItemCategory;
+import com.viksitpro.core.utilities.TrainerWorkflowStages;
 
 /**
  * @author mayank
@@ -111,6 +112,8 @@ public class RestTrainerWorkflowServices {
 		GroupPojo attendanceResponse = (GroupPojo) gsonRequest.fromJson(attendanceResponsesString, listType);
 		TrainerWorkflowServices serv = new TrainerWorkflowServices();
 		serv.submitAttendance(taskId, istarUserId, attendanceResponse);	
+		serv.updateState(taskId, istarUserId,TrainerWorkflowStages.ATTENDANCE);
+		
 		
 		HashMap<String, Object> jsonMap = new HashMap<String, Object>();
 		String result = gson.toJson(jsonMap);				
@@ -130,7 +133,8 @@ public class RestTrainerWorkflowServices {
 		Gson gsonRequest = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		ClassFeedbackByTrainer feedbackResponse = (ClassFeedbackByTrainer) gsonRequest.fromJson(FeedbackResponsesString, listType);
 		TrainerWorkflowServices serv = new TrainerWorkflowServices();
-		serv.submitFeedbackByTrainer(taskId, istarUserId, feedbackResponse);	
+		serv.submitFeedbackByTrainer(taskId, istarUserId, feedbackResponse);
+		serv.updateState(taskId, istarUserId,TrainerWorkflowStages.FEEDBACK);
 		HashMap<String, Object> jsonMap = new HashMap<String, Object>();
 		String result = gson.toJson(jsonMap);				
 		return Response.ok(result).build();
@@ -174,5 +178,25 @@ public class RestTrainerWorkflowServices {
 	}
 	
 	
+	
+	@GET
+	@Path("{taskId}/{state}/{user_id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateTrainerWorkflowState(@PathParam("taskId") int taskId, @PathParam("state") String state,  @PathParam("user_id") int userId){
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		try{
+			
+			TrainerWorkflowServices service = new TrainerWorkflowServices();
+			service.updateState(taskId, userId, state);					
+			HashMap<String, Object> jsonMap = new HashMap<String, Object>();
+			String result = gson.toJson(jsonMap);				
+			return Response.ok(result).build();
+		}catch(Exception e){
+			e.printStackTrace();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
+		}
+	}
 	
 }
