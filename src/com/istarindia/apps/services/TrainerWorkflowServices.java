@@ -131,7 +131,7 @@ public class TrainerWorkflowServices {
 			for(HashMap<String, Object> row: courseData)
 			{
 				CourseItem item = new CourseItem();
-				Integer itemId = (int)row.get("id");
+				int itemId = (int)row.get("id");
 				String itemName = row.get("title").toString().trim();
 				int orderId = (int)row.get("order_id");
 				item.setItemId(itemId);
@@ -185,10 +185,10 @@ public class TrainerWorkflowServices {
 		float avgRating = 5;
 		float totalRating = Float.parseFloat(feedbackData.get("noise")) +Float.parseFloat(feedbackData.get("attendance")) +Float.parseFloat(feedbackData.get("sick")) +Float.parseFloat(feedbackData.get("content")) +Float.parseFloat(feedbackData.get("assignment")) +Float.parseFloat(feedbackData.get("internals")) +Float.parseFloat(feedbackData.get("internet")) +Float.parseFloat(feedbackData.get("electricity")) +Float.parseFloat(feedbackData.get("time"));
 			avgRating = totalRating/9;
-		String insertFeedback="INSERT INTO trainer_feedback (id, user_id, rating, comments, event_id, noise, attendance, sick, content, assignment, internals, internet, electricity, time) "
+		String insertFeedback="INSERT INTO trainer_feedback (id, user_id, rating, comments, event_id, noise, attendance, sick, content, assignment, internals, internet, electricity, time, projector) "
 				+ "VALUES ((select COALESCE(max(id),0)+1 from trainer_feedback), "+istarUserId+","
 						+ " "+avgRating+", "
-								+ "'"+feedbackData.get("comments")+"',"
+								+ "'"+feedbackData.get("comment")+"',"
 										+ " ( select item_id from task where id="+taskId+"),"
 												+ " "+Float.parseFloat(feedbackData.get("noise"))+","
 														+ " "+Float.parseFloat(feedbackData.get("attendance"))+","
@@ -198,7 +198,8 @@ public class TrainerWorkflowServices {
 																						+ " "+Float.parseFloat(feedbackData.get("internals"))+", "
 																								+ ""+Float.parseFloat(feedbackData.get("internet"))+","
 																										+ " "+Float.parseFloat(feedbackData.get("electricity"))+", "
-																												+ ""+Float.parseFloat(feedbackData.get("time"))+");";
+																												+ ""+Float.parseFloat(feedbackData.get("time"))+","
+																														+ ""+Float.parseFloat(feedbackData.get("projector"))+");";
 		util.executeUpdate(insertFeedback);
 		
 		

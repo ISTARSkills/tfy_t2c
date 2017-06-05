@@ -110,7 +110,8 @@ public class RestTrainerWorkflowServices {
 		Gson gsonRequest = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		GroupPojo attendanceResponse = (GroupPojo) gsonRequest.fromJson(attendanceResponsesString, listType);
 		TrainerWorkflowServices serv = new TrainerWorkflowServices();
-		serv.submitAttendance(taskId, istarUserId, attendanceResponse);		
+		serv.submitAttendance(taskId, istarUserId, attendanceResponse);	
+		
 		HashMap<String, Object> jsonMap = new HashMap<String, Object>();
 		String result = gson.toJson(jsonMap);				
 		return Response.ok(result).build();
