@@ -138,7 +138,7 @@ public class TrainerWorkflowServices {
 				item.setItemName(itemName);
 				item.setItemType(TaskItemCategory.LESSON);
 				item.setOrderId(orderId);
-				item.setItemUrl(mediaPath+"/lessonXMLs/"+itemId+".xml");
+				item.setItemUrl(mediaPath+"/lessonXMLs/"+itemId+".zip");
 				if(currentItemId!=null  && itemId==currentItemId)
 				{
 					curentItemOrderId = orderId;
