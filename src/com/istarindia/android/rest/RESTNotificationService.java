@@ -56,7 +56,7 @@ public class RESTNotificationService {
 			IstarNotification istarNotification = istarNotificationServices.getIstarNotification(notificationId);
 			
 			TaskServices taskServices = new TaskServices();
-			if(istarNotification.getTaskId()!=null)
+			if(istarNotification !=null  && istarNotification.getTaskId()!=null  )
 			{
 				Task task = taskServices.getTask(istarNotification.getTaskId());
 				

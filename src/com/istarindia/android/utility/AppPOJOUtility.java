@@ -54,33 +54,29 @@ public class AppPOJOUtility {
 
 	public StudentProfile getStudentProfile(IstarUser student) {
 		System.out.println("POJO service");
-		String mediaUrlPath ="";
-		int per_assessment_points=5,
-				per_lesson_points=5,
-				per_question_points=1,
-				per_assessment_coins=5,
-				per_lesson_coins=5,
-				per_question_coins=1;
-		try{
+		String mediaUrlPath = "";
+		int per_assessment_points = 5, per_lesson_points = 5, per_question_points = 1, per_assessment_coins = 5,
+				per_lesson_coins = 5, per_question_coins = 1;
+		try {
 			Properties properties = new Properties();
 			String propertyFileName = "app.properties";
 			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-				if (inputStream != null) {
-					properties.load(inputStream);
-					mediaUrlPath =  properties.getProperty("media_url_path");
-					per_assessment_points = Integer.parseInt(properties.getProperty("per_assessment_points"));
-					per_lesson_points = Integer.parseInt(properties.getProperty("per_lesson_points"));
-					per_question_points = Integer.parseInt(properties.getProperty("per_question_points"));
-					per_assessment_coins = Integer.parseInt(properties.getProperty("per_assessment_coins"));
-					per_lesson_coins = Integer.parseInt(properties.getProperty("per_lesson_coins"));
-					per_question_coins = Integer.parseInt(properties.getProperty("per_question_coins"));
-					System.out.println("media_url_path"+mediaUrlPath);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			
+			if (inputStream != null) {
+				properties.load(inputStream);
+				mediaUrlPath = properties.getProperty("media_url_path");
+				per_assessment_points = Integer.parseInt(properties.getProperty("per_assessment_points"));
+				per_lesson_points = Integer.parseInt(properties.getProperty("per_lesson_points"));
+				per_question_points = Integer.parseInt(properties.getProperty("per_question_points"));
+				per_assessment_coins = Integer.parseInt(properties.getProperty("per_assessment_coins"));
+				per_lesson_coins = Integer.parseInt(properties.getProperty("per_lesson_coins"));
+				per_question_coins = Integer.parseInt(properties.getProperty("per_question_coins"));
+				System.out.println("media_url_path" + mediaUrlPath);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+
 		}
-		
+
 		StudentProfile studentProfile = new StudentProfile();
 
 		studentProfile.setId(student.getId());
@@ -90,8 +86,7 @@ public class AppPOJOUtility {
 		studentProfile.setAuthenticationToken(student.getAuthToken());
 		studentProfile.setIsVerified(student.getIsVerified());
 		studentProfile.setLoginType(student.getLoginType());
-				
-		
+
 		if (student.getUserProfile() != null) {
 			System.out.println("FIRST NAME POJO is->" + student.getUserProfile().getFirstName());
 			studentProfile.setFirstName(student.getUserProfile().getFirstName());
@@ -102,20 +97,18 @@ public class AppPOJOUtility {
 			if (student.getUserProfile().getAddress() != null) {
 				studentProfile.setLocation(student.getUserProfile().getAddress().getPincode().getCity());
 			}
-			studentProfile.setProfileImage(mediaUrlPath+student.getUserProfile().getImage());
-			String userCategory ="COLLEGE_STUDENT";
-			if(student.getUserProfile().getUserCategory()!=null)
-			{
-				 userCategory = student.getUserProfile().getUserCategory();				
+			studentProfile.setProfileImage(mediaUrlPath + student.getUserProfile().getImage());
+			String userCategory = "COLLEGE_STUDENT";
+			if (student.getUserProfile().getUserCategory() != null) {
+				userCategory = student.getUserProfile().getUserCategory();
 			}
 			studentProfile.setUserCategory(userCategory);
-			
-			if(student.getUserRoles()!=null && student.getUserRoles().size()>0)
-			{
+
+			if (student.getUserRoles() != null && student.getUserRoles().size() > 0) {
 				String role = student.getUserRoles().iterator().next().getRole().getRoleName();
 				studentProfile.setUserType(role);
 			}
-			
+
 		}
 
 		if (student.getProfessionalProfile() != null) {
@@ -130,25 +123,35 @@ public class AppPOJOUtility {
 			studentProfile.setResumeURL(student.getProfessionalProfile().getResumeUrl());
 			studentProfile.setUnderGraduationYear(student.getProfessionalProfile().getUnderGraduationYear());
 		}
-		
-		
-		DBUTILS util = new DBUTILS(); 
-		String getRankPointsForUser="SELECT * FROM ( SELECT istar_user, user_points, total_points, CAST (coins AS INTEGER) AS coins, perc, CAST ( RANK () OVER (ORDER BY user_points DESC) AS INTEGER ) AS user_rank FROM ( SELECT istar_user, user_points, total_points, coins, (case when total_points!= 0 then CAST ( (user_points * 100) / total_points AS INTEGER ) else 0 end )AS perc FROM ( SELECT T1.istar_user, SUM (T1.points) AS user_points, SUM (T1.max_points) AS total_points, SUM (T1.coins) AS coins FROM ( WITH summary AS ( SELECT P .istar_user, P .skill_objective, custom_eval ( CAST ( REPLACE ( REPLACE ( REPLACE ( COALESCE (P .points, '0'), ':per_lesson_points', '"+per_lesson_points+"' ), ':per_assessment_points', '"+per_assessment_points+"' ), ':per_question_points', '"+per_question_points+"' ) AS TEXT ) ) AS points, custom_eval ( CAST ( REPLACE ( REPLACE ( REPLACE ( COALESCE (P .coins, '0'), ':per_lesson_coins', '"+per_lesson_coins+"' ), ':per_assessment_coins', '"+per_assessment_coins+"' ), ':per_question_coins', '"+per_assessment_coins+"' ) AS TEXT ) ) AS coins, custom_eval ( CAST ( REPLACE ( REPLACE ( REPLACE ( COALESCE (P .max_points, '0'), ':per_lesson_points', '"+per_lesson_points+"' ), ':per_assessment_points', '"+per_assessment_points+"' ), ':per_question_points', '"+per_question_points+"' ) AS TEXT ) ) AS max_points, P .item_id, ROW_NUMBER () OVER ( PARTITION BY P .istar_user, P .skill_objective, P .item_id ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P WHERE item_type IN ('QUESTION', 'LESSON') AND batch_group_id = ( SELECT batch_group. ID FROM batch_students, batch_group WHERE batch_students.batch_group_id = batch_group. ID AND batch_students.student_id = "+student.getId()+" AND batch_group.is_primary = 't' LIMIT 1 ) ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 GROUP BY istar_user  ) T2 ORDER BY user_points DESC, perc DESC, total_points DESC ) T3 ) T4 WHERE istar_user = "+student.getId();
-		System.out.println("get getRankPointsForUser"+getRankPointsForUser);
+
+		DBUTILS util = new DBUTILS();
+		String getRankPointsForUser = "SELECT * FROM ( SELECT istar_user, user_points, total_points, CAST (coins AS INTEGER) AS coins, perc, CAST ( RANK () OVER (ORDER BY user_points DESC) AS INTEGER ) AS user_rank FROM ( SELECT istar_user, user_points, total_points, coins, (case when total_points!= 0 then CAST ( (user_points * 100) / total_points AS INTEGER ) else 0 end )AS perc FROM ( SELECT T1.istar_user, SUM (T1.points) AS user_points, SUM (T1.max_points) AS total_points, SUM (T1.coins) AS coins FROM ( WITH summary AS ( SELECT P .istar_user, P .skill_objective, custom_eval ( CAST ( REPLACE ( REPLACE ( REPLACE ( COALESCE (P .points, '0'), ':per_lesson_points', '"
+				+ per_lesson_points + "' ), ':per_assessment_points', '" + per_assessment_points
+				+ "' ), ':per_question_points', '" + per_question_points
+				+ "' ) AS TEXT ) ) AS points, custom_eval ( CAST ( REPLACE ( REPLACE ( REPLACE ( COALESCE (P .coins, '0'), ':per_lesson_coins', '"
+				+ per_lesson_coins + "' ), ':per_assessment_coins', '" + per_assessment_coins
+				+ "' ), ':per_question_coins', '" + per_assessment_coins
+				+ "' ) AS TEXT ) ) AS coins, custom_eval ( CAST ( REPLACE ( REPLACE ( REPLACE ( COALESCE (P .max_points, '0'), ':per_lesson_points', '"
+				+ per_lesson_points + "' ), ':per_assessment_points', '" + per_assessment_points
+				+ "' ), ':per_question_points', '" + per_question_points
+				+ "' ) AS TEXT ) ) AS max_points, P .item_id, ROW_NUMBER () OVER ( PARTITION BY P .istar_user, P .skill_objective, P .item_id ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P WHERE item_type IN ('QUESTION', 'LESSON') AND batch_group_id = ( SELECT batch_group. ID FROM batch_students, batch_group WHERE batch_students.batch_group_id = batch_group. ID AND batch_students.student_id = "
+				+ student.getId()
+				+ " AND batch_group.is_primary = 't' LIMIT 1 ) ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 GROUP BY istar_user  ) T2 ORDER BY user_points DESC, perc DESC, total_points DESC ) T3 ) T4 WHERE istar_user = "
+				+ student.getId();
+		System.out.println("get getRankPointsForUser" + getRankPointsForUser);
 		List<HashMap<String, Object>> rankPointsData = util.executeQuery(getRankPointsForUser);
 		int rank = 0;
 		int coins = 0;
 		double userPoints = 0;
 		double totalPoints = 0;
-		if(rankPointsData.size()>0)
-		{
-			rank = (int)rankPointsData.get(0).get("user_rank");
-			coins = (int)rankPointsData.get(0).get("coins");
+		if (rankPointsData.size() > 0) {
+			rank = (int) rankPointsData.get(0).get("user_rank");
+			coins = (int) rankPointsData.get(0).get("coins");
 			userPoints = (double) rankPointsData.get(0).get("user_points");
-			totalPoints= (double) rankPointsData.get(0).get("total_points");
+			totalPoints = (double) rankPointsData.get(0).get("total_points");
 		}
 		studentProfile.setCoins(coins);
-		studentProfile.setExperiencePoints((int)userPoints);
+		studentProfile.setExperiencePoints((int) userPoints);
 		studentProfile.setBatchRank(rank);
 		return studentProfile;
 	}
@@ -243,14 +246,11 @@ public class AppPOJOUtility {
 		assessmentPOJO.setCategory(assessment.getCategory());
 		assessmentPOJO.setDescription(assessment.getDescription());
 		assessmentPOJO.setDurationInMinutes(assessment.getAssessmentdurationminutes());
-		if(assessment.getRetryAble()!=null && assessment.getRetryAble())
-		{
+		if (assessment.getRetryAble() != null && assessment.getRetryAble()) {
 			assessmentPOJO.setRetryable(true);
-		}
-		else
-		{
+		} else {
 			assessment.setRetryAble(false);
-		}	
+		}
 		Double maxPoints = 0.0;
 		AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
 		maxPoints = appAssessmentServices.getMaxPointsOfAssessment(assessment.getId());
@@ -277,7 +277,17 @@ public class AppPOJOUtility {
 
 		questionPOJO.setId(question.getId());
 		questionPOJO.setOrderId(orderId);
-		questionPOJO.setText(question.getComprehensivePassageText() + question.getQuestionText());
+
+		String text = "";
+		if (question.getComprehensivePassageText() != null
+				&& !question.getComprehensivePassageText().equalsIgnoreCase("")
+				&& !question.getComprehensivePassageText().equalsIgnoreCase("null")
+				&& !question.getComprehensivePassageText().equalsIgnoreCase("<p>null</p>")) {
+			text = question.getComprehensivePassageText() + question.getQuestionText();
+		} else {
+			text = question.getQuestionText();
+		}
+		questionPOJO.setText(text);
 		questionPOJO.setType(question.getQuestionType());
 		questionPOJO.setDifficultyLevel(question.getDifficultyLevel());
 		questionPOJO.setExplanation(question.getExplanation());
@@ -307,7 +317,7 @@ public class AppPOJOUtility {
 	public OptionPOJO getOptionPOJO(AssessmentOption assessmentOption) {
 
 		OptionPOJO optionPOJO = new OptionPOJO();
-		
+
 		optionPOJO.setId(assessmentOption.getId());
 		optionPOJO.setText(assessmentOption.getText().replaceAll("\n", "").replaceAll("\r\n", ""));
 

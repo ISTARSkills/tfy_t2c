@@ -123,90 +123,95 @@ public class AppCourseServices {
 					}
 				}
 				
-				if(modulePOJO==null){
-					modulePOJO = new ModulePOJO();
-					modulePOJO.setId(module.getId());
-					modulePOJO.setName(module.getModuleName());
-					modulePOJO.setImageURL(mediaUrlPath+module.getImage_url());
-					modulePOJO.setDescription(module.getModule_description());
-					modulePOJO.setOrderId(++moduleOrderId);
-					
-					if(!cmsessionIds.contains(cmsession.getId())){
-						System.out.println("Adding CMSession Skill");
-						Set<String> allSkillObjectivesOfModule = new HashSet<String>();
-						for (SkillObjective skillObjective : cmsession.getSkillObjectives()) {
-							allSkillObjectivesOfModule.add(skillObjective.getName());
+				try {
+					if(modulePOJO==null){
+						modulePOJO = new ModulePOJO();
+						modulePOJO.setId(module.getId());
+						modulePOJO.setName(module.getModuleName());
+						modulePOJO.setImageURL(mediaUrlPath+module.getImage_url());
+						modulePOJO.setDescription(module.getModule_description());
+						modulePOJO.setOrderId(++moduleOrderId);
+						
+						if(!cmsessionIds.contains(cmsession.getId())){
+							System.out.println("Adding CMSession Skill");
+							Set<String> allSkillObjectivesOfModule = new HashSet<String>();
+							for (SkillObjective skillObjective : cmsession.getSkillObjectives()) {
+								allSkillObjectivesOfModule.add(skillObjective.getName());
+							}
+							cmsessionIds.add(cmsession.getId());
+							modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
 						}
-						cmsessionIds.add(cmsession.getId());
-						modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
-					}
-	
-					ConcreteItemPOJO ConcreteItemPOJO = new ConcreteItemPOJO();
-					LessonPOJO lessonPOJO = new LessonPOJO();
-					lessonPOJO.setId(lesson.getId());
-					lessonPOJO.setTitle(lesson.getTitle());
-					lessonPOJO.setDescription(lesson.getDescription());
-					lessonPOJO.setDuration(lesson.getDuration());
-					lessonPOJO.setPlaylistId(studentPlaylist.getId());
-					lessonPOJO.setStatus(studentPlaylist.getStatus());
-					lessonPOJO.setSubject(lesson.getSubject());
-					lessonPOJO.setType(lesson.getType());
-					lessonPOJO.setOrderId(studentPlaylist.getId());
-					lessonPOJO.setLessonUrl(mediaUrlPath+"/lessonXMLs/"+lesson.getId()+".zip");
-					
-					ConcreteItemPOJO.setId(lesson.getId());
-					if(!lesson.getType().equalsIgnoreCase("ASSESSMENT"))
-					{
-						ConcreteItemPOJO.setType("LESSON_"+lesson.getType());
-					}
-					else
-					{
-						ConcreteItemPOJO.setType("ASSESSMENT");
-					}	
-					ConcreteItemPOJO.setLesson(lessonPOJO);
-					ConcreteItemPOJO.setOrderId(studentPlaylist.getId());
-					ConcreteItemPOJO.setStatus(studentPlaylist.getStatus());
-					ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
-					modulePOJO.getLessons().add(ConcreteItemPOJO);
-					coursePOJO.getModules().add(modulePOJO);
-				}else{
-					
-					if(!cmsessionIds.contains(cmsession.getId())){
-						System.out.println("Adding CMSession Skill");
-						Set<String> allSkillObjectivesOfModule = new HashSet<String>();
-						for (SkillObjective skillObjective : cmsession.getSkillObjectives()) {
-							allSkillObjectivesOfModule.add(skillObjective.getName());
+
+						ConcreteItemPOJO ConcreteItemPOJO = new ConcreteItemPOJO();
+						LessonPOJO lessonPOJO = new LessonPOJO();
+						lessonPOJO.setId(lesson.getId());
+						lessonPOJO.setTitle(lesson.getTitle());
+						lessonPOJO.setDescription(lesson.getDescription());
+						lessonPOJO.setDuration(lesson.getDuration());
+						lessonPOJO.setPlaylistId(studentPlaylist.getId());
+						lessonPOJO.setStatus(studentPlaylist.getStatus());
+						lessonPOJO.setSubject(lesson.getSubject());
+						lessonPOJO.setType(lesson.getType());
+						lessonPOJO.setOrderId(studentPlaylist.getId());
+						lessonPOJO.setLessonUrl(mediaUrlPath+"/lessonXMLs/"+lesson.getId()+".zip");
+						
+						ConcreteItemPOJO.setId(lesson.getId());
+						if(!lesson.getType().equalsIgnoreCase("ASSESSMENT"))
+						{
+							ConcreteItemPOJO.setType("LESSON_"+lesson.getType());
 						}
-						cmsessionIds.add(cmsession.getId());
-						modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
-					}
-					
-					ConcreteItemPOJO ConcreteItemPOJO = new ConcreteItemPOJO();
-					LessonPOJO lessonPOJO = new LessonPOJO();
-					lessonPOJO.setId(lesson.getId());
-					lessonPOJO.setTitle(lesson.getTitle());
-					lessonPOJO.setDescription(lesson.getDescription());
-					lessonPOJO.setDuration(lesson.getDuration());
-					lessonPOJO.setPlaylistId(studentPlaylist.getId());
-					lessonPOJO.setStatus(studentPlaylist.getStatus());
-					lessonPOJO.setSubject(lesson.getSubject());
-					if(!lesson.getType().equalsIgnoreCase("ASSESSMENT"))
-					{
+						else
+						{
+							ConcreteItemPOJO.setType("ASSESSMENT");
+						}	
+						ConcreteItemPOJO.setLesson(lessonPOJO);
+						ConcreteItemPOJO.setOrderId(studentPlaylist.getId());
+						ConcreteItemPOJO.setStatus(studentPlaylist.getStatus());
+						ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
+						modulePOJO.getLessons().add(ConcreteItemPOJO);
+						coursePOJO.getModules().add(modulePOJO);
+					}else{
+						
+						if(!cmsessionIds.contains(cmsession.getId())){
+							System.out.println("Adding CMSession Skill");
+							Set<String> allSkillObjectivesOfModule = new HashSet<String>();
+							for (SkillObjective skillObjective : cmsession.getSkillObjectives()) {
+								allSkillObjectivesOfModule.add(skillObjective.getName());
+							}
+							cmsessionIds.add(cmsession.getId());
+							modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
+						}
+						
+						ConcreteItemPOJO ConcreteItemPOJO = new ConcreteItemPOJO();
+						LessonPOJO lessonPOJO = new LessonPOJO();
+						lessonPOJO.setId(lesson.getId());
+						lessonPOJO.setTitle(lesson.getTitle());
+						lessonPOJO.setDescription(lesson.getDescription());
+						lessonPOJO.setDuration(lesson.getDuration());
+						lessonPOJO.setPlaylistId(studentPlaylist.getId());
+						lessonPOJO.setStatus(studentPlaylist.getStatus());
+						lessonPOJO.setSubject(lesson.getSubject());
+						if(!lesson.getType().equalsIgnoreCase("ASSESSMENT"))
+						{
+							ConcreteItemPOJO.setType("LESSON_"+lesson.getType());
+						}
+						else
+						{
+							ConcreteItemPOJO.setType("ASSESSMENT");
+						}
+						lessonPOJO.setOrderId(studentPlaylist.getId());
+						lessonPOJO.setLessonUrl(mediaUrlPath+"/lessonXMLs/"+lesson.getId()+".zip");
+						ConcreteItemPOJO.setId(lesson.getId());
 						ConcreteItemPOJO.setType("LESSON_"+lesson.getType());
+						ConcreteItemPOJO.setLesson(lessonPOJO);
+						ConcreteItemPOJO.setOrderId(studentPlaylist.getId());
+						ConcreteItemPOJO.setStatus(studentPlaylist.getStatus());
+						ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
+						modulePOJO.getLessons().add(ConcreteItemPOJO);
 					}
-					else
-					{
-						ConcreteItemPOJO.setType("ASSESSMENT");
-					}
-					lessonPOJO.setOrderId(studentPlaylist.getId());
-					lessonPOJO.setLessonUrl(mediaUrlPath+"/lessonXMLs/"+lesson.getId()+".zip");
-					ConcreteItemPOJO.setId(lesson.getId());
-					ConcreteItemPOJO.setType("LESSON_"+lesson.getType());
-					ConcreteItemPOJO.setLesson(lessonPOJO);
-					ConcreteItemPOJO.setOrderId(studentPlaylist.getId());
-					ConcreteItemPOJO.setStatus(studentPlaylist.getStatus());
-					ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
-					modulePOJO.getLessons().add(ConcreteItemPOJO);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+				//	e.printStackTrace();
 				}
 				modulePOJO.sortLessonsAndAssignStatus();
 			}

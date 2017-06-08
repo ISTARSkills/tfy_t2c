@@ -57,41 +57,48 @@ public class RESTLessonService {
 
 			String mediaPath = createZIPForItem.getMediaPath();
 			String mediaURLPath = createZIPForItem.getMediaURLPath();
-			String serverPath = mediaURLPath+"lessons/" + lessonId + ".zip";
-			String lessonZipFileActualPath = mediaPath + "/lessons/" + lessonId + ".zip";
+			String serverPath = mediaURLPath+"lessonXMLs/" +lessonId+"/"+lessonId+"/"+ lessonId + ".zip";
+			String lessonZipFileActualPath = mediaPath + "/lessonXMLs/" + lessonId + ".zip";
 			File file = new File(lessonZipFileActualPath);
 			Serializer serializer = new Persister();
 			Object object = null;
-			if (!file.exists()) {		
-				System.out.println("cannot find zip at "+lessonZipFileActualPath);
-				System.out.println("Creating New Zip file");
-				object = createZIPForItem.generateXMLForLesson(lessonId);		
-			} else {
-				String lessonXML = getLessonXML(lesson.getId());
-				System.out.println("Zip file exists");
-				
-				try{
-					if (lesson.getType().equals("INTERACTIVE")) {
-						InteractiveContent interactiveContent = serializer.read(InteractiveContent.class, lessonXML);
-						interactiveContent.setZipFileURL(serverPath);
-						object = interactiveContent;
-					} else if (lesson.getType().equals("VIDEO")) {
-						VideoLesson videoLesson = serializer.read(VideoLesson.class, lessonXML);
-						videoLesson.setZipFileURL(serverPath);
-						object = videoLesson;
-					}
-					else if(lesson.getType().equalsIgnoreCase("PRESENTATION"))
-					{						
-							object = mediaURLPath+"/lessons/"+lesson.getId()+".zip";
-							System.out.println("oject string in case of lessonXML"+object.toString());
+			if(lesson.getType().equalsIgnoreCase("PRESENTATION"))
+			{
+				//create zip every time
+				object = createZIPForItem.generateXMLForLesson(lessonId);				
+				System.out.println("oject string in case of lessonXML"+object.toString());
+			}
+			else
+			{
+				if (!file.exists()) {		
+					System.out.println("cannot find zip at "+lessonZipFileActualPath);
+					System.out.println("Creating New Zip file");
+					object = createZIPForItem.generateXMLForLesson(lessonId);		
+				} else {
+					String lessonXML = getLessonXML(lesson.getId());
+					System.out.println("Zip file exists");
+					
+					try{
+						if (lesson.getType().equals("INTERACTIVE")) {
+							InteractiveContent interactiveContent = serializer.read(InteractiveContent.class, lessonXML);
+							interactiveContent.setZipFileURL(serverPath);
+							object = interactiveContent;
+						} else if (lesson.getType().equals("VIDEO")) {
+							VideoLesson videoLesson = serializer.read(VideoLesson.class, lessonXML);
+							videoLesson.setZipFileURL(serverPath);
+							object = videoLesson;
+						}					
+						
+					}catch(Exception ex)
+					{
+						System.out.println("exception in lesson  id = "+lesson.getType()+" and type"+lesson.getType());
 					}
 					
-				}catch(Exception ex)
-				{
-					System.out.println("exception in lesson  id = "+lesson.getType()+" and type"+lesson.getType());
 				}
-				
-			}
+			}	
+			
+			
+			
 
 			
 			

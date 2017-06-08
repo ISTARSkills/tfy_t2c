@@ -9,6 +9,9 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Map.Entry;
@@ -26,7 +29,9 @@ import com.viksitpro.core.cms.interactive.EntityOption;
 import com.viksitpro.core.cms.interactive.InfoCard;
 import com.viksitpro.core.cms.interactive.InteractiveContent;
 import com.viksitpro.core.cms.lesson.VideoLesson;
+import com.viksitpro.core.cms.oldcontent.services.ZipFiles;
 import com.viksitpro.core.dao.entities.Lesson;
+import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Task;
 
 import com.viksitpro.core.utilities.TaskItemCategory;
@@ -103,9 +108,62 @@ public class CreateZIPForItem {
 		return object;
 	}
 
+	private String getServerType() {
+		String mediaPath = null;
+		try {
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+			if (inputStream != null) {
+				properties.load(inputStream);
+				mediaPath = properties.getProperty("server_type");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return mediaPath;
+	}
+	
 	private String createZIPForPresentationLesson(Lesson lesson) {
+
+		Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+		// add owners permission
+		perms.add(PosixFilePermission.OWNER_READ);
+		perms.add(PosixFilePermission.OWNER_WRITE);
+		perms.add(PosixFilePermission.OWNER_EXECUTE);
+		// add group permissions
+		perms.add(PosixFilePermission.GROUP_READ);
+		perms.add(PosixFilePermission.GROUP_WRITE);
+		perms.add(PosixFilePermission.GROUP_EXECUTE);
+		// add others permissions
+		perms.add(PosixFilePermission.OTHERS_READ);
+		perms.add(PosixFilePermission.OTHERS_WRITE);
+		perms.add(PosixFilePermission.OTHERS_EXECUTE);
 		
-		String xml_object = getMediaURLPath()+"/lessons/"+lesson.getId()+".zip";	
+		String SOURCE_FOLDER = getMediaPath() + "/lessonXMLs/" + lesson.getId()+"/";
+		File sourceFile = new File(SOURCE_FOLDER);
+
+		String zipName = getMediaPath() + "/lessonXMLs/" + lesson.getId() + ".zip";
+		
+		File oldZip = new File(zipName);
+		if(oldZip.exists())
+		{
+				oldZip.delete();
+		}
+		
+		ZipFiles zipFiles = new ZipFiles();
+		zipFiles.zipDirectory(sourceFile, zipName);
+		if(getServerType().equalsIgnoreCase("linux"))
+		{
+		try {
+			Files.setPosixFilePermissions(Paths.get(oldZip.getAbsolutePath()), perms);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		}
+		
+		String xml_object = getMediaURLPath()+"/lessonXMLs/"+lesson.getId()+".zip";	
 		System.out.println("returning "+xml_object);
 		return xml_object;
 	}
@@ -352,6 +410,22 @@ public class CreateZIPForItem {
 		}
 		zipOutputStream.closeEntry();
 		fis.close();
+	}
+	
+	
+	public static void main(String[] args)
+	{
+		CreateZIPForItem kk = new CreateZIPForItem();
+		for(int i=1 ; i<6913; i++)
+		{
+			try{
+				kk.createZIPForPresentationLesson(new LessonDAO().findById(i));
+			}
+			catch(Exception e)
+			{
+				
+			}
+		}
 	}
 
 }

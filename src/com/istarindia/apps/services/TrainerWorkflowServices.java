@@ -92,6 +92,10 @@ public class TrainerWorkflowServices {
 	}
 
 	public CourseContent getCourseContent(Integer courseId, int taskId) {
+		
+		
+		
+		
 		String mediaPath = "";
 		try {
 			Properties properties = new Properties();
@@ -203,6 +207,9 @@ public class TrainerWorkflowServices {
 		util.executeUpdate(insertFeedback);
 		
 		
+		
+		String updateTaskAsCompleted = "update task set is_active = 'f' where id="+taskId;
+		util.executeUpdate(updateTaskAsCompleted);
 		
 		
 	}

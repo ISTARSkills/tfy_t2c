@@ -83,6 +83,8 @@ public class RESTAssessmentService {
 	@Path("{assessmentId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAssessment(@PathParam("assessmentId") int assessmentId) {
+	
+		System.err.println("--------------------------------------------------------I LOVE KAMINI");
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
