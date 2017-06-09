@@ -118,8 +118,13 @@ public class AppCourseServices {
 				Lesson lesson = studentPlaylist.getLesson();
 				
 				for(ModulePOJO tempModulePOJO : coursePOJO.getModules()){
-					if(tempModulePOJO.getId()== module.getId()){
-						modulePOJO = tempModulePOJO;
+					try {
+						if(tempModulePOJO.getId()== module.getId()){
+							modulePOJO = tempModulePOJO;
+						}
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						//e.printStackTrace();
 					}
 				}
 				

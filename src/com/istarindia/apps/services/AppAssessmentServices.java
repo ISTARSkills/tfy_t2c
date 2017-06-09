@@ -995,10 +995,35 @@ public class AppAssessmentServices {
 	}
 
 	public Double getMaxPointsOfAssessment(Integer assessmentId) {
-
 		
-
-		return 0d;
+		double totalPoints = 0d;
+		String per_assessment_points="",
+				per_lesson_points="",
+				per_question_points ="",per_assessment_coins="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					per_assessment_points =  properties.getProperty("per_assessment_points");
+					per_lesson_points =  properties.getProperty("per_lesson_points");
+					per_question_points =  properties.getProperty("per_question_points");
+					per_assessment_coins = properties.getProperty("per_assessment_coins");
+					System.out.println("per_assessment_points"+per_assessment_points);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();			
+		}
+		String getTotalPoints ="select cast (sum(TFINAL.points_per_item) as float8) as tot_points from (select cast (custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (max_points, '0'), ':per_lesson_points', '"+per_lesson_points+"' ), ':per_assessment_points', '"+per_assessment_points+"' ), ':per_question_points', '"+per_question_points+"' ) ) AS TEXT ) ) as integer) as points_per_item  from ((select max_points, item_id , item_type from assessment_benchmark where item_id in (select distinct questionid from assessment_question where assessmentid = "+assessmentId+" ) and item_type ='QUESTION' ) union  (select max_points , item_id , item_type from assessment_benchmark where item_id ="+assessmentId+" and item_type ='ASSESSMENT' ) )TT ) TFINAL";
+		DBUTILS util = new DBUTILS();
+		List<HashMap<String, Object>> data = util.executeQuery(getTotalPoints);
+		if(data.size()>0 && data.get(0).get("tot_points")!=null)
+		{
+			totalPoints=(double)data.get(0).get("tot_points");
+		}
+			
+		return totalPoints;
 	}
 
 	public Assessment getAssessment(int assessmentId) {

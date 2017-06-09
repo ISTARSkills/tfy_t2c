@@ -398,6 +398,7 @@ public class RESTIstarUserService {
 	@Path("{userId}/complex")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getComplexObject(@PathParam("userId") int istarUserId) {
+		
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();

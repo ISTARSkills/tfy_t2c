@@ -97,7 +97,12 @@ public class AppPOJOUtility {
 			if (student.getUserProfile().getAddress() != null) {
 				studentProfile.setLocation(student.getUserProfile().getAddress().getPincode().getCity());
 			}
-			studentProfile.setProfileImage(mediaUrlPath + student.getUserProfile().getImage());
+			if(student.getUserProfile().getImage().contains("http://")){
+				studentProfile.setProfileImage(student.getUserProfile().getImage());
+			} else {
+				studentProfile.setProfileImage(mediaUrlPath + student.getUserProfile().getImage());
+
+			}
 			String userCategory = "COLLEGE_STUDENT";
 			if (student.getUserProfile().getUserCategory() != null) {
 				userCategory = student.getUserProfile().getUserCategory();
