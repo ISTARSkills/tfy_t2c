@@ -288,6 +288,7 @@ public class AppAssessmentServices {
 		List<SkillReportPOJO> shellTree = new ArrayList<>();
 		DBUTILS util = new DBUTILS();
 		String shelltreeData = "SELECT T1.skill_objective_id, T1.max_points, T1. NAME AS skill_name, module_skill . ID AS module_id, module_skill .name as module_name FROM ( SELECT assessment.course_id, skill_objective_id, custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (max_points, '0'), ':per_lesson_points', '"+per_lesson_points+"' ), ':per_assessment_points', '"+per_assessment_points+"' ), ':per_question_points', '"+per_question_points+"' ) ) AS TEXT ) ) AS max_points, skill_objective. NAME FROM assessment_benchmark, assessment, skill_objective WHERE assessment_benchmark.item_id = assessment. ID AND assessment_benchmark.item_type = 'ASSESSMENT' AND assessment. ID = "+assessmentId+" AND assessment_benchmark.context_id = assessment.course_id AND assessment_benchmark.skill_objective_id = skill_objective. ID ) T1 JOIN skill_objective cmsession_skill ON ( cmsession_skill.id = T1.skill_objective_id ) JOIN skill_objective module_skill ON ( module_skill .id = cmsession_skill.parent_skill ) WHERE module_skill.context  = T1.course_id and  cmsession_skill.context = T1.course_id  ";
+		System.err.println("getShellTreeForAssessment>>>"+shelltreeData);
 		List<HashMap<String, Object>> assessmentData = util.executeQuery(shelltreeData);
 		for(HashMap<String, Object> row: assessmentData)
 		{
@@ -483,7 +484,7 @@ public class AppAssessmentServices {
 	@SuppressWarnings("unchecked")
 	public List<Integer> getAttemptedAssessmentsOfUser(int istarUserId){
 		
-		String sql = "select distinct item_id from user_gamification where istar_user="+istarUserId+" and timestamp is not null";
+		String sql = "select distinct item_id from user_gamification where istar_user="+istarUserId+" and item_type='ASSESSMENT'  and timestamp is not null";
 		System.out.println("all Assessments of user from UsrGmfctn---->"+sql);
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();

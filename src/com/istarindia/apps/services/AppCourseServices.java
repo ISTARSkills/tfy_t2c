@@ -77,7 +77,6 @@ public class AppCourseServices {
 		if(course!=null && allStudentPlaylist.size() > 0){
 			
 			coursePOJO = new CoursePOJO();
-
 			coursePOJO.setId(course.getId());
 			coursePOJO.setCategory(course.getCategory());
 			coursePOJO.setDescription(course.getCourseDescription());
@@ -218,8 +217,33 @@ public class AppCourseServices {
 					// TODO Auto-generated catch block
 				//	e.printStackTrace();
 				}
-				modulePOJO.sortLessonsAndAssignStatus();
+				
+				String finModuleStatus="select cast( count(*) as integer) as incomple_lesssons from student_playlist where student_id = "+istarUserId+" and status = 'SCHEDULED' and module_id="+module.getId();
+				List<HashMap<String, Object>> incompleteLessons = util.executeQuery(finModuleStatus);
+				if(incompleteLessons.size()>0 && (int)incompleteLessons.get(0).get("incomple_lesssons") >0)
+				{
+					modulePOJO.setStatus("INCOMPLETE");
+				}
+				else
+				{
+					modulePOJO.setStatus("COMPLETED");
+				}	
+				
 			}
+			
+			String findecourseProgress="SELECT 	cast (count(*) filter (where status ='SCHEDULED') as integer) as incomplete, cast(count(*) filter (where status ='COMPLETED') as integer) as completed FROM 	student_playlist WHERE 	student_id = "+istarUserId+" AND course_id = "+courseId;
+			List<HashMap<String, Object>> incompleteLessonsInCourse = util.executeQuery(findecourseProgress);
+			if(incompleteLessonsInCourse.size()>0 && (int)incompleteLessonsInCourse.get(0).get("incomplete") >0 && (int)incompleteLessonsInCourse.get(0).get("completed")>0)
+			{
+				int completed = (int)incompleteLessonsInCourse.get(0).get("completed");
+				int incomplete = (int)incompleteLessonsInCourse.get(0).get("incomplete");
+				Double percentage = ((double)completed*100/(completed+incomplete));
+				coursePOJO.setProgress(percentage);
+			}
+			else
+			{
+				coursePOJO.setProgress(0d);
+			}	
 			coursePOJO.sortModulesAndAssignStatus();
 		}		
 		return coursePOJO;
@@ -286,7 +310,7 @@ public class AppCourseServices {
 			
 		}
 		
-		String getDataForTree="SELECT * FROM ( SELECT T1. ID, T1.skill_objective, T1.points, T1.max_points, cmsession_module.module_id FROM ( WITH summary AS ( SELECT P . ID, P .skill_objective, custom_eval( cast (replace(replace(replace(COALESCE(P .points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"') as text)) as points, custom_eval( cast (replace(replace(replace(COALESCE(P .max_points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"') as text)) as max_points, ROW_NUMBER () OVER ( PARTITION BY P .skill_objective,  P.item_id ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P WHERE P .course_id = "+courseId+" AND P .item_type = 'QUESTION' ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 JOIN cmsession_skill_objective ON ( T1.skill_objective = cmsession_skill_objective.skill_objective_id ) JOIN cmsession_module ON ( cmsession_module.cmsession_id = cmsession_skill_objective.cmsession_id ) ) LT UNION  SELECT QT. ID, QT.skill_objective, QT.points, QT.max_points, QT.module_id FROM  ( WITH summary AS ( SELECT P . ID, P .skill_objective, custom_eval( cast (replace(replace(replace(P .points,':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"') as text)) as points, custom_eval( cast (replace(replace(replace(P .max_points,':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"') as text)) as max_points, P .module_id, ROW_NUMBER () OVER ( PARTITION BY P .skill_objective ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P WHERE P .course_id = "+courseId+" AND P .item_type = 'LESSON' ) SELECT s.* FROM summary s WHERE s.rk = 1 ) QT";
+		String getDataForTree="SELECT 	T1. ID, 	T1.skill_objective, 	T1.points, 	T1.max_points, 	module_skill. ID AS module_id FROM 	( 		WITH summary AS ( 			SELECT 				P . ID, 				P .skill_objective, 				custom_eval ( 					CAST ( 						TRIM ( 							REPLACE ( 								REPLACE ( 									REPLACE ( 										COALESCE (P .points, '0'), 										':per_lesson_points', 										'"+per_lesson_points+"' 									), 									':per_assessment_points', 									'"+per_assessment_points+"' 								), 								':per_question_points', 								'"+per_question_points+"' 							) 						) AS TEXT 					) 				) AS points, 				custom_eval ( 					CAST ( 						TRIM ( 							REPLACE ( 								REPLACE ( 									REPLACE ( 										COALESCE (P .max_points, '0'), 										':per_lesson_points', 										'"+per_lesson_points+"' 									), 									':per_assessment_points', 									'"+per_assessment_points+"' 								), 								':per_question_points', 								'"+per_question_points+"' 							) 						) AS TEXT 					) 				) AS max_points, 				ROW_NUMBER () OVER ( 					PARTITION BY P .skill_objective, 					P .item_id 				ORDER BY 					P . TIMESTAMP DESC 				) AS rk 			FROM 				user_gamification P, 				assessment_question, 				question 			WHERE 				P .course_id = "+courseId+" 			AND P .istar_user = "+istarUserId+" 			AND P .item_id = assessment_question.questionid 			AND assessment_question.assessmentid in (select distinct item_id from user_gamification where course_id = "+courseId+" and istar_user = "+istarUserId+" and item_type='ASSESSMENT') 			AND assessment_question.questionid = question. ID 			AND question.context_id = "+courseId+" 			AND P .item_type = 'QUESTION' 		) SELECT 			s.* 		FROM 			summary s 		WHERE 			s.rk = 1 	) T1 JOIN skill_objective cmsession_skill ON ( 	T1.skill_objective = cmsession_skill. ID ) JOIN skill_objective module_skill ON ( 	module_skill. ID = cmsession_skill.parent_skill )";
 		System.out.println("getDataForTree in course"+getDataForTree);
 		DBUTILS util = new DBUTILS();
 		List<HashMap<String, Object>> data = util.executeQuery(getDataForTree);
@@ -858,10 +882,14 @@ public class AppCourseServices {
 		
 		Object[] result = (Object[]) query.list().get(0);
 		
-		Integer completedQuestions = (Integer) result[1];
-		Integer totalQuestions = (Integer) result[0] + (Integer) result[1];
+		Integer completed = (Integer) result[1];
+		Integer total = (Integer) result[0] + (Integer) result[1];
 		
-		Double progress = ((completedQuestions*1.0)/totalQuestions)*100.0;
+		Double progress = 0d;
+		if(completed!=0)
+		{
+			progress = ((completed*1.0)/total)*100.0;
+		}
 		return progress;
 	}
 	

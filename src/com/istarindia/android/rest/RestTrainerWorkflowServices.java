@@ -134,7 +134,7 @@ public class RestTrainerWorkflowServices {
 		ClassFeedbackByTrainer feedbackResponse = (ClassFeedbackByTrainer) gsonRequest.fromJson(FeedbackResponsesString, listType);
 		TrainerWorkflowServices serv = new TrainerWorkflowServices();
 		serv.submitFeedbackByTrainer(taskId, istarUserId, feedbackResponse);
-		serv.updateState(taskId, istarUserId,TrainerWorkflowStages.FEEDBACK);
+		serv.updateState(taskId, istarUserId,TrainerWorkflowStages.COMPLETED);
 		HashMap<String, Object> jsonMap = new HashMap<String, Object>();
 		String result = gson.toJson(jsonMap);				
 		return Response.ok(result).build();
