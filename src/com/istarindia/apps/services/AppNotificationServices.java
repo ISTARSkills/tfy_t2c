@@ -159,6 +159,7 @@ public class AppNotificationServices {
 	}
 
 	public NotificationPOJO getNotificationPOJOForLesson(IstarNotification istarNotification) {
+		System.err.println("istarNotification id>>>>>>"+istarNotification.getId());
 		NotificationPOJO notificationPOJO = null;
 		String mediaUrlPath ="";
 		try{

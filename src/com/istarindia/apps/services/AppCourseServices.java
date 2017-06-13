@@ -74,6 +74,7 @@ public class AppCourseServices {
 		Course course = getCourse(courseId);
 		DBUTILS util = new DBUTILS();
 		List<StudentPlaylist> allStudentPlaylist = studentPlaylistServices.getStudentPlaylistOfUserForCourse(istarUserId, courseId);
+		
 		if(course!=null && allStudentPlaylist.size() > 0){
 			
 			coursePOJO = new CoursePOJO();
@@ -213,21 +214,24 @@ public class AppCourseServices {
 						ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
 						modulePOJO.getLessons().add(ConcreteItemPOJO);
 					}
+					
+					String finModuleStatus="select cast( count(*) as integer) as incomple_lesssons from student_playlist where student_id = "+istarUserId+" and status = 'SCHEDULED' and module_id="+module.getId();
+					List<HashMap<String, Object>> incompleteLessons = util.executeQuery(finModuleStatus);
+					if(incompleteLessons.size()>0 && (int)incompleteLessons.get(0).get("incomple_lesssons") >0)
+					{
+						modulePOJO.setStatus("INCOMPLETE");
+					}
+					else
+					{
+						modulePOJO.setStatus("COMPLETED");
+					}	
+					
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 				//	e.printStackTrace();
 				}
 				
-				String finModuleStatus="select cast( count(*) as integer) as incomple_lesssons from student_playlist where student_id = "+istarUserId+" and status = 'SCHEDULED' and module_id="+module.getId();
-				List<HashMap<String, Object>> incompleteLessons = util.executeQuery(finModuleStatus);
-				if(incompleteLessons.size()>0 && (int)incompleteLessons.get(0).get("incomple_lesssons") >0)
-				{
-					modulePOJO.setStatus("INCOMPLETE");
-				}
-				else
-				{
-					modulePOJO.setStatus("COMPLETED");
-				}	
+				
 				
 			}
 			
