@@ -24,6 +24,7 @@ import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Task;
+import com.viksitpro.core.dao.entities.TaskDAO;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.utilities.TaskItemCategory;
@@ -121,8 +122,8 @@ public class RESTDashboardService {
 	public Response getTaskSummaryForUser(@PathParam("userId") int userId, @PathParam("taskId") int taskId) {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
-			TaskServices taskServices = new TaskServices();
-			Task task = taskServices.getTask(taskId);
+			
+			Task task = new TaskDAO().findById(taskId);
 
 			if(task!=null){
 				throw new Exception("Invlaid Task ID"+taskId);
