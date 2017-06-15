@@ -129,69 +129,79 @@ public class RESTAssessmentService {
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
 			Assessment assessment = appAssessmentServices.getAssessment(assessmentId);
 
-			StudentAssessmentServices studentAssessmentServices = new StudentAssessmentServices();
+			
+				StudentAssessmentServices studentAssessmentServices = new StudentAssessmentServices();
 
-			AppBatchStudentsServices appBatchStudentsServices = new AppBatchStudentsServices();
-			BatchGroup batchGroupOfStudent = appBatchStudentsServices.getBatchGroupOfStudent(istarUser.getId());
+				AppBatchStudentsServices appBatchStudentsServices = new AppBatchStudentsServices();
+				BatchGroup batchGroupOfStudent = appBatchStudentsServices.getBatchGroupOfStudent(istarUser.getId());
 
-			Integer batchGroupId = null;
+				Integer batchGroupId = null;
 
-			if (batchGroupOfStudent != null) {
-				batchGroupId = batchGroupOfStudent.getId();
-			}
+				if (batchGroupOfStudent != null) {
+					batchGroupId = batchGroupOfStudent.getId();
+				}
 
-			AppContentServiceUtility appContentServiceUtility = new AppContentServiceUtility();
+				AppContentServiceUtility appContentServiceUtility = new AppContentServiceUtility();
 
-			int correctAnswersCount = 0;
-			int assessmentDuration = 0;
-			for (QuestionResponsePOJO questionResponsePOJO : questionResponses) {
-				Question question = appContentServiceUtility.getQuestion(questionResponsePOJO.getQuestionId());
+				int correctAnswersCount = 0;
+				int assessmentDuration = 0;
+				for (QuestionResponsePOJO questionResponsePOJO : questionResponses) {
+					Question question = appContentServiceUtility.getQuestion(questionResponsePOJO.getQuestionId());
 
-				HashMap<String, Boolean> optionsMap = appContentServiceUtility.getAnsweredOptionsMap(question,
-						questionResponsePOJO.getOptions());
+					HashMap<String, Boolean> optionsMap = appContentServiceUtility.getAnsweredOptionsMap(question,
+							questionResponsePOJO.getOptions());
 
-				StudentAssessment studentAssessment = studentAssessmentServices
-						.getStudentAssessmentOfQuestionForUser(istarUserId, assessmentId, question.getId());
+					StudentAssessment studentAssessment = studentAssessmentServices
+							.getStudentAssessmentOfQuestionForUser(istarUserId, assessmentId, question.getId());
 
-				if (studentAssessment != null) {
-					studentAssessment = studentAssessmentServices.updateStudentAssessment(studentAssessment,
-							optionsMap.get("isCorrect"), optionsMap.get("option0"), optionsMap.get("option1"),
-							optionsMap.get("option2"), optionsMap.get("option3"), optionsMap.get("option4"), null, null,
-							batchGroupId, questionResponsePOJO.getDuration());
+					if (studentAssessment != null) {
+						if(assessment.getRetryAble()!=null && assessment.getRetryAble())
+						{
+							studentAssessment = studentAssessmentServices.updateStudentAssessment(studentAssessment,
+									optionsMap.get("isCorrect"), optionsMap.get("option0"), optionsMap.get("option1"),
+									optionsMap.get("option2"), optionsMap.get("option3"), optionsMap.get("option4"), null, null,
+									batchGroupId, questionResponsePOJO.getDuration());
+						}
+						
+					} else {
+						studentAssessment = studentAssessmentServices.createStudentAssessment(assessment, question,
+								istarUser, optionsMap.get("isCorrect"), optionsMap.get("option0"),
+								optionsMap.get("option1"), optionsMap.get("option2"), optionsMap.get("option3"),
+								optionsMap.get("option4"), null, null, batchGroupId, questionResponsePOJO.getDuration());
+					}
+
+					if (optionsMap.get("isCorrect")) {
+						++correctAnswersCount;
+					}
+					if (questionResponsePOJO.getDuration() != null) {
+						assessmentDuration = assessmentDuration + questionResponsePOJO.getDuration();
+					}
+				}
+
+				Double maxPoints = appAssessmentServices.getMaxPointsOfAssessment(assessment.getId());
+
+				ReportServices reportServices = new ReportServices();
+				Report report = reportServices.getAssessmentReportForUser(istarUserId, assessmentId);
+				GamificationServices gamificationService = new GamificationServices();
+				if (report == null) {
+					System.out.println("Report is null, creating new report");
+					reportServices.createReport(istarUser, assessment, correctAnswersCount, assessmentDuration,
+							maxPoints.intValue());
+					gamificationService.updateUserGamificationAfterAssessment(istarUser,assessment);
 				} else {
-					studentAssessment = studentAssessmentServices.createStudentAssessment(assessment, question,
-							istarUser, optionsMap.get("isCorrect"), optionsMap.get("option0"),
-							optionsMap.get("option1"), optionsMap.get("option2"), optionsMap.get("option3"),
-							optionsMap.get("option4"), null, null, batchGroupId, questionResponsePOJO.getDuration());
+					System.out.println("Report exists, updating report");
+					if(assessment.getRetryAble()!=null && assessment.getRetryAble())
+					{
+						reportServices.updateReport(report, istarUser, assessment, correctAnswersCount, assessmentDuration,maxPoints.intValue());
+						gamificationService.updateUserGamificationAfterAssessment(istarUser,assessment);
+					}	
 				}
 
-				if (optionsMap.get("isCorrect")) {
-					++correctAnswersCount;
-				}
-				if (questionResponsePOJO.getDuration() != null) {
-					assessmentDuration = assessmentDuration + questionResponsePOJO.getDuration();
-				}
-			}
+				TaskServices taskServices = new TaskServices();
+				taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
 
-			Double maxPoints = appAssessmentServices.getMaxPointsOfAssessment(assessment.getId());
-
-			ReportServices reportServices = new ReportServices();
-			Report report = reportServices.getAssessmentReportForUser(istarUserId, assessmentId);
-			GamificationServices gamificationService = new GamificationServices();
-			if (report == null) {
-				System.out.println("Report is null, creating new report");
-				reportServices.createReport(istarUser, assessment, correctAnswersCount, assessmentDuration,
-						maxPoints.intValue());
-				gamificationService.updateUserGamificationAfterAssessment(istarUser,assessment);
-			} else {
-				System.out.println("Report exists, updating report");
-				reportServices.updateReport(report, istarUser, assessment, correctAnswersCount, assessmentDuration,maxPoints.intValue());
-				gamificationService.updateUserGamificationAfterAssessment(istarUser,assessment);
-			}
-
-			TaskServices taskServices = new TaskServices();
-			taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
-
+			
+			
 			/*AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReport(istarUserId,
 					assessment.getId());
 			String result = gson.toJson(assessmentReportPOJO);
