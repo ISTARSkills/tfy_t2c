@@ -114,6 +114,9 @@ public class TaskSummaryPojoCreator {
 				taskSummaryPOJO.setStatus("COMPLETED");
 				taskSummaryPOJO.setDate(task.getStartDate());
 			}
+			
+			
+			
 			taskSummaryPOJO.setHeader(lesson.getSubject());
 			taskSummaryPOJO.setTitle(lesson.getTitle());
 			taskSummaryPOJO.setDescription(lesson.getDescription());
