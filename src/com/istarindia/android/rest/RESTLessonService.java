@@ -2,6 +2,7 @@ package com.istarindia.android.rest;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.ws.rs.FormParam;
@@ -33,9 +34,11 @@ import com.viksitpro.core.cms.interactive.InteractiveContent;
 import com.viksitpro.core.cms.lesson.VideoLesson;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Lesson;
+import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.utilities.DBUTILS;
+import com.viksitpro.core.utilities.TaskItemCategory;
 
 @Path("lessons/user/{userId}")
 public class RESTLessonService {
@@ -233,6 +236,26 @@ public class RESTLessonService {
 			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
 					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
 			return Response.status(Response.Status.OK).entity(result).build();
+		}
+	}
+	
+	
+	@POST
+	@Path("/add_log/lesson/{lesson_id}/{slide_id}/{slide_title}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public void addUserSessionLog(@PathParam("userId") int istarUserId,@PathParam("slide_id") int slideId, @PathParam("lesson_id") int lessonId,@PathParam("slide_title") int slideTitle) {
+		try {
+			DBUTILS util = new DBUTILS();
+			Lesson l = new LessonDAO().findById(lessonId);
+			int courseId =  l.getCmsessions().iterator().next().getModules().iterator().next().getCourses().iterator().next().getId();
+			int moduleId = l.getCmsessions().iterator().next().getModules().iterator().next().getId();
+			int cmsessionId = l.getCmsessions().iterator().next().getId();
+			
+			String insertIntoLog = "INSERT INTO user_session_log (id, cmsession_id, course_id, created_at, lesson_id, lesson_type, module_id,  slide_id, updated_at, url, user_id)"
+					+ " VALUES ((select COALESCE(max(id),0)+1 from user_session_log), "+cmsessionId+", "+courseId+", now(), "+lessonId+", "+l.getType()+", "+moduleId+", "+slideId+", now(), '"+slideTitle+"', "+istarUserId+");";
+			util.executeUpdate(insertIntoLog);
+		} catch (Exception e) {
+			
 		}
 	}
 }
