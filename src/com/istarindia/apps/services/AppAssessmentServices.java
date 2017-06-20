@@ -129,7 +129,7 @@ public class AppAssessmentServices {
 				}
 			}
 			
-			assessmentReportPOJO = new AssessmentReportPOJO();
+			
 			
 			assessmentReportPOJO.setId(assessment.getId());
 			assessmentReportPOJO.setName(assessment.getAssessmenttitle());

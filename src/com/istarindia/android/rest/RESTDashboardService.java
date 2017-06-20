@@ -125,7 +125,7 @@ public class RESTDashboardService {
 			
 			Task task = new TaskDAO().findById(taskId);
 
-			if(task!=null){
+			if(task==null){
 				throw new Exception("Invlaid Task ID"+taskId);
 			}
 			TaskFactory factory = new TaskFactory();
