@@ -33,6 +33,8 @@ import com.istarindia.apps.services.StudentPlaylistServices;
 import com.viksitpro.core.cms.interactive.InteractiveContent;
 import com.viksitpro.core.cms.lesson.VideoLesson;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
+import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
@@ -239,11 +241,42 @@ public class RESTLessonService {
 		}
 	}
 	
+	@POST
+	@Path("{lesson_id}/update_lesson_status")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateLessonStatusByLessonId(@PathParam("lesson_id") int lessonId,@PathParam("userId") int userId) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		try {
+			DBUTILS util = new DBUTILS();
+			String updateStudentPlayList = "update student_playlist set status='COMPLETED' where lesson_id = "+lessonId+" and student_id="+userId;
+			util.executeUpdate(updateStudentPlayList);
+			GamificationServices gmService = new GamificationServices();
+			IstarUser user = new IstarUserDAO().findById(userId);
+			Lesson lesson = new LessonDAO().findById(lessonId);
+			gmService.updatePointsAndCoinsOnLessonComplete(user, lesson);
+	
+			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
+			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(userId);
+
+			if (complexObject == null) {
+				throw new Exception();
+			}
+			String result = gson.toJson(complexObject);
+			
+			return Response.ok(result).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
+		}
+	}
+	
 	
 	@POST
-	@Path("/add_log/lesson/{lesson_id}/{slide_id}/{slide_title}")
+	@Path("/add_log/lesson/{lesson_id}/{slide_id}/{slide_title}/{total_slide_count}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public void addUserSessionLog(@PathParam("userId") int istarUserId,@PathParam("slide_id") int slideId, @PathParam("lesson_id") int lessonId,@PathParam("slide_title") int slideTitle) {
+	public void addUserSessionLog(@PathParam("userId") int istarUserId,@PathParam("slide_id") int slideId, @PathParam("lesson_id") int lessonId,@PathParam("slide_title") int slideTitle,@PathParam("total_slide_count") int totalSlideCount) {
 		try {
 			DBUTILS util = new DBUTILS();
 			Lesson l = new LessonDAO().findById(lessonId);
@@ -251,8 +284,8 @@ public class RESTLessonService {
 			int moduleId = l.getCmsessions().iterator().next().getModules().iterator().next().getId();
 			int cmsessionId = l.getCmsessions().iterator().next().getId();
 			
-			String insertIntoLog = "INSERT INTO user_session_log (id, cmsession_id, course_id, created_at, lesson_id, lesson_type, module_id,  slide_id, updated_at, url, user_id)"
-					+ " VALUES ((select COALESCE(max(id),0)+1 from user_session_log), "+cmsessionId+", "+courseId+", now(), "+lessonId+", "+l.getType()+", "+moduleId+", "+slideId+", now(), '"+slideTitle+"', "+istarUserId+");";
+			String insertIntoLog = "INSERT INTO user_session_log (id, cmsession_id, course_id, created_at, lesson_id, lesson_type, module_id,  slide_id, updated_at, url, user_id,total_slide_count)"
+					+ " VALUES ((select COALESCE(max(id),0)+1 from user_session_log), "+cmsessionId+", "+courseId+", now(), "+lessonId+", '"+l.getType()+"', "+moduleId+", "+slideId+", now(), '"+slideTitle+"', "+istarUserId+","+totalSlideCount+");";
 			util.executeUpdate(insertIntoLog);
 		} catch (Exception e) {
 			

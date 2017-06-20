@@ -14,6 +14,7 @@ public class ConcreteItemPOJO implements Comparable<ConcreteItemPOJO>{
 	private Integer orderId = 0;
 	private Integer taskId;
 	
+	private Integer progress;
 	
 	public ConcreteItemPOJO(){
 		
@@ -86,5 +87,14 @@ public class ConcreteItemPOJO implements Comparable<ConcreteItemPOJO>{
 	@Override
 	public int compareTo(ConcreteItemPOJO o) {
 		return this.orderId -o.orderId;
+	}
+	
+	@XmlAttribute(name = "progress", required = false)
+	public Integer getProgress() {
+		return progress;
+	}
+
+	public void setProgress(Integer progress) {
+		this.progress = progress;
 	}
 }

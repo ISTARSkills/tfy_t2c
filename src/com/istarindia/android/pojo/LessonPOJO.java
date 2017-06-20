@@ -17,6 +17,7 @@ public class LessonPOJO implements Comparable<LessonPOJO>{
 	private String status;
 	private String lessonUrl;
 	
+	
 	public LessonPOJO(){
 		
 	}
@@ -105,6 +106,7 @@ public class LessonPOJO implements Comparable<LessonPOJO>{
 	public void setLessonUrl(String lessonUrl) {
 		this.lessonUrl = lessonUrl;
 	}
+	
 	
 	
 	

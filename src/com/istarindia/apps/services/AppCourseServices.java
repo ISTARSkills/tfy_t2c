@@ -159,7 +159,26 @@ public class AppCourseServices {
 						lessonPOJO.setType(lesson.getType());
 						lessonPOJO.setOrderId(studentPlaylist.getId());
 						lessonPOJO.setLessonUrl(mediaUrlPath+"/lessonXMLs/"+lesson.getId()+".zip");
-						
+						String findLessonProgress="select lesson_id, total_slide_count, cast (count(DISTINCT slide_id) as integer) as slide_moved   from user_session_log where lesson_id = "+lesson.getId()+" and user_id = "+istarUserId+" group by lesson_id, total_slide_count limit 1";
+						List<HashMap<String, Object>> progressData = util.executeQuery(findLessonProgress);
+						if(progressData.size()>0 )
+						{
+							int slide_moved = (int)progressData.get(0).get("slide_moved");
+							int totalSlide = (int)progressData.get(0).get("total_slide_count");
+							if(totalSlide!=0)
+							{
+								int progress = (slide_moved*100)/totalSlide;
+								ConcreteItemPOJO.setProgress(progress);
+							}
+							else
+							{
+								ConcreteItemPOJO.setProgress(0);
+							}	
+						}
+						else
+						{
+							ConcreteItemPOJO.setProgress(0);
+						}	
 						ConcreteItemPOJO.setId(lesson.getId());
 						if(!lesson.getType().equalsIgnoreCase("ASSESSMENT"))
 						{
@@ -196,6 +215,28 @@ public class AppCourseServices {
 						lessonPOJO.setPlaylistId(studentPlaylist.getId());
 						lessonPOJO.setStatus(studentPlaylist.getStatus());
 						lessonPOJO.setSubject(lesson.getSubject());
+						
+						String findLessonProgress="select lesson_id, total_slide_count, cast (count(DISTINCT slide_id) as integer) as slide_moved   from user_session_log where lesson_id = "+lesson.getId()+" and user_id = "+istarUserId+" group by lesson_id, total_slide_count limit 1";
+						List<HashMap<String, Object>> progressData = util.executeQuery(findLessonProgress);
+						if(progressData.size()>0 )
+						{
+							int slide_moved = (int)progressData.get(0).get("slide_moved");
+							int totalSlide = (int)progressData.get(0).get("total_slide_count");
+							if(totalSlide!=0)
+							{
+								int progress = (slide_moved*100)/totalSlide;
+								ConcreteItemPOJO.setProgress(progress);
+							}
+							else
+							{
+								ConcreteItemPOJO.setProgress(0);
+							}	
+						}
+						else
+						{
+							ConcreteItemPOJO.setProgress(0);
+						}
+						
 						if(!lesson.getType().equalsIgnoreCase("ASSESSMENT"))
 						{
 							ConcreteItemPOJO.setType("LESSON_"+lesson.getType());
