@@ -133,7 +133,9 @@ public class RESTLessonService {
 		try {
 			DBUTILS util = new DBUTILS();		
 			String updateLessonStatus ="update student_playlist set  status = '"+status+"' where student_id = "+istarUserId+" and lesson_id = "+lessonId;
-			util.executeUpdate(updateLessonStatus); 
+			util.executeUpdate(updateLessonStatus);
+			
+				
 		} catch (Exception e) {
 			e.printStackTrace();
 			
@@ -213,7 +215,7 @@ public class RESTLessonService {
 		try {
 			StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 			StudentPlaylist studentPlaylist = studentPlaylistServices.getStudentPlaylist(playlistId);
-
+			System.err.println(studentPlaylist.getLesson().getId());
 			if (studentPlaylist == null) {
 				throw new Exception();
 			}
@@ -241,7 +243,7 @@ public class RESTLessonService {
 		}
 	}
 	
-	@POST
+	@GET
 	@Path("{lesson_id}/update_lesson_status")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateLessonStatusByLessonId(@PathParam("lesson_id") int lessonId,@PathParam("userId") int userId) {
@@ -250,6 +252,13 @@ public class RESTLessonService {
 			DBUTILS util = new DBUTILS();
 			String updateStudentPlayList = "update student_playlist set status='COMPLETED' where lesson_id = "+lessonId+" and student_id="+userId;
 			util.executeUpdate(updateStudentPlayList);
+			
+			String updateStudentPlayList1 = "update  task set is_active='f' where id in(select task_id from student_playlist where student_id = "+userId+" "
+					+ " and lesson_id = "+lessonId+")";
+			System.err.println("updateStudentPlayList1--->"+updateStudentPlayList1);
+			util.executeUpdate(updateStudentPlayList1);
+			
+			
 			GamificationServices gmService = new GamificationServices();
 			IstarUser user = new IstarUserDAO().findById(userId);
 			Lesson lesson = new LessonDAO().findById(lessonId);
@@ -274,7 +283,7 @@ public class RESTLessonService {
 	
 	
 	@POST
-	@Path("/add_log/lesson/{lesson_id}/{slide_id}/{slide_title}/{total_slide_count}")
+	@Path("add_log/lesson/{lesson_id}/{slide_id}/{slide_title}/{total_slide_count}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public void addUserSessionLog(@PathParam("userId") int istarUserId,@PathParam("slide_id") int slideId, @PathParam("lesson_id") int lessonId,@PathParam("slide_title") int slideTitle,@PathParam("total_slide_count") int totalSlideCount) {
 		try {
