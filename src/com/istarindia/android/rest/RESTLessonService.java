@@ -280,6 +280,42 @@ public class RESTLessonService {
 			return Response.status(Response.Status.OK).entity(result).build();
 		}
 	}
+		@GET
+		@Path("{lesson_id}/{task_id}/update_lesson_status22")
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response updateLessonStatusByLessonId1(@PathParam("lesson_id") int lessonId,@PathParam("userId") int userId ,@PathParam("task_id") int task_id) {
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+			try {
+				DBUTILS util = new DBUTILS();
+				String updateStudentPlayList = "update student_playlist set status='COMPLETED' where lesson_id = "+lessonId+" and student_id="+userId;
+				util.executeUpdate(updateStudentPlayList);
+				
+				String updateStudentPlayList1 = "update  task set is_active='f' where id in("+task_id+")";
+				System.err.println("updateStudentPlayList1--->"+updateStudentPlayList1);
+				util.executeUpdate(updateStudentPlayList1);
+				
+				
+				GamificationServices gmService = new GamificationServices();
+				IstarUser user = new IstarUserDAO().findById(userId);
+				Lesson lesson = new LessonDAO().findById(lessonId);
+				gmService.updatePointsAndCoinsOnLessonComplete(user, lesson);
+		
+				AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
+				ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(userId);
+
+				if (complexObject == null) {
+					throw new Exception();
+				}
+				String result = gson.toJson(complexObject);
+				
+				return Response.ok(result).build();
+			} catch (Exception e) {
+				e.printStackTrace();
+				String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+						: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+				return Response.status(Response.Status.OK).entity(result).build();
+			}
+	}
 	
 	
 	@POST
