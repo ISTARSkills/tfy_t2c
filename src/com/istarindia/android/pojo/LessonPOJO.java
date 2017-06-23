@@ -16,8 +16,12 @@ public class LessonPOJO implements Comparable<LessonPOJO>{
 	private Integer duration;
 	private String status;
 	private String lessonUrl;
+	private Integer currentSlideId;
+	private String imageUrl;
 	
 	
+	
+
 	public LessonPOJO(){
 		
 	}
@@ -107,7 +111,22 @@ public class LessonPOJO implements Comparable<LessonPOJO>{
 		this.lessonUrl = lessonUrl;
 	}
 	
+	@XmlAttribute(name = "currentSlideId", required = false)
+	public Integer getCurrentSlideId() {
+		return currentSlideId;
+	}
+
+	public void setCurrentSlideId(Integer currentSlideId) {
+		this.currentSlideId = currentSlideId;
+	}
 	
-	
+	@XmlAttribute(name = "imageUrl", required = false)
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
 	
 }

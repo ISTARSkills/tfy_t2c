@@ -58,7 +58,9 @@ public class LessonProgressService extends HttpServlet {
 			util.executeUpdate(insertIntoLog);
 		} catch (Exception e) {
 			
-		}	}
+		}	
+	response.getWriter().write("200");	
+	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
