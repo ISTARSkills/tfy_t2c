@@ -160,7 +160,7 @@ public class AppCourseServices {
 						lessonPOJO.setOrderId(studentPlaylist.getId());
 						lessonPOJO.setLessonUrl(mediaUrlPath+"/lessonXMLs/"+lesson.getId()+".zip");
 						lessonPOJO.setImageUrl(lesson.getImage_url());
-						String findLessonProgress="select lesson_id, total_slide_count, cast (count(DISTINCT slide_id) as integer) as slide_moved   from user_session_log where lesson_id = "+lesson.getId()+" and user_id = "+istarUserId+" group by lesson_id, total_slide_count limit 1";
+						String findLessonProgress="select lesson_id, total_slide_count, cast (count(DISTINCT slide_id) as integer)+1 as slide_moved   from user_session_log where lesson_id = "+lesson.getId()+" and user_id = "+istarUserId+" group by lesson_id, total_slide_count limit 1";
 						List<HashMap<String, Object>> progressData = util.executeQuery(findLessonProgress);
 						if(progressData.size()>0 )
 						{
@@ -225,7 +225,7 @@ public class AppCourseServices {
 						lessonPOJO.setStatus(studentPlaylist.getStatus());
 						lessonPOJO.setSubject(lesson.getSubject());
 						lessonPOJO.setImageUrl(lesson.getImage_url());
-						String findLessonProgress="select lesson_id, total_slide_count, cast (count(DISTINCT slide_id) as integer) as slide_moved   from user_session_log where lesson_id = "+lesson.getId()+" and user_id = "+istarUserId+" group by lesson_id, total_slide_count limit 1";
+						String findLessonProgress="select lesson_id, total_slide_count, cast (count(DISTINCT slide_id) as integer)+1 as slide_moved   from user_session_log where lesson_id = "+lesson.getId()+" and user_id = "+istarUserId+" group by lesson_id, total_slide_count limit 1";
 						List<HashMap<String, Object>> progressData = util.executeQuery(findLessonProgress);
 						if(progressData.size()>0 )
 						{
