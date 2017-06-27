@@ -79,12 +79,16 @@ public class AppAssessmentServices {
 			List<SkillReportPOJO> shellTree = getShellTreeForAssessment(assessmentId);
 			for(SkillReportPOJO dd : shellTree)
 			{
-				System.out.println("in shell tree "+dd.getName()+" - "+dd.getId());
-				System.out.println("inshell tree "+" "+dd.getUserPoints()+" "+dd.getTotalPoints()+" "+dd.getPercentage());
+				if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
+					System.out.println("in shell tree "+dd.getName()+" - "+dd.getId());
+					System.out.println("inshell tree "+" "+dd.getUserPoints()+" "+dd.getTotalPoints()+" "+dd.getPercentage());
+				}
 				for(SkillReportPOJO ll: dd.getSkills())
 				{
-					System.out.println("in shell tree "+ll.getName()+" - "+ll.getId());
-					System.out.println("inshell tree "+" "+ll.getUserPoints()+" "+ll.getTotalPoints()+" "+ll.getPercentage());
+					if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
+						System.out.println("in shell tree "+ll.getName()+" - "+ll.getId());
+						System.out.println("inshell tree "+" "+ll.getUserPoints()+" "+ll.getTotalPoints()+" "+ll.getPercentage());
+					}
 				}
 			}
 			
@@ -93,12 +97,18 @@ public class AppAssessmentServices {
 			
 			for(SkillReportPOJO dd : skillReportForAssesssment)
 			{
-				System.err.println("skillReportForAssesssment in data tree "+dd.getName()+" - "+dd.getId());
-				System.err.println("skillReportForAssesssment data tree "+" "+dd.getUserPoints()+" "+dd.getTotalPoints()+" "+dd.getPercentage());
-				for(SkillReportPOJO ll: dd.getSkills())
-				{
-					System.err.println("skillReportForAssesssment in data tree "+ll.getName()+" - "+ll.getId());
-					System.err.println("skillReportForAssesssment in data tree "+" "+ll.getUserPoints()+" "+ll.getTotalPoints()+" "+ll.getPercentage());
+				if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
+					System.err.println("skillReportForAssesssment in data tree " + dd.getName() + " - " + dd.getId());
+					System.err.println("skillReportForAssesssment data tree " + " " + dd.getUserPoints() + " "
+							+ dd.getTotalPoints() + " " + dd.getPercentage());
+				}
+				for (SkillReportPOJO ll : dd.getSkills()) {
+					if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
+						System.err
+								.println("skillReportForAssesssment in data tree " + ll.getName() + " - " + ll.getId());
+						System.err.println("skillReportForAssesssment in data tree " + " " + ll.getUserPoints() + " "
+								+ ll.getTotalPoints() + " " + ll.getPercentage());
+					}
 				}
 			}
 			
@@ -1013,7 +1023,9 @@ public class AppAssessmentServices {
 					per_lesson_points =  properties.getProperty("per_lesson_points");
 					per_question_points =  properties.getProperty("per_question_points");
 					per_assessment_coins = properties.getProperty("per_assessment_coins");
+					if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
 					System.out.println("per_assessment_points"+per_assessment_points);
+					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();			

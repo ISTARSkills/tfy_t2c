@@ -24,6 +24,7 @@ import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.UserGamification;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
+import com.viksitpro.core.utilities.AppProperies;
 import com.viksitpro.core.utilities.DBUTILS;
 
 public class AppUserRankUtility {
@@ -372,7 +373,9 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 		DBUTILS util = new DBUTILS();
 		
 		String findRankPoinsCoins ="SELECT * FROM ( SELECT student_id, user_points, total_points, CAST (coins AS INTEGER) AS coins, perc, CAST ( Rank () OVER (order by user_points desc) AS INTEGER ) AS user_rank FROM ( SELECT student_id, user_points, total_points, coins, case  when total_points =0 then 0 else CAST ( (user_points * 100) / total_points AS INTEGER ) end  AS perc FROM ( SELECT T1.student_id, COALESCE(SUM (T1.points),0) AS user_points, COALESCE(SUM (T1.max_points),0) AS total_points, COALESCE(SUM (T1.coins),0) AS coins FROM ( WITH summary AS ( SELECT TX .student_id, P .skill_objective, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.coins,'0'),':per_lesson_coins','"+per_lesson_coins+"'),':per_assessment_coins','"+per_assessment_coins+"'),':per_question_coins','"+per_question_coins+"'))  as text)) as coins, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as points, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.max_points,'0'),':per_lesson_points','"+per_lesson_points+"'),':per_assessment_points','"+per_assessment_points+"'),':per_question_points','"+per_question_points+"'))  as text)) as max_points, P .item_id, ROW_NUMBER () OVER ( PARTITION BY TX .student_id, P .skill_objective, P .item_id ORDER BY P . TIMESTAMP DESC ) AS rk FROM ( select student_id from batch_students where batch_group_id in (( SELECT batch_group. ID FROM batch_students, batch_group WHERE batch_students.batch_group_id = batch_group. ID AND batch_students.student_id = "+istarUserId+" AND batch_group.is_primary = 't' LIMIT 1 )) )TX left join user_gamification P on (p.istar_user = TX.student_id and item_type IN ('QUESTION', 'LESSON') AND batch_group_id = ( SELECT batch_group. ID FROM batch_students, batch_group WHERE batch_students.batch_group_id = batch_group. ID AND batch_students.student_id = "+istarUserId+" AND batch_group.is_primary = 't' LIMIT 1 ))  ) SELECT s.* FROM summary s WHERE s.rk = 1) T1 GROUP BY student_id ) T2 ORDER BY  total_points DESC, perc DESC, total_points DESC ) T3 ) T4";
-				System.err.println("findRankPoinsCoins  "+findRankPoinsCoins);
+		if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {		
+			System.err.println("findRankPoinsCoins  "+findRankPoinsCoins);
+		}
 		List<HashMap<String, Object>> rankData= util.executeQuery(findRankPoinsCoins);
 		if(rankData.size()>0)
 		{
