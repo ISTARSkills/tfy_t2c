@@ -51,7 +51,6 @@ public class AppNotificationServices {
 				if (inputStream != null) {
 					properties.load(inputStream);
 					mediaUrlPath =  properties.getProperty("media_url_path");
-					System.out.println("media_url_path"+mediaUrlPath);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -113,7 +112,6 @@ public class AppNotificationServices {
 				if (inputStream != null) {
 					properties.load(inputStream);
 					mediaUrlPath =  properties.getProperty("media_url_path");
-					System.out.println("media_url_path"+mediaUrlPath);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -226,7 +224,6 @@ public class AppNotificationServices {
 				if (inputStream != null) {
 					properties.load(inputStream);
 					mediaUrlPath =  properties.getProperty("media_url_path");
-					System.out.println("media_url_path"+mediaUrlPath);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

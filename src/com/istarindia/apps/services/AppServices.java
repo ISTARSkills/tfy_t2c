@@ -20,6 +20,7 @@ import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
+import com.viksitpro.core.utilities.AppProperies;
 
 public class AppServices {
 	
@@ -99,7 +100,6 @@ public class AppServices {
 				if (inputStream != null) {
 					properties.load(inputStream);
 					mediaUrlPath =  properties.getProperty("media_url_path");
-					System.out.println("media_url_path"+mediaUrlPath);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -127,8 +127,10 @@ public class AppServices {
 				courseSkillPOJO.calculateUserPoints();
 				courseSkillPOJO.calculateTotalPoints();
 				courseSkillPOJO.calculatePercentage();
+				if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
 				System.err.println("courseSkillPOJO.gettotal points"+courseSkillPOJO.getTotalPoints());
 				System.err.println("courseSkillPOJO.getUserPoints points"+courseSkillPOJO.getUserPoints());
+				}
 				allSkills.add(courseSkillPOJO);
 			}
 		}

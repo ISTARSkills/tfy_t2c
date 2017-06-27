@@ -34,6 +34,7 @@ import com.viksitpro.core.dao.entities.Module;
 import com.viksitpro.core.dao.entities.ModuleDAO;
 import com.viksitpro.core.dao.entities.SkillObjective;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
+import com.viksitpro.core.utilities.AppProperies;
 import com.viksitpro.core.utilities.DBUTILS;
 
 public class AppCourseServices {
@@ -59,7 +60,6 @@ public class AppCourseServices {
 					per_assessment_coins = Integer.parseInt(properties.getProperty("per_assessment_coins"));
 					per_lesson_coins = Integer.parseInt(properties.getProperty("per_lesson_coins"));
 					per_question_coins = Integer.parseInt(properties.getProperty("per_question_coins"));
-					System.out.println("media_url_path"+mediaUrlPath);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -98,9 +98,10 @@ public class AppCourseServices {
 				userPoints = (double) rankPointsData.get(0).get("user_points");
 				totalPoints= (double) rankPointsData.get(0).get("total_points");
 			}
-			
+			if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
 			System.out.println("userPoints>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+userPoints);
 			System.out.println("totalPoints>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+totalPoints);
+			}
 			coursePOJO.setUserPoints(userPoints);
 			coursePOJO.setRank(rank);
 			coursePOJO.setTotalPoints(totalPoints);
@@ -116,176 +117,184 @@ public class AppCourseServices {
 				Module module = studentPlaylist.getModule();
 				Cmsession cmsession = studentPlaylist.getCmsession();
 				Lesson lesson = studentPlaylist.getLesson();
-				
-				for(ModulePOJO tempModulePOJO : coursePOJO.getModules()){
-					try {
-						if(tempModulePOJO.getId()== module.getId()){
-							modulePOJO = tempModulePOJO;
+				if(lesson.getIsDeleted()!=null && !lesson.getIsDeleted())
+				{
+					for(ModulePOJO tempModulePOJO : coursePOJO.getModules()){
+						try {
+							if(tempModulePOJO.getId()== module.getId()){
+								modulePOJO = tempModulePOJO;
+							}
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							//e.printStackTrace();
 						}
+					}
+					
+					try {
+						if(modulePOJO==null){
+							modulePOJO = new ModulePOJO();
+							modulePOJO.setId(module.getId());
+							modulePOJO.setName(module.getModuleName());
+							modulePOJO.setImageURL(mediaUrlPath+module.getImage_url());
+							modulePOJO.setDescription(module.getModule_description());
+							modulePOJO.setOrderId(++moduleOrderId);
+							
+							if(!cmsessionIds.contains(cmsession.getId())){
+								if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
+									System.out.println("Adding CMSession Skill");
+								}
+								Set<String> allSkillObjectivesOfModule = new HashSet<String>();
+								for (SkillObjective skillObjective : cmsession.getSkillObjectives()) {
+									allSkillObjectivesOfModule.add(skillObjective.getName());
+								}
+								cmsessionIds.add(cmsession.getId());
+								modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
+							}
+
+							ConcreteItemPOJO ConcreteItemPOJO = new ConcreteItemPOJO();
+							LessonPOJO lessonPOJO = new LessonPOJO();
+							lessonPOJO.setId(lesson.getId());
+							lessonPOJO.setTitle(lesson.getTitle());
+							lessonPOJO.setDescription(lesson.getDescription());
+							lessonPOJO.setDuration(lesson.getDuration());
+							lessonPOJO.setPlaylistId(studentPlaylist.getId());
+							lessonPOJO.setStatus(studentPlaylist.getStatus());
+							lessonPOJO.setSubject(lesson.getSubject());
+							lessonPOJO.setType(lesson.getType());
+							lessonPOJO.setOrderId(studentPlaylist.getId());
+							lessonPOJO.setLessonUrl(mediaUrlPath+"/lessonXMLs/"+lesson.getId()+".zip");
+							lessonPOJO.setImageUrl(lesson.getImage_url());
+							String findLessonProgress="select lesson_id, total_slide_count, cast (count(DISTINCT slide_id) as integer)+1 as slide_moved   from user_session_log where lesson_id = "+lesson.getId()+" and user_id = "+istarUserId+" group by lesson_id, total_slide_count limit 1";
+							List<HashMap<String, Object>> progressData = util.executeQuery(findLessonProgress);
+							if(progressData.size()>0 )
+							{
+								int slide_moved = (int)progressData.get(0).get("slide_moved");
+								int totalSlide = (int)progressData.get(0).get("total_slide_count");
+								if(totalSlide!=0)
+								{
+									int progress = (slide_moved*100)/totalSlide;
+									ConcreteItemPOJO.setProgress(progress);
+								}
+								else
+								{
+									ConcreteItemPOJO.setProgress(0);
+								}
+								
+								String getCurrentSlide="select slide_id from user_session_log where user_id = "+istarUserId+" and lesson_id = "+lesson.getId()+" order by id desc limit 1";
+								List<HashMap<String, Object>> currentslideData = util.executeQuery(getCurrentSlide);
+								if(currentslideData.size()>0)
+								{
+									lessonPOJO.setCurrentSlideId((int)currentslideData.get(0).get("slide_id"));
+								}
+									
+							}
+							else
+							{
+								ConcreteItemPOJO.setProgress(0);
+							}	
+							ConcreteItemPOJO.setId(lesson.getId());
+							if(!lesson.getType().equalsIgnoreCase("ASSESSMENT"))
+							{
+								ConcreteItemPOJO.setType("LESSON_"+lesson.getType());
+							}
+							else
+							{
+								ConcreteItemPOJO.setType("ASSESSMENT");
+							}	
+							ConcreteItemPOJO.setLesson(lessonPOJO);
+							ConcreteItemPOJO.setOrderId(studentPlaylist.getId());
+							ConcreteItemPOJO.setStatus(studentPlaylist.getStatus());
+							ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
+							modulePOJO.getLessons().add(ConcreteItemPOJO);
+							
+							coursePOJO.getModules().add(modulePOJO);
+						}else{
+							
+							if(!cmsessionIds.contains(cmsession.getId())){
+								if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
+									System.out.println("Adding CMSession Skill");
+								}
+								Set<String> allSkillObjectivesOfModule = new HashSet<String>();
+								for (SkillObjective skillObjective : cmsession.getSkillObjectives()) {
+									allSkillObjectivesOfModule.add(skillObjective.getName());
+								}
+								cmsessionIds.add(cmsession.getId());
+								modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
+							}
+							
+							ConcreteItemPOJO ConcreteItemPOJO = new ConcreteItemPOJO();
+							LessonPOJO lessonPOJO = new LessonPOJO();
+							lessonPOJO.setId(lesson.getId());
+							lessonPOJO.setTitle(lesson.getTitle());
+							lessonPOJO.setDescription(lesson.getDescription());
+							lessonPOJO.setDuration(lesson.getDuration());
+							lessonPOJO.setPlaylistId(studentPlaylist.getId());
+							lessonPOJO.setStatus(studentPlaylist.getStatus());
+							lessonPOJO.setSubject(lesson.getSubject());
+							lessonPOJO.setImageUrl(lesson.getImage_url());
+							String findLessonProgress="select lesson_id, total_slide_count, cast (count(DISTINCT slide_id) as integer)+1 as slide_moved   from user_session_log where lesson_id = "+lesson.getId()+" and user_id = "+istarUserId+" group by lesson_id, total_slide_count limit 1";
+							List<HashMap<String, Object>> progressData = util.executeQuery(findLessonProgress);
+							if(progressData.size()>0 )
+							{
+								int slide_moved = (int)progressData.get(0).get("slide_moved");
+								int totalSlide = (int)progressData.get(0).get("total_slide_count");
+								if(totalSlide!=0)
+								{
+									int progress = (slide_moved*100)/totalSlide;
+									ConcreteItemPOJO.setProgress(progress);
+								}
+								else
+								{
+									ConcreteItemPOJO.setProgress(0);
+								}
+								
+								String getCurrentSlide="select slide_id from user_session_log where user_id = "+istarUserId+" and lesson_id = "+lesson.getId()+" order by id desc limit 1";
+								List<HashMap<String, Object>> currentslideData = util.executeQuery(getCurrentSlide);
+								if(currentslideData.size()>0)
+								{
+									lessonPOJO.setCurrentSlideId((int)currentslideData.get(0).get("slide_id"));
+								}
+							}
+							else
+							{
+								ConcreteItemPOJO.setProgress(0);
+							}
+							
+							if(!lesson.getType().equalsIgnoreCase("ASSESSMENT"))
+							{
+								ConcreteItemPOJO.setType("LESSON_"+lesson.getType());
+							}
+							else
+							{
+								ConcreteItemPOJO.setType("ASSESSMENT");
+							}
+							lessonPOJO.setOrderId(studentPlaylist.getId());
+							lessonPOJO.setLessonUrl(mediaUrlPath+"/lessonXMLs/"+lesson.getId()+".zip");
+							ConcreteItemPOJO.setId(lesson.getId());
+							ConcreteItemPOJO.setType("LESSON_"+lesson.getType());
+							ConcreteItemPOJO.setLesson(lessonPOJO);
+							ConcreteItemPOJO.setOrderId(studentPlaylist.getId());
+							ConcreteItemPOJO.setStatus(studentPlaylist.getStatus());
+							ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
+							modulePOJO.getLessons().add(ConcreteItemPOJO);
+						}
+						
+						String finModuleStatus="select cast( count(*) as integer) as incomple_lesssons from student_playlist where student_id = "+istarUserId+" and status = 'SCHEDULED' and module_id="+module.getId();
+						List<HashMap<String, Object>> incompleteLessons = util.executeQuery(finModuleStatus);
+						if(incompleteLessons.size()>0 && (int)incompleteLessons.get(0).get("incomple_lesssons") >0)
+						{
+							modulePOJO.setStatus("INCOMPLETE");
+						}
+						else
+						{
+							modulePOJO.setStatus("COMPLETED");
+						}	
+						
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
-						//e.printStackTrace();
-					}
-				}
-				
-				try {
-					if(modulePOJO==null){
-						modulePOJO = new ModulePOJO();
-						modulePOJO.setId(module.getId());
-						modulePOJO.setName(module.getModuleName());
-						modulePOJO.setImageURL(mediaUrlPath+module.getImage_url());
-						modulePOJO.setDescription(module.getModule_description());
-						modulePOJO.setOrderId(++moduleOrderId);
-						
-						if(!cmsessionIds.contains(cmsession.getId())){
-							System.out.println("Adding CMSession Skill");
-							Set<String> allSkillObjectivesOfModule = new HashSet<String>();
-							for (SkillObjective skillObjective : cmsession.getSkillObjectives()) {
-								allSkillObjectivesOfModule.add(skillObjective.getName());
-							}
-							cmsessionIds.add(cmsession.getId());
-							modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
-						}
-
-						ConcreteItemPOJO ConcreteItemPOJO = new ConcreteItemPOJO();
-						LessonPOJO lessonPOJO = new LessonPOJO();
-						lessonPOJO.setId(lesson.getId());
-						lessonPOJO.setTitle(lesson.getTitle());
-						lessonPOJO.setDescription(lesson.getDescription());
-						lessonPOJO.setDuration(lesson.getDuration());
-						lessonPOJO.setPlaylistId(studentPlaylist.getId());
-						lessonPOJO.setStatus(studentPlaylist.getStatus());
-						lessonPOJO.setSubject(lesson.getSubject());
-						lessonPOJO.setType(lesson.getType());
-						lessonPOJO.setOrderId(studentPlaylist.getId());
-						lessonPOJO.setLessonUrl(mediaUrlPath+"/lessonXMLs/"+lesson.getId()+".zip");
-						lessonPOJO.setImageUrl(lesson.getImage_url());
-						String findLessonProgress="select lesson_id, total_slide_count, cast (count(DISTINCT slide_id) as integer)+1 as slide_moved   from user_session_log where lesson_id = "+lesson.getId()+" and user_id = "+istarUserId+" group by lesson_id, total_slide_count limit 1";
-						List<HashMap<String, Object>> progressData = util.executeQuery(findLessonProgress);
-						if(progressData.size()>0 )
-						{
-							int slide_moved = (int)progressData.get(0).get("slide_moved");
-							int totalSlide = (int)progressData.get(0).get("total_slide_count");
-							if(totalSlide!=0)
-							{
-								int progress = (slide_moved*100)/totalSlide;
-								ConcreteItemPOJO.setProgress(progress);
-							}
-							else
-							{
-								ConcreteItemPOJO.setProgress(0);
-							}
-							
-							String getCurrentSlide="select slide_id from user_session_log where user_id = "+istarUserId+" and lesson_id = "+lesson.getId()+" order by id desc limit 1";
-							List<HashMap<String, Object>> currentslideData = util.executeQuery(getCurrentSlide);
-							if(currentslideData.size()>0)
-							{
-								lessonPOJO.setCurrentSlideId((int)currentslideData.get(0).get("slide_id"));
-							}
-								
-						}
-						else
-						{
-							ConcreteItemPOJO.setProgress(0);
-						}	
-						ConcreteItemPOJO.setId(lesson.getId());
-						if(!lesson.getType().equalsIgnoreCase("ASSESSMENT"))
-						{
-							ConcreteItemPOJO.setType("LESSON_"+lesson.getType());
-						}
-						else
-						{
-							ConcreteItemPOJO.setType("ASSESSMENT");
-						}	
-						ConcreteItemPOJO.setLesson(lessonPOJO);
-						ConcreteItemPOJO.setOrderId(studentPlaylist.getId());
-						ConcreteItemPOJO.setStatus(studentPlaylist.getStatus());
-						ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
-						modulePOJO.getLessons().add(ConcreteItemPOJO);
-						coursePOJO.getModules().add(modulePOJO);
-					}else{
-						
-						if(!cmsessionIds.contains(cmsession.getId())){
-							System.out.println("Adding CMSession Skill");
-							Set<String> allSkillObjectivesOfModule = new HashSet<String>();
-							for (SkillObjective skillObjective : cmsession.getSkillObjectives()) {
-								allSkillObjectivesOfModule.add(skillObjective.getName());
-							}
-							cmsessionIds.add(cmsession.getId());
-							modulePOJO.getSkillObjectives().addAll(allSkillObjectivesOfModule);
-						}
-						
-						ConcreteItemPOJO ConcreteItemPOJO = new ConcreteItemPOJO();
-						LessonPOJO lessonPOJO = new LessonPOJO();
-						lessonPOJO.setId(lesson.getId());
-						lessonPOJO.setTitle(lesson.getTitle());
-						lessonPOJO.setDescription(lesson.getDescription());
-						lessonPOJO.setDuration(lesson.getDuration());
-						lessonPOJO.setPlaylistId(studentPlaylist.getId());
-						lessonPOJO.setStatus(studentPlaylist.getStatus());
-						lessonPOJO.setSubject(lesson.getSubject());
-						lessonPOJO.setImageUrl(lesson.getImage_url());
-						String findLessonProgress="select lesson_id, total_slide_count, cast (count(DISTINCT slide_id) as integer)+1 as slide_moved   from user_session_log where lesson_id = "+lesson.getId()+" and user_id = "+istarUserId+" group by lesson_id, total_slide_count limit 1";
-						List<HashMap<String, Object>> progressData = util.executeQuery(findLessonProgress);
-						if(progressData.size()>0 )
-						{
-							int slide_moved = (int)progressData.get(0).get("slide_moved");
-							int totalSlide = (int)progressData.get(0).get("total_slide_count");
-							if(totalSlide!=0)
-							{
-								int progress = (slide_moved*100)/totalSlide;
-								ConcreteItemPOJO.setProgress(progress);
-							}
-							else
-							{
-								ConcreteItemPOJO.setProgress(0);
-							}
-							
-							String getCurrentSlide="select slide_id from user_session_log where user_id = "+istarUserId+" and lesson_id = "+lesson.getId()+" order by id desc limit 1";
-							List<HashMap<String, Object>> currentslideData = util.executeQuery(getCurrentSlide);
-							if(currentslideData.size()>0)
-							{
-								lessonPOJO.setCurrentSlideId((int)currentslideData.get(0).get("slide_id"));
-							}
-						}
-						else
-						{
-							ConcreteItemPOJO.setProgress(0);
-						}
-						
-						if(!lesson.getType().equalsIgnoreCase("ASSESSMENT"))
-						{
-							ConcreteItemPOJO.setType("LESSON_"+lesson.getType());
-						}
-						else
-						{
-							ConcreteItemPOJO.setType("ASSESSMENT");
-						}
-						lessonPOJO.setOrderId(studentPlaylist.getId());
-						lessonPOJO.setLessonUrl(mediaUrlPath+"/lessonXMLs/"+lesson.getId()+".zip");
-						ConcreteItemPOJO.setId(lesson.getId());
-						ConcreteItemPOJO.setType("LESSON_"+lesson.getType());
-						ConcreteItemPOJO.setLesson(lessonPOJO);
-						ConcreteItemPOJO.setOrderId(studentPlaylist.getId());
-						ConcreteItemPOJO.setStatus(studentPlaylist.getStatus());
-						ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
-						modulePOJO.getLessons().add(ConcreteItemPOJO);
+					//	e.printStackTrace();
 					}
 					
-					String finModuleStatus="select cast( count(*) as integer) as incomple_lesssons from student_playlist where student_id = "+istarUserId+" and status = 'SCHEDULED' and module_id="+module.getId();
-					List<HashMap<String, Object>> incompleteLessons = util.executeQuery(finModuleStatus);
-					if(incompleteLessons.size()>0 && (int)incompleteLessons.get(0).get("incomple_lesssons") >0)
-					{
-						modulePOJO.setStatus("INCOMPLETE");
-					}
-					else
-					{
-						modulePOJO.setStatus("COMPLETED");
-					}	
-					
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-				//	e.printStackTrace();
 				}
 				
 				
@@ -316,12 +325,19 @@ public class AppCourseServices {
 		List<SkillReportPOJO> shellTree = getShellSkillTreeForCourse(courseId);
 		for(SkillReportPOJO dd : shellTree)
 		{
-			System.err.println("in mod shell tree "+dd.getName()+" - "+dd.getId());
-			System.err.println("in mod shell tree "+" "+dd.getUserPoints()+" "+dd.getTotalPoints()+" "+dd.getPercentage());
+			if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
+				System.err.println("in mod shell tree " + dd.getName() + " - " + dd.getId());
+				System.err.println("in mod shell tree " + " " + dd.getUserPoints() + " " + dd.getTotalPoints() + " "
+						+ dd.getPercentage());
+
+			}
 			for(SkillReportPOJO ll: dd.getSkills())
 			{
-				System.err.println("in cmsession shell tree "+ll.getName()+" - "+ll.getId());
-				System.err.println("in cmsession shell tree "+" "+ll.getUserPoints()+" "+ll.getTotalPoints()+" "+ll.getPercentage());
+				if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
+					System.err.println("in cmsession shell tree " + ll.getName() + " - " + ll.getId());
+					System.err.println("in cmsession shell tree " + " " + ll.getUserPoints() + " " + ll.getTotalPoints()
+							+ " " + ll.getPercentage());
+				}
 			}
 		}
 		DBUTILS utils = new DBUTILS();
@@ -331,12 +347,16 @@ public class AppCourseServices {
 		
 		for(SkillReportPOJO dd : skillReportForCourse)
 		{
+			if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
 			System.err.println("in filled mod tree "+dd.getName()+" - "+dd.getId());
 			System.err.println("in filled mod tree "+" "+dd.getUserPoints()+" "+dd.getTotalPoints()+" "+dd.getPercentage());
+			}
 			for(SkillReportPOJO ll: dd.getSkills())
 			{
+				if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
 				System.err.println("in filled sms tree "+ll.getName()+" - "+ll.getId());
 				System.err.println("in filled sms tree "+" "+ll.getUserPoints()+" "+ll.getTotalPoints()+" "+ll.getPercentage());
+				}
 			}
 		}
 		
@@ -450,7 +470,6 @@ public class AppCourseServices {
 					per_assessment_coins = Integer.parseInt(properties.getProperty("per_assessment_coins"));
 					per_lesson_coins = Integer.parseInt(properties.getProperty("per_lesson_coins"));
 					per_question_coins = Integer.parseInt(properties.getProperty("per_question_coins"));
-					System.out.println("media_url_path"+mediaUrlPath);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();			

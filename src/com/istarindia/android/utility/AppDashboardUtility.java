@@ -30,8 +30,6 @@ public class AppDashboardUtility {
 			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
 				if (inputStream != null) {
 					properties.load(inputStream);
-					mediaUrlPath =  properties.getProperty("media_url_path");
-					System.out.println("media_url_path"+mediaUrlPath);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

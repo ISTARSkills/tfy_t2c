@@ -31,6 +31,8 @@ public class TaskFactory {
 				return creator.getClassroomAssessmentTask(task);
 			case TaskItemCategory.CONTENT:
 				return creator.getContentTask(task);
+			case TaskItemCategory.CLASSROOM_SESSION_STUDENT:
+				return creator.getClassroomSessionStudent(task);
 			default:
 				return null;			
 			

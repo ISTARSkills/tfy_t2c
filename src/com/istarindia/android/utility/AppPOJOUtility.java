@@ -28,6 +28,7 @@ import com.viksitpro.core.dao.entities.Module;
 import com.viksitpro.core.dao.entities.Question;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.pojo.recruiter.IstarUserPOJO;
+import com.viksitpro.core.utilities.AppProperies;
 import com.viksitpro.core.utilities.DBUTILS;
 
 public class AppPOJOUtility {
@@ -53,7 +54,9 @@ public class AppPOJOUtility {
 	}
 
 	public StudentProfile getStudentProfile(IstarUser student) {
-		System.out.println("POJO service");
+		if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
+			System.out.println("POJO service");
+		}
 		String mediaUrlPath = "";
 		int per_assessment_points = 5, per_lesson_points = 5, per_question_points = 1, per_assessment_coins = 5,
 				per_lesson_coins = 5, per_question_coins = 1;
@@ -70,7 +73,6 @@ public class AppPOJOUtility {
 				per_assessment_coins = Integer.parseInt(properties.getProperty("per_assessment_coins"));
 				per_lesson_coins = Integer.parseInt(properties.getProperty("per_lesson_coins"));
 				per_question_coins = Integer.parseInt(properties.getProperty("per_question_coins"));
-				System.out.println("media_url_path" + mediaUrlPath);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -88,8 +90,10 @@ public class AppPOJOUtility {
 		studentProfile.setLoginType(student.getLoginType());
 
 		if (student.getUserProfile() != null) {
-			System.out.println("FIRST NAME POJO is->" + student.getUserProfile().getFirstName());
-			studentProfile.setFirstName(student.getUserProfile().getFirstName());
+			if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
+				System.out.println("FIRST NAME POJO is->" + student.getUserProfile().getFirstName());
+
+	}			studentProfile.setFirstName(student.getUserProfile().getFirstName());
 			studentProfile.setLastName(student.getUserProfile().getLastName());
 			studentProfile.setGender(student.getUserProfile().getGender());
 			studentProfile.setDateOfBirth(student.getUserProfile().getDob());

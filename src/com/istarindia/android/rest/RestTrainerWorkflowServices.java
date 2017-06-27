@@ -177,6 +177,53 @@ public class RestTrainerWorkflowServices {
 		}
 	}
 	
+	@GET
+	@Path("{taskId}/get_course_contents_student")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getCourseContentForStudent(@PathParam("taskId") int taskId){
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		try{
+			CourseContent courseContent = new CourseContent();
+			TrainerWorkflowServices service = new TrainerWorkflowServices();
+			DBUTILS util = new DBUTILS();
+			Integer courseId= null;
+			String GetCourseId ="select course_id from task,batch_schedule_event where batch_schedule_event.id = task.item_id and item_type ='"+TaskItemCategory.CLASSROOM_SESSION_STUDENT+"' and task.id = "+taskId;
+			System.out.println("getCourseId-------------"+GetCourseId);
+			List<HashMap<String, Object>> courseIdData = util.executeQuery(GetCourseId);
+			String getTrainerTaskId = "select id from task where item_type ='"+TaskItemCategory.CLASSROOM_SESSION+"' and project_id in (select project_id from task where id = "+taskId+")";
+			System.out.println("getTrainerTaskId-------------"+getTrainerTaskId);
+			List<HashMap<String, Object>> trainerTaskIdData = util.executeQuery(getTrainerTaskId);
+			
+			if(courseIdData.size()>0)
+			{
+				courseId = (int)courseIdData.get(0).get("course_id");
+				if(trainerTaskIdData.size()>0 && trainerTaskIdData.get(0).get("id")!=null)
+				{
+					int trainerTaskId = (int)trainerTaskIdData.get(0).get("id");
+					courseContent = service.getCourseContent(courseId, trainerTaskId);	
+					
+					String result = gson.toJson(courseContent);
+					return Response.ok(result).build();
+				}
+				else
+				{
+					throw new Exception();
+				}	
+				
+			}
+			else
+			{
+				throw new Exception();
+			}	
+			
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
+		}
+	}
 	
 	
 	@GET

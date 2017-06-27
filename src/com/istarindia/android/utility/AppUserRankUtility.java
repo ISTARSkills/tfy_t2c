@@ -94,7 +94,6 @@ public class AppUserRankUtility {
 		per_assessment_coins = Integer.parseInt(properties.getProperty("per_assessment_coins"));
 		per_lesson_coins = Integer.parseInt(properties.getProperty("per_lesson_coins"));
 		per_question_coins = Integer.parseInt(properties.getProperty("per_question_coins"));
-		System.out.println("media_url_path"+mediaUrlPath);
 		}
 		} catch (IOException e) {
 		e.printStackTrace();
@@ -362,7 +361,6 @@ public CourseRankPOJO getOverAllLeaderboardForUser(int istarUserId){
 				per_assessment_coins = Integer.parseInt(properties.getProperty("per_assessment_coins"));
 				per_lesson_coins = Integer.parseInt(properties.getProperty("per_lesson_coins"));
 				per_question_coins = Integer.parseInt(properties.getProperty("per_question_coins"));	
-				System.out.println("media_url_path"+mediaUrlPath);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();		

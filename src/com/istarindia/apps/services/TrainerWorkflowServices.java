@@ -37,7 +37,6 @@ public class TrainerWorkflowServices {
 				if (inputStream != null) {
 					properties.load(inputStream);
 					mediaUrlPath =  properties.getProperty("media_url_path");
-					System.out.println("media_url_path"+mediaUrlPath);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -124,7 +123,7 @@ public class TrainerWorkflowServices {
 			currentItemSlideId = ((BigInteger)itemStats.get(0).get("slide_id")).longValue();
 		}
 		
-		String getCourseId ="select T1.* , 	CAST ( 		ROW_NUMBER () OVER () AS INTEGER 	) - 1 AS order_id   from (SELECT 	lesson. ID, 	lesson.title FROM 	module_course, 	cmsession_module, 	lesson_cmsession, 	lesson WHERE 	module_course.course_id = "+courseId+" AND cmsession_module.module_id = module_course.module_id AND lesson_cmsession.cmsession_id = cmsession_module.cmsession_id AND lesson_cmsession.lesson_id = lesson. ID AND lesson.is_published = 't' AND lesson.category IN ('ILT', 'BOTH') AND lesson. TYPE != 'ASSESSMENT' ORDER BY 	module_course.oid, 	cmsession_module.oid, 	lesson_cmsession.oid ) T1";
+		String getCourseId ="select T1.* , 	CAST ( 		ROW_NUMBER () OVER () AS INTEGER 	) - 1 AS order_id   from (SELECT 	lesson. ID, 	lesson.title FROM 	module_course, 	cmsession_module, 	lesson_cmsession, 	lesson WHERE 	module_course.course_id = "+courseId+" AND cmsession_module.module_id = module_course.module_id AND lesson_cmsession.cmsession_id = cmsession_module.cmsession_id AND lesson_cmsession.lesson_id = lesson. ID AND lesson.is_published = 't' and  lesson.is_deleted != 't' AND lesson.category IN ('ILT', 'BOTH') AND lesson. TYPE != 'ASSESSMENT' ORDER BY 	module_course.oid, 	cmsession_module.oid, 	lesson_cmsession.oid ) T1";
 		System.err.println("getCourseId>>>"+getCourseId);
 		List<HashMap<String, Object>> courseData = util.executeQuery(getCourseId);
 		

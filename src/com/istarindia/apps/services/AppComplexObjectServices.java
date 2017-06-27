@@ -26,6 +26,7 @@ import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
+import com.viksitpro.core.utilities.AppProperies;
 import com.viksitpro.core.utilities.TaskItemCategory;
 
 public class AppComplexObjectServices {
@@ -58,8 +59,11 @@ public class AppComplexObjectServices {
 			//Student Profile
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 			complexObject.setStudentProfile(studentProfile);
-			System.err.println("complexObject StudentProfile " + "Time->"+(System.currentTimeMillis()-previousTime));
-			
+			if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
+				System.err.println(
+						"complexObject StudentProfile " + "Time->" + (System.currentTimeMillis() - previousTime));
+
+			}
 			//Skills -- to be changed
 			List<SkillReportPOJO> allSkills = appServices.getSkillsMapOfUser(userId);
 			complexObject.setSkills(allSkills);

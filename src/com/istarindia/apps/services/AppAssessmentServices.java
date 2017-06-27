@@ -28,6 +28,7 @@ import com.viksitpro.core.dao.entities.Question;
 import com.viksitpro.core.dao.entities.SkillObjective;
 import com.viksitpro.core.dao.entities.SkillObjectiveDAO;
 import com.viksitpro.core.dao.entities.StudentAssessment;
+import com.viksitpro.core.utilities.AppProperies;
 import com.viksitpro.core.utilities.DBUTILS;
 
 public class AppAssessmentServices {
@@ -214,7 +215,9 @@ public class AppAssessmentServices {
 					{
 						if(cmsSkill.getId()== skillId)
 						{
+							if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
 							System.out.println("idsss<<<<<<<<<<<<<<<<<"+cmsSkill.getId());
+							}
 							
 							if(cmsSkill.getId()==188)
 							{
@@ -277,7 +280,6 @@ public class AppAssessmentServices {
 					per_assessment_coins = Integer.parseInt(properties.getProperty("per_assessment_coins"));
 					per_lesson_coins = Integer.parseInt(properties.getProperty("per_lesson_coins"));
 					per_question_coins = Integer.parseInt(properties.getProperty("per_question_coins"));
-					System.out.println("media_url_path"+mediaUrlPath);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
