@@ -33,6 +33,10 @@ public class TaskFactory {
 				return creator.getContentTask(task);
 			case TaskItemCategory.CLASSROOM_SESSION_STUDENT:
 				return creator.getClassroomSessionStudent(task);
+			case TaskItemCategory.ZOOM_INTERVIEW_INTERVIEWEE:
+				return creator.getZoomIntervieweeTask(task);
+			case TaskItemCategory.ZOOM_INTERVIEW_INTERVIEWER:
+				return creator.getZoomInterviewerTask(task);
 			default:
 				return null;			
 			

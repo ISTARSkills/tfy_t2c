@@ -5,6 +5,7 @@ package com.istarindia.apps.factories;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import com.istarindia.android.pojo.TaskSummaryPOJO;
 import com.istarindia.android.pojo.task.AssessmentTask;
@@ -26,6 +28,7 @@ import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.utilities.DBUTILS;
+import com.viksitpro.core.utilities.TaskItemCategory;
 
 /**
  * @author mayank
@@ -316,6 +319,168 @@ public class TaskSummaryPojoCreator {
 			
 			}
 		}
+		
+		return taskSummaryPOJO;
+	}
+
+	public TaskSummaryPOJO getZoomIntervieweeTask(Task task) {
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
+		TaskSummaryPOJO taskSummaryPOJO = null;
+		DBUTILS util = new DBUTILS();
+		String getTaskDetails ="SELECT 	interviewer.first_name AS interviewer_name, 	interviewee.first_name AS interviewee_name, 	course.course_name, start_url, join_url FROM 	interview_task_details, 	task, 	user_profile interviewer, 	user_profile interviewee, 	course WHERE 	interview_task_details.task_id = "+task.getId()+" AND interview_task_details.course_id = course. ID AND interview_task_details.interviewee_id = interviewee.user_id AND interview_task_details.interviewer_id = interviewer.user_id";
+		List<HashMap<String, Object>> interviewData = util.executeQuery(getTaskDetails);
+		if(interviewData.size()>0)
+		{
+			String courseName="";
+			String interviewerName ="";
+			String intervieweeName ="";
+			String startUrl ="";
+			String joinUrl ="";
+			for(HashMap<String, Object> row: interviewData)
+			{
+				courseName =row.get("course_name").toString();
+				interviewerName =row.get("interviewer_name").toString();
+				intervieweeName =row.get("interviewee_name").toString();
+				startUrl =row.get("start_url").toString();
+				joinUrl =row.get("join_url").toString();
+			}
+			
+			
+			AppCourseServices appCourseServices= new AppCourseServices();
+			taskSummaryPOJO = new TaskSummaryPOJO();
+			taskSummaryPOJO.setId(task.getId());
+			taskSummaryPOJO.setItemId(task.getItemId());
+			taskSummaryPOJO.setItemType(TaskItemCategory.ZOOM_INTERVIEW_INTERVIEWEE);
+			if(task.getIsActive()){
+				taskSummaryPOJO.setStatus("INCOMPLETE");
+				taskSummaryPOJO.setDate(task.getStartDate());
+			}else{
+				taskSummaryPOJO.setStatus("COMPLETED");
+				taskSummaryPOJO.setDate(task.getStartDate());
+			}				
+			taskSummaryPOJO.setHeader("INTERVIEW");
+			taskSummaryPOJO.setTitle(courseName);
+			//taskSummaryPOJO.setDescription(lesson.getDescription());
+			taskSummaryPOJO.setImageURL(mediaUrlPath+"/assets/img/interview.jpg");
+			long diff = task.getEndDate().getTime() - task.getStartDate().getTime();
+		    long diffSeconds = diff / 1000 % 60;
+		    long diffMinutes = diff / (60 * 1000) % 60;
+		    HashMap<String, String> taskContent = new HashMap<>();
+		    
+			taskSummaryPOJO.setDurationMinutes((int)diffMinutes);
+			
+			
+			taskContent.put("interviewer_name", interviewerName);
+			taskContent.put("interviewee_name", intervieweeName);
+			taskContent.put("start_url", startUrl);
+			taskContent.put("join_url", joinUrl);
+			
+			taskSummaryPOJO.setTaskContent(taskContent);
+			Date date = new Date(task.getStartDate().getTime());
+			SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+			sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+			String formattedDate = sdf.format(date);		
+			taskSummaryPOJO.setTime(formattedDate);
+		}	
+		
+		return taskSummaryPOJO;
+	}
+
+	public TaskSummaryPOJO getZoomInterviewerTask(Task task) {
+
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
+		TaskSummaryPOJO taskSummaryPOJO = null;
+		DBUTILS util = new DBUTILS();
+		String getTaskDetails ="SELECT 	interviewer.first_name AS interviewer_name, 	interviewee.first_name AS interviewee_name, 	course.course_name, start_url, join_url, interviewer_id,interviewee_id, course_id FROM 	interview_task_details, 	task, 	user_profile interviewer, 	user_profile interviewee, 	course WHERE 	interview_task_details.task_id = "+task.getId()+" AND interview_task_details.course_id = course. ID AND interview_task_details.interviewee_id = interviewee.user_id AND interview_task_details.interviewer_id = interviewer.user_id";
+		List<HashMap<String, Object>> interviewData = util.executeQuery(getTaskDetails);
+		if(interviewData.size()>0)
+		{
+			String courseName="";
+			String interviewerName ="";
+			String intervieweeName ="";
+			String startUrl ="";
+			String joinUrl ="";
+			String courseId ="";
+			String interviewerId ="";
+			String intervieweeId ="";
+			for(HashMap<String, Object> row: interviewData)
+			{
+				courseName =row.get("course_name").toString();
+				interviewerName =row.get("interviewer_name").toString();
+				intervieweeName =row.get("interviewee_name").toString();
+				startUrl =row.get("start_url").toString();
+				joinUrl =row.get("join_url").toString();
+				courseId =row.get("course_id").toString();
+				interviewerId =row.get("interviewer_id").toString();
+				intervieweeId =row.get("interviewee_id").toString();
+			}
+			
+			  
+			
+			AppCourseServices appCourseServices= new AppCourseServices();
+			taskSummaryPOJO = new TaskSummaryPOJO();
+			taskSummaryPOJO.setId(task.getId());
+			taskSummaryPOJO.setItemId(task.getItemId());
+			taskSummaryPOJO.setItemType(TaskItemCategory.ZOOM_INTERVIEW_INTERVIEWER);
+			if(task.getIsActive()){
+				taskSummaryPOJO.setStatus("INCOMPLETE");
+				taskSummaryPOJO.setDate(task.getStartDate());
+			}else{
+				taskSummaryPOJO.setStatus("COMPLETED");
+				taskSummaryPOJO.setDate(task.getStartDate());
+			}				
+			taskSummaryPOJO.setHeader("INTERVIEW");
+			taskSummaryPOJO.setTitle(courseName);
+			//taskSummaryPOJO.setDescription(lesson.getDescription());
+			taskSummaryPOJO.setImageURL(mediaUrlPath+"/assets/img/interview.jpg");
+			long diff = task.getEndDate().getTime() - task.getStartDate().getTime();
+		    long diffSeconds = diff / 1000 % 60;
+		    long diffMinutes = diff / (60 * 1000) % 60;
+		  
+		    
+			taskSummaryPOJO.setDurationMinutes((int)diffMinutes);
+			
+			HashMap<String, String> taskContent = new HashMap<>();
+			taskContent.put("interviewer_name", interviewerName);
+			taskContent.put("interviewee_name", intervieweeName);
+			taskContent.put("start_url", startUrl);
+			taskContent.put("join_url", joinUrl);
+			taskContent.put("course_id", courseId);
+			taskContent.put("interviewer_id", interviewerId);
+			taskContent.put("interviewee_id", intervieweeId);
+			
+			taskSummaryPOJO.setTaskContent(taskContent);
+			
+			Date date = new Date(task.getStartDate().getTime());
+			SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+			sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+			String formattedDate = sdf.format(date);		
+			taskSummaryPOJO.setTime(formattedDate);
+		}	
 		
 		return taskSummaryPOJO;
 	}

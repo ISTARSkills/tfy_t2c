@@ -1,8 +1,10 @@
 package com.istarindia.android.pojo;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "task")
@@ -40,6 +42,8 @@ public class TaskSummaryPOJO {
 	private String time;
 	private String event_address;
 	/*related to classroom task ends here*/
+	
+	HashMap<String, String> taskContent ;
 	public TaskSummaryPOJO(){
 		
 	}
@@ -278,6 +282,17 @@ public class TaskSummaryPOJO {
 
 	public void setRetryable(Boolean retryable) {
 		this.retryable = retryable;
+	}
+
+
+	@XmlElement(name="task_content", required=false)
+	public HashMap<String, String> getTaskContent() {
+		return taskContent;
+	}
+
+
+	public void setTaskContent(HashMap<String, String> taskContent) {
+		this.taskContent = taskContent;
 	}
 
 	
