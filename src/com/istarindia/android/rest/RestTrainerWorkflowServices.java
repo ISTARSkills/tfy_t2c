@@ -187,10 +187,10 @@ public class RestTrainerWorkflowServices {
 			TrainerWorkflowServices service = new TrainerWorkflowServices();
 			DBUTILS util = new DBUTILS();
 			Integer courseId= null;
-			String GetCourseId ="select course_id from task,batch_schedule_event where batch_schedule_event.id = task.item_id and item_type ='"+TaskItemCategory.CLASSROOM_SESSION_STUDENT+"' and task.id = "+taskId;
+			String GetCourseId ="select course_id from task,batch_schedule_event where batch_schedule_event.id = task.item_id and item_type in ('"+TaskItemCategory.CLASSROOM_SESSION_STUDENT+"','"+TaskItemCategory.REMOTE_CLASS_STUDENT+"') and task.id = "+taskId;
 			System.out.println("getCourseId-------------"+GetCourseId);
 			List<HashMap<String, Object>> courseIdData = util.executeQuery(GetCourseId);
-			String getTrainerTaskId = "select id from task where item_type ='"+TaskItemCategory.CLASSROOM_SESSION+"' and project_id in (select project_id from task where id = "+taskId+")";
+			String getTrainerTaskId = "select id from task where item_type in ('"+TaskItemCategory.CLASSROOM_SESSION+"','"+TaskItemCategory.REMOTE_CLASS_TRAINER+"') and project_id in (select project_id from task where id = "+taskId+")";
 			System.out.println("getTrainerTaskId-------------"+getTrainerTaskId);
 			List<HashMap<String, Object>> trainerTaskIdData = util.executeQuery(getTrainerTaskId);
 			
