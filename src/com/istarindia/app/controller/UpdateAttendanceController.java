@@ -33,7 +33,7 @@ public class UpdateAttendanceController extends HttpServlet {
 
 		int taskID = 0;
 		int user_id = 0;
-		taskID = request.getParameter("taskID") != null ? Integer.parseInt(request.getParameter("taskID")) : 0;
+		taskID = request.getParameter("task_id") != null ? Integer.parseInt(request.getParameter("task_id")) : 0;
 		user_id = request.getParameter("user_id") != null ? Integer.parseInt(request.getParameter("user_id")) : 0;
 		
 			String sql = "SELECT 	actor_id, 	ID FROM 	batch_schedule_event WHERE 	batch_group_code IN ( 		SELECT 			batch_group_code 		FROM 			batch_schedule_event 		WHERE 			ID IN ( 				SELECT 					item_id 				FROM 					task 				WHERE 					actor = "+user_id+" 				AND item_type = 'CLASSROOM_SESSION_STUDENT' 				AND ID = "+taskID+" 			) 	) AND TYPE = 'BATCH_SCHEDULE_EVENT_TRAINER'";

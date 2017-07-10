@@ -57,6 +57,7 @@ public class TaskSummaryPojoCreator {
 			}else{
 				taskSummaryPOJO.setStatus("COMPLETED");
 				taskSummaryPOJO.setDate(task.getStartDate());
+				taskSummaryPOJO.setCompletedDate(task.getUpdatedAt());
 			}
 			taskSummaryPOJO.setTitle(assessment.getAssessmenttitle());
 			taskSummaryPOJO.setImageURL(null);
@@ -115,6 +116,7 @@ public class TaskSummaryPojoCreator {
 			}else{
 				taskSummaryPOJO.setStatus("COMPLETED");
 				taskSummaryPOJO.setDate(task.getStartDate());
+				taskSummaryPOJO.setCompletedDate(task.getUpdatedAt());
 			}
 			
 			
@@ -210,6 +212,7 @@ public class TaskSummaryPojoCreator {
 				}else{
 					taskSummaryPOJO.setStatus("COMPLETED");
 					taskSummaryPOJO.setDate(task.getStartDate());
+					taskSummaryPOJO.setCompletedDate(task.getUpdatedAt());
 				}
 				taskSummaryPOJO.setHeader(header);
 				taskSummaryPOJO.setTitle(title);
@@ -310,6 +313,7 @@ public class TaskSummaryPojoCreator {
 				}else{
 					taskSummaryPOJO.setStatus("COMPLETED");
 					taskSummaryPOJO.setDate(task.getStartDate());
+					taskSummaryPOJO.setCompletedDate(task.getUpdatedAt());
 				}
 				taskSummaryPOJO.setHeader(header);
 				taskSummaryPOJO.setTitle(title);
@@ -369,6 +373,7 @@ public class TaskSummaryPojoCreator {
 			}else{
 				taskSummaryPOJO.setStatus("COMPLETED");
 				taskSummaryPOJO.setDate(task.getStartDate());
+				taskSummaryPOJO.setCompletedDate(task.getUpdatedAt());
 			}				
 			taskSummaryPOJO.setHeader("INTERVIEW");
 			taskSummaryPOJO.setTitle(courseName);
@@ -452,6 +457,7 @@ public class TaskSummaryPojoCreator {
 			}else{
 				taskSummaryPOJO.setStatus("COMPLETED");
 				taskSummaryPOJO.setDate(task.getStartDate());
+				taskSummaryPOJO.setCompletedDate(task.getUpdatedAt());
 			}				
 			taskSummaryPOJO.setHeader("INTERVIEW");
 			taskSummaryPOJO.setTitle(courseName);

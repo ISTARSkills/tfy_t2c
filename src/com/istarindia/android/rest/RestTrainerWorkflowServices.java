@@ -67,7 +67,7 @@ public class RestTrainerWorkflowServices {
 				ArrayList<GroupStudentPojo> students = new ArrayList<>();
 				int groupId = (int)groupData.get(0).get("batch_group_id");
 				String groupName = groupData.get(0).get("name").toString();
-				students = service.studentsInGroup(groupId);
+				students = service.studentsInGroup(groupId,taskId);
 				
 				group.setGroupId(groupId);
 				group.setGroupName(groupName);

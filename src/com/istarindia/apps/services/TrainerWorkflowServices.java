@@ -17,6 +17,7 @@ import com.istarindia.android.pojo.trainerworkflow.CourseItem;
 import com.istarindia.android.pojo.trainerworkflow.FeedbackPojo;
 import com.istarindia.android.pojo.trainerworkflow.GroupPojo;
 import com.istarindia.android.pojo.trainerworkflow.GroupStudentPojo;
+import com.viksitpro.core.utilities.AppProperies;
 import com.viksitpro.core.utilities.DBUTILS;
 import com.viksitpro.core.utilities.TaskItemCategory;
 
@@ -27,39 +28,42 @@ import com.viksitpro.core.utilities.TaskItemCategory;
 public class TrainerWorkflowServices {
 	
 	
-	public ArrayList<GroupStudentPojo> studentsInGroup(int groupId)
+	public ArrayList<GroupStudentPojo> studentsInGroup(int groupId, int taskID)
 	{
-		String mediaUrlPath ="";
-		try{
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-				if (inputStream != null) {
-					properties.load(inputStream);
-					mediaUrlPath =  properties.getProperty("media_url_path");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			
-		}
-		
+		String mediaUrlPath =AppProperies.getProperty("media_url_path");
 		ArrayList<GroupStudentPojo> students = new ArrayList<>();
 		DBUTILS utils = new DBUTILS();
-		String sql="select distinct  user_profile.user_id, user_profile.first_name, user_profile.profile_image  from batch_students, user_profile where batch_students.batch_group_id = "+groupId+" and batch_students.student_id = user_profile.user_id";
+		String sql="SELECT 	istar_user. ID, 	CASE WHEN ( 	user_profile.first_name IS NULL ) THEN 	istar_user.email ELSE 	user_profile.first_name END,  user_profile.profile_image,  CASE WHEN (attendance.status IS NULL) THEN 	'ABSENT' ELSE 	attendance.status END FROM "
+				+ "	task LEFT JOIN batch_schedule_event ON ( 	task.item_id = batch_schedule_event. ID ) "
+				+ "LEFT JOIN batch_students ON ( 	batch_students.batch_group_id = "+groupId+" ) "
+				+ "LEFT JOIN istar_user ON ( 	batch_students.student_id = istar_user. ID )"
+				+ " LEFT JOIN user_profile ON ( 	istar_user. ID = user_profile.user_id ) "
+				+ "LEFT JOIN attendance ON ( 	attendance.event_id = batch_schedule_event. ID 	AND istar_user. ID = attendance.user_id )"
+				+ " WHERE 	task. ID = "+taskID+" AND istar_user. ID NOTNULL";
+		
+		System.err.println(sql);
 		List<HashMap<String, Object>> studentData = utils.executeQuery(sql);
 		for(HashMap<String, Object> row : studentData)
 		{
-			int studentId = (int)row.get("user_id");
+			int studentId = (int)row.get("id");
 			String name = row.get("first_name").toString();
 			String profileImage = "/users/"+name.charAt(0)+".png";
 			if(row.get("profile_image")!=null)
 			{
 				profileImage = row.get("profile_image").toString();
 			}
+			String status = row.get("status").toString();
 			GroupStudentPojo stu = new GroupStudentPojo();
 			stu.setImageUrl(mediaUrlPath+profileImage);
 			stu.setStudentId(studentId);
 			stu.setStudentName(name);
+			if(status.equalsIgnoreCase("PRESENT")) {
+				stu.setStatus(true);
+			}else{
+				stu.setStatus(false);
+			}
+			
+			
 			students.add(stu);
 		}
 		
