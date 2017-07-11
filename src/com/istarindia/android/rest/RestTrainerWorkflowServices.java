@@ -58,7 +58,7 @@ public class RestTrainerWorkflowServices {
 			
 			TrainerWorkflowServices service = new TrainerWorkflowServices();
 			DBUTILS util = new DBUTILS();
-			String getGroupId ="select batch_group_id, batch_group.name from task,batch_schedule_event, batch_group where batch_group.id = batch_schedule_event.batch_group_id and batch_schedule_event.id = task.item_id and task.id ="+taskId+" and item_type ='"+TaskItemCategory.CLASSROOM_SESSION+"' ";
+			String getGroupId ="select batch_group_id, batch_group.name from task,batch_schedule_event, batch_group where batch_group.id = batch_schedule_event.batch_group_id and batch_schedule_event.id = task.item_id and task.id ="+taskId+" and item_type in ('"+TaskItemCategory.CLASSROOM_SESSION+"' , '"+TaskItemCategory.REMOTE_CLASS_TRAINER+"') ";
 			System.out.println("getGroupId>>>"+getGroupId);
 			List<HashMap<String, Object>> groupData = util.executeQuery(getGroupId);
 			GroupPojo group = new GroupPojo();
@@ -152,7 +152,7 @@ public class RestTrainerWorkflowServices {
 			TrainerWorkflowServices service = new TrainerWorkflowServices();
 			DBUTILS util = new DBUTILS();
 			Integer courseId= null;
-			String GetCourseId ="select course_id from task,batch_schedule_event where batch_schedule_event.id = task.item_id and item_type ='"+TaskItemCategory.CLASSROOM_SESSION+"' and task.id = "+taskId;
+			String GetCourseId ="select course_id from task,batch_schedule_event where batch_schedule_event.id = task.item_id and item_type in ('"+TaskItemCategory.CLASSROOM_SESSION+"','"+TaskItemCategory.REMOTE_CLASS_TRAINER+"')  and task.id = "+taskId;
 			System.out.println("getCourseId-------------"+GetCourseId);
 			List<HashMap<String, Object>> courseIdData = util.executeQuery(GetCourseId);
 			if(courseIdData.size()>0)
