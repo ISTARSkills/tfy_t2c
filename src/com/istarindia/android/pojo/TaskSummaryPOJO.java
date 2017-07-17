@@ -22,7 +22,7 @@ public class TaskSummaryPOJO {
 	private Timestamp date;
 	private String messageForCompletedTasks;
 	private String messageForIncompleteTasks;
-	
+	private Timestamp completedDate;
 	
 	/*related to assessment task starts here*/
 	private Integer numberOfQuestions;
@@ -293,6 +293,17 @@ public class TaskSummaryPOJO {
 
 	public void setTaskContent(HashMap<String, String> taskContent) {
 		this.taskContent = taskContent;
+	}
+
+
+	@XmlAttribute(name="completedDate", required=false)
+	public Timestamp getCompletedDate() {
+		return completedDate;
+	}
+
+
+	public void setCompletedDate(Timestamp completedDate) {
+		this.completedDate = completedDate;
 	}
 
 	
