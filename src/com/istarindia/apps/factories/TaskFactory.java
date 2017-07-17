@@ -37,6 +37,8 @@ public class TaskFactory {
 				return creator.getZoomIntervieweeTask(task);
 			case TaskItemCategory.ZOOM_INTERVIEW_INTERVIEWER:
 				return creator.getZoomInterviewerTask(task);
+			case TaskItemCategory.CUSTOM_TASK:
+				return creator.getCustomTask(task);
 			default:
 				return null;			
 			

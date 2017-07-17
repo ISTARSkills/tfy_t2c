@@ -25,6 +25,8 @@ import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.TrainerWorkflowServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.Course;
+import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.utilities.DBUTILS;
@@ -483,6 +485,29 @@ public class TaskSummaryPojoCreator {
 		}	
 		
 		return taskSummaryPOJO;
+	}
+
+	public TaskSummaryPOJO getCustomTask(Task task) {
+		
+		IstarUser user =  task.getIstarUserByActor();
+		String header = "";
+		try {
+			header = user.getBatchStudentses().iterator().next().getBatchGroup().getName();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		}
+		TaskSummaryPOJO pojo = new TaskSummaryPOJO();
+		pojo.setDate(task.getStartDate());
+		pojo.setHeader(header);
+		pojo.setStatus(task.getState());
+		pojo.setId(task.getId());
+		pojo.setItemType("CUSTOM_TASK");
+		pojo.setDescription(task.getDescription());
+		pojo.setItemId(task.getItemId());
+		pojo.setImageURL("http://blog.pickevent.com/wp-content/uploads/2014/01/feedback.jpg");
+		pojo.setTitle(task.getName());
+		return pojo;
 	}
 
 }
