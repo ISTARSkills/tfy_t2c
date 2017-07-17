@@ -237,8 +237,8 @@ public class TaskSummaryPOJO {
 	}
 
 	@XmlAttribute(name = "date", required = false)
-	public Timestamp getDate() {
-		return date;
+	public Long getDate() {
+		return date.getTime();
 	}
 
 
