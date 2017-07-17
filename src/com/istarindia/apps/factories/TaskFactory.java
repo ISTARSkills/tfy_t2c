@@ -39,6 +39,14 @@ public class TaskFactory {
 				return creator.getZoomInterviewerTask(task);
 			case TaskItemCategory.CUSTOM_TASK:
 				return creator.getCustomTask(task);
+			case TaskItemCategory.WEBINAR_TRAINER:
+				return creator.getTrainerWebinarTask(task);
+			case TaskItemCategory.WEBINAR_STUDENT:
+				return creator.getStudentWebinarTask(task);	
+			case TaskItemCategory.REMOTE_CLASS_TRAINER:
+				return creator.getTrainerRemoteTask(task);
+			case TaskItemCategory.REMOTE_CLASS_STUDENT:
+				return creator.getStudentRemoteTask(task);	
 			default:
 				return null;			
 			
