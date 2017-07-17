@@ -336,9 +336,9 @@ public class AppCourseServices {
 			for(SkillReportPOJO ll: dd.getSkills())
 			{
 				if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-				//	System.err.println("in cmsession shell tree " + ll.getName() + " - " + ll.getId());
-					//System.err.println("in cmsession shell tree " + " " + ll.getUserPoints() + " " + ll.getTotalPoints()
-						//	+ " " + ll.getPercentage());
+					System.err.println("in cmsession shell tree " + ll.getName() + " - " + ll.getId());
+					System.err.println("in cmsession shell tree " + " " + ll.getUserPoints() + " " + ll.getTotalPoints()
+							+ " " + ll.getPercentage());
 				}
 			}
 		}

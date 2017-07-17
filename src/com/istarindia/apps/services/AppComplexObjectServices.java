@@ -83,7 +83,6 @@ public class AppComplexObjectServices {
 				if (taskSummaryPOJO != null) {
 					if (taskSummaryPOJO.getStatus().equals("COMPLETED")) {
 						completedTasks++;
-						
 					}
 					tasks.add(taskSummaryPOJO);
 				}
