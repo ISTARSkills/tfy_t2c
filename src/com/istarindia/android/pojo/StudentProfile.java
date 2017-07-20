@@ -115,8 +115,8 @@ public class StudentProfile {
 	}
 
 	@XmlAttribute(name = "dateOfBirth", required = false)
-	public String getDateOfBirth() {
-		return dateOfBirth.toString();
+	public Date getDateOfBirth() {
+		return dateOfBirth;
 	}
 
 	public void setDateOfBirth(Date dateOfBirth) {
