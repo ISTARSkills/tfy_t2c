@@ -211,7 +211,7 @@ public class CreateZIPForItem {
 		String lessonXML = FileUtils.readFileToString(new File(xmlPath));
 		Serializer serializer = new Persister();
 		videoLesson = serializer.read(VideoLesson.class, lessonXML);
-		videoLesson.setZipFileURL(zipName);			
+		videoLesson.setZipFileURL(getMediaURLPath()+"/lessonXMLs/"+lesson.getId()+".zip");			
 		return videoLesson;		
 	}
 	
@@ -259,7 +259,7 @@ public class CreateZIPForItem {
 		String lessonXML = FileUtils.readFileToString(new File(xmlPath));
 		Serializer serializer = new Persister();
 		interactiveContent = serializer.read(InteractiveContent.class, lessonXML);
-		interactiveContent.setZipFileURL(zipName);	
+		interactiveContent.setZipFileURL(getMediaURLPath()+"/lessonXMLs/"+lesson.getId()+".zip");	
 		
 		return interactiveContent;
 	}
