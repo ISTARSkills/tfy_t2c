@@ -217,7 +217,7 @@ public class AppNotificationServices {
 	
 
 	public NotificationPOJO getNotificationPOJOForLesson(IstarNotification istarNotification) {
-		System.err.println("istarNotification id>>>>>>"+istarNotification.getId());
+		//System.err.println("istarNotification id>>>>>>"+istarNotification.getId());
 		NotificationPOJO notificationPOJO = null;
 		String mediaUrlPath ="";
 		try{
@@ -227,7 +227,7 @@ public class AppNotificationServices {
 				if (inputStream != null) {
 					properties.load(inputStream);
 					mediaUrlPath =  properties.getProperty("media_url_path");
-					System.out.println("media_url_path"+mediaUrlPath);
+					//System.out.println("media_url_path"+mediaUrlPath);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

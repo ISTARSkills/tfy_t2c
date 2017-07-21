@@ -24,7 +24,7 @@ public class PublishDelegator {
 					properties.load(inputStream);
 					serverConfig = properties.getProperty("serverConfig");
 					
-					System.out.println("serverConfig"+serverConfig);
+					//System.out.println("serverConfig"+serverConfig);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -50,11 +50,11 @@ public class PublishDelegator {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				System.out.println("error in sending notification");
+				//System.out.println("error in sending notification");
 			}
-			System.out.println("Notification sent to user");
+			//System.out.println("Notification sent to user");
 		}else{
-			System.out.println("DEV SERVER");
+			//System.out.println("DEV SERVER");
 			DatabaseReference databaseReferenceForUser = FirebaseDatabase.getInstance().getReference("istar-notification-dev");
 			
 			databaseReferenceForUser.child(istarUserID+"");
@@ -67,9 +67,9 @@ public class PublishDelegator {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				System.out.println("error in sending notification");
+				//System.out.println("error in sending notification");
 			}
-			System.out.println("Notification sent to user");
+			//System.out.println("Notification sent to user");
 		}
 	}
 	
@@ -94,11 +94,11 @@ public class PublishDelegator {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				System.out.println("error in sending notification");
+				//System.out.println("error in sending notification");
 			}			
-			System.out.println("Notification sent to all the users");
+			//System.out.println("Notification sent to all the users");
 		}else{
-			System.out.println("DEV SERVER");
+			//System.out.println("DEV SERVER");
 			for(Integer istarUserId : allIstarUserIds){
 				DatabaseReference databaseReferenceForUser = FirebaseDatabase.getInstance().getReference("istar-notification-dev");
 				
@@ -113,9 +113,9 @@ public class PublishDelegator {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				System.out.println("error in sending notification");
+				//System.out.println("error in sending notification");
 			}			
-			System.out.println("Notification sent to all the users");
+			//System.out.println("Notification sent to all the users");
 		}
 	}	
 }

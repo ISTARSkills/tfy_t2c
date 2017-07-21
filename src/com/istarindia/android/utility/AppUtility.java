@@ -49,25 +49,25 @@ public class AppUtility {
 					properties.load(inputStream);
 					String benchmark = properties.getProperty("pointsBenchmark");
 					imageUploadPath = properties.getProperty("mediaPath");					
-					System.out.println("imageUploadPath"+imageUploadPath);
-					System.out.println("benchmark"+benchmark);
+					//System.out.println("imageUploadPath"+imageUploadPath);
+					//System.out.println("benchmark"+benchmark);
 				}
 
 				File rootUploadFolder = new File(imageUploadPath+subDirectory);
 				if(!rootUploadFolder.exists()){
-					System.out.println("RootUploadFolder does not exists, creating new one");
+					//System.out.println("RootUploadFolder does not exists, creating new one");
 					rootUploadFolder.mkdir();
 					Files.setPosixFilePermissions(Paths.get(rootUploadFolder.getAbsolutePath()), perms);
 				}				
 				if(context!=null){
 					subDirectory = subDirectory + context + "/";
 				}										
-				System.out.println("subDirectory"+subDirectory);
+				//System.out.println("subDirectory"+subDirectory);
 		imageUploadPath = imageUploadPath+subDirectory;
 		File uploadFolder = new File(imageUploadPath);
-		System.out.println(uploadFolder.getAbsolutePath());
+		//System.out.println(uploadFolder.getAbsolutePath());
 		if(!uploadFolder.exists()){
-			System.out.println("Folder does not exists");
+			//System.out.println("Folder does not exists");
 			uploadFolder.mkdir();
 			Files.setPosixFilePermissions(Paths.get(uploadFolder.getAbsolutePath()), perms);
 			
@@ -80,8 +80,8 @@ public class AppUtility {
         file.write(imgByteArray);              
         file.close();
         File f = new File(filePath);        
-        System.out.println("absouolte file path ->"+f.getAbsolutePath());
-        System.out.println("fileURL ->"+fileURL);
+        //System.out.println("absouolte file path ->"+f.getAbsolutePath());
+        //System.out.println("fileURL ->"+fileURL);
         try {
 			Files.setPosixFilePermissions(Paths.get(f.getAbsolutePath()), perms);
 		} catch (Exception e) {

@@ -41,7 +41,7 @@ public class TrainerWorkflowServices {
 				+ "LEFT JOIN attendance ON ( 	attendance.event_id = batch_schedule_event. ID 	AND istar_user. ID = attendance.user_id )"
 				+ " WHERE 	task. ID = "+taskID+" AND istar_user. ID NOTNULL";
 		
-		System.err.println(sql);
+		//System.err.println(sql);
 		List<HashMap<String, Object>> studentData = utils.executeQuery(sql);
 		for(HashMap<String, Object> row : studentData)
 		{
@@ -119,7 +119,7 @@ public class TrainerWorkflowServices {
 		Integer currentItemId = null;
 		Long currentItemSlideId=null;
 		String getCurrentPrevAndNextItemForCourse = "select lesson_id , slide_id  as slide_id from slide_change_log , batch_schedule_event, task where task.item_id = batch_schedule_event.id and batch_schedule_event.course_id= slide_change_log.course_id and slide_change_log.batch_group_id = batch_schedule_event.batch_group_id and task.id = "+taskId+" order by slide_change_log.id desc  limit 1";
-		System.err.println("getCurrentPrevAndNextItemForCourse>>>>>>"+getCurrentPrevAndNextItemForCourse);			
+		//System.err.println("getCurrentPrevAndNextItemForCourse>>>>>>"+getCurrentPrevAndNextItemForCourse);			
 		List<HashMap<String, Object>> itemStats = util.executeQuery(getCurrentPrevAndNextItemForCourse);
 		if(itemStats.size()>0)
 		{
@@ -128,7 +128,7 @@ public class TrainerWorkflowServices {
 		}
 		
 		String getCourseId ="select T1.* , 	CAST ( 		ROW_NUMBER () OVER () AS INTEGER 	) - 1 AS order_id   from (SELECT 	lesson. ID, 	lesson.title FROM 	module_course, 	cmsession_module, 	lesson_cmsession, 	lesson WHERE 	module_course.course_id = "+courseId+" AND cmsession_module.module_id = module_course.module_id AND lesson_cmsession.cmsession_id = cmsession_module.cmsession_id AND lesson_cmsession.lesson_id = lesson. ID AND lesson.is_published = 't' and  lesson.is_deleted != 't' AND lesson.category IN ('ILT', 'BOTH') AND lesson. TYPE != 'ASSESSMENT' ORDER BY 	module_course.oid, 	cmsession_module.oid, 	lesson_cmsession.oid ) T1";
-		System.err.println("getCourseId>>>"+getCourseId);
+		//System.err.println("getCourseId>>>"+getCourseId);
 		List<HashMap<String, Object>> courseData = util.executeQuery(getCourseId);
 		
 		

@@ -51,7 +51,7 @@ public class RESTNotificationService {
 	public Response getNotificationAndEventPOJO(@PathParam("userId") int userId, @PathParam("notificationId") int notificationId){
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try{
-			System.out.println("notification id "+notificationId);
+			//System.out.println("notification id "+notificationId);
 			IstarNotificationServices istarNotificationServices = new IstarNotificationServices();
 			IstarNotification istarNotification = istarNotificationServices.getIstarNotification(notificationId);
 			
@@ -102,7 +102,7 @@ public class RESTNotificationService {
 	public Response markNotificationAsRead(@PathParam("userId") int userId, List<Integer> notifications){	
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try{
-			System.out.println("Mark notifications as read");
+			//System.out.println("Mark notifications as read");
 			IstarNotificationServices istarNotificationServices = new IstarNotificationServices();
 			
 			for(Integer notificationId : notifications){

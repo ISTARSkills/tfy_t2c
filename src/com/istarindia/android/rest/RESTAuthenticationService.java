@@ -97,7 +97,7 @@ public class RESTAuthenticationService {
 
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
-			System.out.println("Returing system profile");
+			//System.out.println("Returing system profile");
 
 			String result = gson.toJson(studentProfile);
 			appServices.logEntryToLoginTable(istarUser, "LOGIN_"+socialMedia);

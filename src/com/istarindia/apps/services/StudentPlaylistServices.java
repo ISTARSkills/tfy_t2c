@@ -55,7 +55,7 @@ public class StudentPlaylistServices {
 		List<StudentPlaylist> allStudentPlaylist = query.list();
 
 		if(allStudentPlaylist.size()>0){
-			System.err.println("getStudentPlaylistOfUserForLessonOfCourse->" + "Time->"+(System.currentTimeMillis()-previousTime));
+			//System.err.println("getStudentPlaylistOfUserForLessonOfCourse->" + "Time->"+(System.currentTimeMillis()-previousTime));
 			return allStudentPlaylist.get(0);
 		}else{
 			return null;
@@ -94,7 +94,7 @@ public class StudentPlaylistServices {
 		List<StudentPlaylist> allStudentPlaylist = query.list();
 
 		if(allStudentPlaylist.size()>0){
-			System.err.println("getStudentPlaylistOfUserForLesson->" + "Time->"+(System.currentTimeMillis()-previousTime));
+			//System.err.println("getStudentPlaylistOfUserForLesson->" + "Time->"+(System.currentTimeMillis()-previousTime));
 			return allStudentPlaylist.get(0);
 		}else{
 			return null;

@@ -59,7 +59,7 @@ public class RestTrainerWorkflowServices {
 			TrainerWorkflowServices service = new TrainerWorkflowServices();
 			DBUTILS util = new DBUTILS();
 			String getGroupId ="select batch_group_id, batch_group.name from task,batch_schedule_event, batch_group where batch_group.id = batch_schedule_event.batch_group_id and batch_schedule_event.id = task.item_id and task.id ="+taskId+" and item_type in ('"+TaskItemCategory.CLASSROOM_SESSION+"' , '"+TaskItemCategory.REMOTE_CLASS_TRAINER+"') ";
-			System.out.println("getGroupId>>>"+getGroupId);
+			//System.out.println("getGroupId>>>"+getGroupId);
 			List<HashMap<String, Object>> groupData = util.executeQuery(getGroupId);
 			GroupPojo group = new GroupPojo();
 			if(groupData.size()>0)
@@ -105,7 +105,7 @@ public class RestTrainerWorkflowServices {
 			@PathParam("taskId") int taskId,
 			@FormParam("response") String attendanceResponsesString) {
 	
-		System.out.println("attendanceResponsesString-->" + attendanceResponsesString);
+		//System.out.println("attendanceResponsesString-->" + attendanceResponsesString);
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		Type listType = new TypeToken<GroupPojo>() {}.getType();
 		Gson gsonRequest = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -127,7 +127,7 @@ public class RestTrainerWorkflowServices {
 			@PathParam("taskId") int taskId,
 			@FormParam("response") String FeedbackResponsesString) {
 	
-		System.out.println("attendanceResponsesString-->" + FeedbackResponsesString);
+		//System.out.println("attendanceResponsesString-->" + FeedbackResponsesString);
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		Type listType = new TypeToken<ClassFeedbackByTrainer>() {}.getType();
 		Gson gsonRequest = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -153,7 +153,7 @@ public class RestTrainerWorkflowServices {
 			DBUTILS util = new DBUTILS();
 			Integer courseId= null;
 			String GetCourseId ="select course_id from task,batch_schedule_event where batch_schedule_event.id = task.item_id and item_type in ('"+TaskItemCategory.CLASSROOM_SESSION+"','"+TaskItemCategory.REMOTE_CLASS_TRAINER+"')  and task.id = "+taskId;
-			System.out.println("getCourseId-------------"+GetCourseId);
+			//System.out.println("getCourseId-------------"+GetCourseId);
 			List<HashMap<String, Object>> courseIdData = util.executeQuery(GetCourseId);
 			if(courseIdData.size()>0)
 			{
@@ -188,10 +188,10 @@ public class RestTrainerWorkflowServices {
 			DBUTILS util = new DBUTILS();
 			Integer courseId= null;
 			String GetCourseId ="select course_id from task,batch_schedule_event where batch_schedule_event.id = task.item_id and item_type in ('"+TaskItemCategory.CLASSROOM_SESSION_STUDENT+"','"+TaskItemCategory.REMOTE_CLASS_STUDENT+"') and task.id = "+taskId;
-			System.out.println("getCourseId-------------"+GetCourseId);
+			//System.out.println("getCourseId-------------"+GetCourseId);
 			List<HashMap<String, Object>> courseIdData = util.executeQuery(GetCourseId);
 			String getTrainerTaskId = "select id from task where item_type in ('"+TaskItemCategory.CLASSROOM_SESSION+"','"+TaskItemCategory.REMOTE_CLASS_TRAINER+"') and project_id in (select project_id from task where id = "+taskId+")";
-			System.out.println("getTrainerTaskId-------------"+getTrainerTaskId);
+			//System.out.println("getTrainerTaskId-------------"+getTrainerTaskId);
 			List<HashMap<String, Object>> trainerTaskIdData = util.executeQuery(getTrainerTaskId);
 			
 			if(courseIdData.size()>0)

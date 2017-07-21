@@ -51,8 +51,8 @@ public class RESTLessonService {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 
-			AppCourseServices appCourseServices = new AppCourseServices();
-			Lesson lesson = appCourseServices.getLesson(lessonId);
+			
+			Lesson lesson = new LessonDAO().findById(lessonId);
 
 			if (lesson == null) {
 				throw new Exception();
@@ -70,41 +70,17 @@ public class RESTLessonService {
 			if(lesson.getType().equalsIgnoreCase("PRESENTATION"))
 			{
 				//create zip every time
-				object = createZIPForItem.generateXMLForLesson(lessonId);				
-				System.out.println("oject string in case of lessonXML"+object.toString());
+				object = createZIPForItem.generateXMLForLesson(lesson);				
+				//System.out.println("oject string in case of lessonXML"+object.toString());
 			}
-			else
+			else if(lesson.getType().equalsIgnoreCase("INTERACTIVE"))
 			{
-				if (!file.exists()) {		
-					System.out.println("cannot find zip at "+lessonZipFileActualPath);
-					System.out.println("Creating New Zip file");
-					object = createZIPForItem.generateXMLForLesson(lessonId);		
-				} else {
-					String lessonXML = getLessonXML(lesson.getId());
-					System.out.println("Zip file exists");
-					
-					try{
-						if (lesson.getType().equals("INTERACTIVE")) {
-							InteractiveContent interactiveContent = serializer.read(InteractiveContent.class, lessonXML);
-							interactiveContent.setZipFileURL(serverPath);
-							object = interactiveContent;
-						} else if (lesson.getType().equals("VIDEO")) {
-							VideoLesson videoLesson = serializer.read(VideoLesson.class, lessonXML);
-							videoLesson.setZipFileURL(serverPath);
-							object = videoLesson;
-						}					
-						
-					}catch(Exception ex)
-					{
-						System.out.println("exception in lesson  id = "+lesson.getType()+" and type"+lesson.getType());
-					}
-					
-				}
+				object = createZIPForItem.generateXMLForLesson(lesson);	
+			}
+			else if(lesson.getType().equalsIgnoreCase("VIDEO"))
+			{
+				object = createZIPForItem.generateXMLForLesson(lesson);	
 			}	
-			
-			
-			
-
 			
 			
 			if (object == null) {
@@ -172,7 +148,7 @@ public class RESTLessonService {
 			Session session = baseHibernateDAO.getSession();
 			
 			String sql = "select id, status from student_playlist where student_id="+istarUserId+" and lesson_id="+lessonId;
-			System.out.println("Lesson SP-->"+sql);
+			//System.out.println("Lesson SP-->"+sql);
 			SQLQuery query = session.createSQLQuery(sql);
 			List<Object[]> queryResult = query.list();
 			
@@ -215,7 +191,7 @@ public class RESTLessonService {
 		try {
 			StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 			StudentPlaylist studentPlaylist = studentPlaylistServices.getStudentPlaylist(playlistId);
-			System.err.println(studentPlaylist.getLesson().getId());
+			////System.err.println(studentPlaylist.getLesson().getId());
 			if (studentPlaylist == null) {
 				throw new Exception();
 			}
@@ -255,7 +231,7 @@ public class RESTLessonService {
 			
 			String updateStudentPlayList1 = "update  task set is_active='f' where id in(select task_id from student_playlist where student_id = "+userId+" "
 					+ " and lesson_id = "+lessonId+")";
-			System.err.println("updateStudentPlayList1--->"+updateStudentPlayList1);
+			////System.err.println("updateStudentPlayList1--->"+updateStudentPlayList1);
 			util.executeUpdate(updateStudentPlayList1);
 			
 			
@@ -291,7 +267,7 @@ public class RESTLessonService {
 				util.executeUpdate(updateStudentPlayList);
 				
 				String updateStudentPlayList1 = "update  task set is_active='f' where id in("+task_id+")";
-				System.err.println("updateStudentPlayList1--->"+updateStudentPlayList1);
+				////System.err.println("updateStudentPlayList1--->"+updateStudentPlayList1);
 				util.executeUpdate(updateStudentPlayList1);
 				
 				

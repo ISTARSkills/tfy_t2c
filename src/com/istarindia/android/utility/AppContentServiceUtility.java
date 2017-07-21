@@ -79,40 +79,40 @@ public class AppContentServiceUtility {
 		HashMap<String, Boolean> optionsMap = new HashMap<String, Boolean>();
 		List<Boolean> incorrectAnswers = new ArrayList<Boolean>();
 		if (options!=null && options.size() > 0) {
-			System.out.println("Checking Options with MaRKED Answers");
+			//System.out.println("Checking Options with MaRKED Answers");
 			ArrayList<AssessmentOption> allOptions = new ArrayList<AssessmentOption>(question.getAssessmentOptions());
 
 			for (int i = 0; i < 5; i++) {
-				//System.out.println("Option ID--->"+allOptions.get(i).getId());
+				////System.out.println("Option ID--->"+allOptions.get(i).getId());
 				if (i < allOptions.size() && allOptions.get(i).getMarkingScheme() == 1) {
 					if (options.contains(allOptions.get(i).getId())) {
 						optionsMap.put("option" + i, true);
-					  System.out.println(i + " Answer is Correct and user marked it correct too!");
+					  //System.out.println(i + " Answer is Correct and user marked it correct too!");
 						isCorrect = true;
 					} else {
 						optionsMap.put("option" + i, false);
-						System.out.println(i +" Answer is Correct and user did not marked it correct!");
+						//System.out.println(i +" Answer is Correct and user did not marked it correct!");
 						isCorrect = false;
 					}
 				} else if (i < allOptions.size()) {
 					if (options.contains(allOptions.get(i).getId())) {
 						optionsMap.put("option" + i, true);
-					 System.out.println(i+" Answer is Not Correct and but user marked it correct!");
+					 //System.out.println(i+" Answer is Not Correct and but user marked it correct!");
 						isCorrect = false;
 						incorrectAnswers.add(isCorrect);
 					} else {
 						optionsMap.put("option" + i, false);
-					 System.out.println(i+" Answer is Not Correct and and user did not marked it also!");
+					 //System.out.println(i+" Answer is Not Correct and and user did not marked it also!");
 					}
 				} else {
-					System.out.println(i+" Less Than 5 Options, so setting it to false");
+					//System.out.println(i+" Less Than 5 Options, so setting it to false");
 					optionsMap.put("option" + i, false);
 				}
 			}
 		} else {
-			 System.out.println("User did not attempt the question");
+			 //System.out.println("User did not attempt the question");
 			for (int i = 0; i < 5; i++) {
-				 System.out.println(i+" Setting All Options to false");
+				 //System.out.println(i+" Setting All Options to false");
 				optionsMap.put("option" + i, false);
 			}
 		}

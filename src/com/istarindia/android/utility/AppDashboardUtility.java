@@ -70,7 +70,7 @@ public class AppDashboardUtility {
 		AssessmentPOJO assessmentPOJO=null;
 		AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 			if(assessment!=null && assessment.getAssessmentQuestions().size() > 0){
-				System.out.println("Assessment not null");
+				//System.out.println("Assessment not null");
 				assessmentPOJO = appPOJOUtility.getAssessmentPOJO(assessment);
 		}
 		return assessmentPOJO;
@@ -100,13 +100,13 @@ public class AppDashboardUtility {
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();			
 		String sql = "update student_playlist set status='"+status+"' where student_id="+istarUserId+" and lesson_id="+lessonId +" returning course_id";
-		System.out.println(sql);
+		//System.out.println(sql);
 		SQLQuery query = session.createSQLQuery(sql);
 		List<Integer> result = query.list();
 		session.close();
-		System.out.println("Updating Student Playlist status");
+		//System.out.println("Updating Student Playlist status");
 		
-		System.out.println("Update User Gamification");
+		//System.out.println("Update User Gamification");
 		
 		if(result.size()>0){
 		
@@ -123,7 +123,7 @@ public class AppDashboardUtility {
 		if (lesson != null) {
 			
 			if(lesson.getType().equals("VIDEO")){
-				System.out.println("LEsson is of type VIDEO");
+				//System.out.println("LEsson is of type VIDEO");
 				String thumbnailURL = lesson.getVideoLesson().getVideo_thumb_url();
 				String videoURL = lesson.getVideoLesson().getVideo_url();
 				

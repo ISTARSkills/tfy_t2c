@@ -30,21 +30,21 @@ public class RESTServletStyle {
 			TaskServices taskServices = new TaskServices();
 			Task task = taskServices.getTask(taskId);
 			
-			System.out.println(uriInfo.getBaseUri());
-			System.out.println(uriInfo.getAbsolutePath());
+			//System.out.println(uriInfo.getBaseUri());
+			//System.out.println(uriInfo.getAbsolutePath());
 			switch(task.getItemType()){
 			case TaskItemCategory.LESSON:
-				System.out.println("Task is Video");
+				//System.out.println("Task is Video");
 				URI uri = new URI(uriInfo.getBaseUri()+"lessons/user/"+userId+"/"+task.getItemId());
 				ResponseBuilder builder =  Response.seeOther(uri);
 				return builder.build();
 			case TaskItemCategory.ASSESSMENT:
-				System.out.println("Task is Assessment");
+				//System.out.println("Task is Assessment");
 				URI uriAssessment = new URI(uriInfo.getBaseUri()+"assessments/user/"+userId+"/"+task.getItemId());
 				ResponseBuilder builderAssessment =  Response.seeOther(uriAssessment);
 				return builderAssessment.build();
 			case TaskItemCategory.JOB_STUDENT:
-				System.out.println("Task is Job");
+				//System.out.println("Task is Job");
 				URI uriJob = new URI(uriInfo.getBaseUri()+"jobs/user/"+userId+"/"+task.getId());
 				ResponseBuilder builderJob =  Response.seeOther(uriJob);
 				return builderJob.build();				

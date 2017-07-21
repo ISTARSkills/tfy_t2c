@@ -223,7 +223,7 @@ public class AppCalendarServices {
 			allTasks.add(dailyTaskPOJO);
 			}catch(Exception e){
 				e.printStackTrace();
-				System.out.println("erooro oror ");
+				//System.out.println("erooro oror ");
 				
 			}
 		}

@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
@@ -74,24 +75,22 @@ public class CreateZIPForItem {
 
 		Object object = null;
 
-		Integer itemId = task.getItemId();
+		
 		String itemType = task.getItemType();
 
 		switch (itemType) {
 		case TaskItemCategory.LESSON:
-			System.out.println("Lesson ID" + task.getItemId());
-			object = generateXMLForLesson(task.getItemId());
+			//System.out.println("Lesson ID" + task.getItemId());
+			Lesson l = new  LessonDAO().findById(task.getItemId());
+			object = generateXMLForLesson(l);
 			break;
 		}
 		return object;
 	}
 
-	public Object generateXMLForLesson(Integer lessonId) throws Exception {
+	public Object generateXMLForLesson(Lesson lesson) throws Exception {
 
 		Object object = null;
-
-		AppCourseServices appCourseServices = new AppCourseServices();
-		Lesson lesson = appCourseServices.getLesson(lessonId);
 		String lessonType = lesson.getType();
 
 		switch (lessonType) {
@@ -164,216 +163,104 @@ public class CreateZIPForItem {
 		}
 		
 		String xml_object = getMediaURLPath()+"/lessonXMLs/"+lesson.getId()+".zip";	
-		System.out.println("returning "+xml_object);
+		//System.out.println("returning "+xml_object);
 		return xml_object;
 	}
 
 	public VideoLesson createZIPForVideoLesson(Lesson lesson) throws Exception{
-		System.out.println("Lesson Type is VIDEO");
-		
-		String mediaPath = getMediaPath();
-		String mediaURLPath = getMediaURLPath();
-		
-		String lessonXML = lesson.getLessonXml();
-		
+		//System.out.println("Lesson Type is VIDEO");
 		VideoLesson videoLesson = null;
+		Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+		// add owners permission
+		perms.add(PosixFilePermission.OWNER_READ);
+		perms.add(PosixFilePermission.OWNER_WRITE);
+		perms.add(PosixFilePermission.OWNER_EXECUTE);
+		// add group permissions
+		perms.add(PosixFilePermission.GROUP_READ);
+		perms.add(PosixFilePermission.GROUP_WRITE);
+		perms.add(PosixFilePermission.GROUP_EXECUTE);
+		// add others permissions
+		perms.add(PosixFilePermission.OTHERS_READ);
+		perms.add(PosixFilePermission.OTHERS_WRITE);
+		perms.add(PosixFilePermission.OTHERS_EXECUTE);
 		
-		Set<String> allUrls = new HashSet<String>();
+		String SOURCE_FOLDER = getMediaPath() + "/lessonXMLs/" + lesson.getId()+"/";
+		File sourceFile = new File(SOURCE_FOLDER);
+
+		String zipName = getMediaPath() + "/lessonXMLs/" + lesson.getId() + ".zip";
 		
-		if (lessonXML != null && !lessonXML.trim().isEmpty()) {
-			Serializer serializer = new Persister();
-			videoLesson = serializer.read(VideoLesson.class, lessonXML);
-			
-			if(videoLesson.getVideo_thumb_url()!=null && !videoLesson.getVideo_thumb_url().trim().isEmpty())
-				allUrls.add(videoLesson.getVideo_thumb_url().replace(mediaURLPath, mediaPath));
-			
-			if(videoLesson.getVideo_url()!=null && !videoLesson.getVideo_url().trim().isEmpty())
-				allUrls.add(videoLesson.getVideo_url().replace(mediaURLPath, mediaPath));
-			
-		}	
-		System.out.println(allUrls.size());
-
-		for (String url : allUrls) {
-			System.out.println("url->" + url);
+		File oldZip = new File(zipName);
+		if(oldZip.exists())
+		{
+				oldZip.delete();
 		}
-
-		File uploadFolder = new File(mediaPath + "lessons/");
-
-		System.out.println(uploadFolder.getAbsolutePath());
-		if (!uploadFolder.exists()) {
-			System.out.println("Folder does not exists");
-			uploadFolder.mkdir();
+		
+		ZipFiles zipFiles = new ZipFiles();
+		zipFiles.zipDirectory(sourceFile, zipName);
+		if(getServerType().equalsIgnoreCase("linux"))
+		{
+		try {
+			Files.setPosixFilePermissions(Paths.get(oldZip.getAbsolutePath()), perms);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
-		String lessonZipFilePath = "/" + lesson.getId() + ".zip";
-		createZipFile(uploadFolder.getAbsolutePath() + lessonZipFilePath, allUrls);
-
-		videoLesson.setZipFileURL(mediaURLPath+"lessons" + lessonZipFilePath);
-		return videoLesson;
+		}
+		
+		String xmlPath = SOURCE_FOLDER+lesson.getId()+"/"+lesson.getId()+".xml";	
+		String lessonXML = FileUtils.readFileToString(new File(xmlPath));
+		Serializer serializer = new Persister();
+		videoLesson = serializer.read(VideoLesson.class, lessonXML);
+		videoLesson.setZipFileURL(zipName);			
+		return videoLesson;		
 	}
 	
 	public InteractiveContent createZIPForInteractiveLesson(Lesson lesson) throws Exception {
-
-		String mediaPath = getMediaPath();
-		String mediaURLPath = getMediaURLPath();
-		
-		String lessonXML = lesson.getLessonXml();
-
 		InteractiveContent interactiveContent = null;
+		
+		Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+		// add owners permission
+		perms.add(PosixFilePermission.OWNER_READ);
+		perms.add(PosixFilePermission.OWNER_WRITE);
+		perms.add(PosixFilePermission.OWNER_EXECUTE);
+		// add group permissions
+		perms.add(PosixFilePermission.GROUP_READ);
+		perms.add(PosixFilePermission.GROUP_WRITE);
+		perms.add(PosixFilePermission.GROUP_EXECUTE);
+		// add others permissions
+		perms.add(PosixFilePermission.OTHERS_READ);
+		perms.add(PosixFilePermission.OTHERS_WRITE);
+		perms.add(PosixFilePermission.OTHERS_EXECUTE);
+		
+		String SOURCE_FOLDER = getMediaPath() + "/lessonXMLs/" + lesson.getId()+"/";
+		File sourceFile = new File(SOURCE_FOLDER);
 
-		Set<String> allUrls = new HashSet<String>();
-
-		if (lessonXML != null && !lessonXML.trim().isEmpty()) {
-			Serializer serializer = new Persister();
-			interactiveContent = serializer.read(InteractiveContent.class, lessonXML);
-
-			if (interactiveContent.getBgImage() != null && !interactiveContent.getBgImage().trim().isEmpty()) {
-				allUrls.add(interactiveContent.getBgImage().replace(mediaURLPath, mediaPath));
-			}
-
-			if (interactiveContent.getAudioUrl() != null && !interactiveContent.getAudioUrl().trim().isEmpty()) {
-				allUrls.add(interactiveContent.getAudioUrl().replace(mediaURLPath, mediaPath));
-			}
-
-			for (Entity entity : interactiveContent.getQuestions()) {
-				if (entity.getBackgroundImage() != null && !entity.getBackgroundImage().trim().isEmpty()) {
-					allUrls.add(entity.getBackgroundImage().replace(mediaURLPath, mediaPath));
-				}
-
-				if (entity.getTransitionImage() != null && !entity.getTransitionImage().trim().isEmpty()) {
-					allUrls.add(entity.getTransitionImage().replace(mediaURLPath, mediaPath));
-				}
-
-				if (entity.getOptions() != null && entity.getOptions().size() > 0) {
-					for (Entry<Integer, EntityOption> entry : entity.getOptions().entrySet()) {
-						if (entry.getValue().getBackgroundImage() != null
-								&& !entry.getValue().getBackgroundImage().trim().isEmpty()) {
-							allUrls.add(entry.getValue().getBackgroundImage().replace(mediaURLPath, mediaPath));
-						}
-						if (entry.getValue().getMediaUrl() != null
-								&& !entry.getValue().getMediaUrl().trim().isEmpty()) {
-							allUrls.add(entry.getValue().getMediaUrl().replace(mediaURLPath, mediaPath));
-						}
-
-						if (entry.getValue().getCards() != null && entry.getValue().getCards().size() > 0) {
-							for (Entry<Integer, InfoCard> entryInfoCard : entry.getValue().getCards().entrySet()) {
-
-								if (entryInfoCard.getValue().getContent() != null) {
-									CardContent content = entryInfoCard.getValue().getContent();
-
-									if (content.getaBackgroundImage() != null
-											&& !content.getaBackgroundImage().trim().isEmpty())
-										allUrls.add(content.getaBackgroundImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getaForegroundImage() != null
-											&& !content.getaForegroundImage().trim().isEmpty())
-										allUrls.add(content.getaForegroundImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getbBackgroundImage() != null
-											&& !content.getbBackgroundImage().trim().isEmpty())
-										allUrls.add(content.getbBackgroundImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getbBottomLeftBGImage() != null
-											&& !content.getbBottomLeftBGImage().trim().isEmpty())
-										allUrls.add(content.getbBottomLeftBGImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getbBottomLeftFGImage() != null
-											&& !content.getbBottomLeftFGImage().trim().isEmpty())
-										allUrls.add(content.getbBottomLeftFGImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getbBottomRightBGImage() != null
-											&& !content.getbBottomRightBGImage().trim().isEmpty())
-										allUrls.add(content.getbBottomRightBGImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getbBottomRightFGImage() != null
-											&& !content.getbBottomRightFGImage().trim().isEmpty())
-										allUrls.add(content.getbBottomRightFGImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getbCenterBottomBackgroundImage() != null
-											&& !content.getbCenterBottomBackgroundImage().trim().isEmpty())
-										allUrls.add(content.getbCenterBottomBackgroundImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getbCenterBottomForegroundImage() != null
-											&& !content.getbCenterBottomForegroundImage().trim().isEmpty())
-										allUrls.add(content.getbCenterBottomForegroundImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getbCenterTopBackgroundImage() != null
-											&& !content.getbCenterTopBackgroundImage().trim().isEmpty())
-										allUrls.add(content.getbCenterTopBackgroundImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getbCenterTopForegroundImage() != null
-											&& !content.getbCenterTopForegroundImage().trim().isEmpty())
-										allUrls.add(content.getbCenterTopForegroundImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getbTopleftBGImage() != null
-											&& !content.getbTopleftBGImage().trim().isEmpty())
-										allUrls.add(content.getbTopleftBGImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getbTopleftFGImage() != null
-											&& !content.getbTopleftFGImage().trim().isEmpty())
-										allUrls.add(content.getbTopleftFGImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getbTopRightBGImage() != null
-											&& !content.getbTopRightBGImage().trim().isEmpty())
-										allUrls.add(content.getbTopRightBGImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getbTopRightFGImage() != null
-											&& !content.getbTopRightFGImage().trim().isEmpty())
-										allUrls.add(content.getbTopRightFGImage().replace(mediaURLPath, mediaPath));
-
-									if (content.getbBottomLeftMediaUrl() != null
-											&& !content.getbBottomLeftMediaUrl().trim().isEmpty())
-										allUrls.add(content.getbBottomLeftMediaUrl().replace(mediaURLPath, mediaPath));
-
-									if (content.getbBottomRightMediaUrl() != null
-											&& !content.getbBottomRightMediaUrl().trim().isEmpty())
-										allUrls.add(content.getbBottomRightMediaUrl().replace(mediaURLPath, mediaPath));
-
-									if (content.getbCenterBottomMediaUrl() != null
-											&& !content.getbCenterBottomMediaUrl().trim().isEmpty())
-										allUrls.add(content.getbCenterBottomMediaUrl().replace(mediaURLPath, mediaPath));
-
-									if (content.getbCenterTopMediaUrl() != null
-											&& !content.getbCenterTopMediaUrl().trim().isEmpty())
-										allUrls.add(content.getbCenterTopMediaUrl().replace(mediaURLPath, mediaPath));
-
-									if (content.getbTopLeftMediaUrl() != null
-											&& !content.getbTopLeftMediaUrl().trim().isEmpty())
-										allUrls.add(content.getbTopLeftMediaUrl().replace(mediaURLPath, mediaPath));
-
-									if (content.getbTopRightMediaUrl() != null
-											&& !content.getbTopRightMediaUrl().trim().isEmpty())
-										allUrls.add(content.getbTopRightMediaUrl().replace(mediaURLPath, mediaPath));
-
-								}
-
-							}
-						}
-
-					}
-				}
-			}
+		String zipName = getMediaPath() + "/lessonXMLs/" + lesson.getId() + ".zip";
+		
+		File oldZip = new File(zipName);
+		if(oldZip.exists())
+		{
+				oldZip.delete();
 		}
-
-		System.out.println(allUrls.size());
-
-		for (String url : allUrls) {
-			System.out.println("url->" + url);
+		
+		ZipFiles zipFiles = new ZipFiles();
+		zipFiles.zipDirectory(sourceFile, zipName);
+		if(getServerType().equalsIgnoreCase("linux"))
+		{
+		try {
+			Files.setPosixFilePermissions(Paths.get(oldZip.getAbsolutePath()), perms);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
-		File uploadFolder = new File(mediaPath + "lessons/");
-
-		System.out.println(uploadFolder.getAbsolutePath());
-		if (!uploadFolder.exists()) {
-			System.out.println("Folder does not exists");
-			uploadFolder.mkdir();
 		}
-
-		String lessonZipFilePath = "/" + lesson.getId() + ".zip";
-		createZipFile(uploadFolder.getAbsolutePath() + lessonZipFilePath, allUrls);
-
-		interactiveContent.setZipFileURL(mediaURLPath+"lessons" + lessonZipFilePath);
-
+		
+		String xmlPath = SOURCE_FOLDER+lesson.getId()+"/"+lesson.getId()+".xml";	
+		String lessonXML = FileUtils.readFileToString(new File(xmlPath));
+		Serializer serializer = new Persister();
+		interactiveContent = serializer.read(InteractiveContent.class, lessonXML);
+		interactiveContent.setZipFileURL(zipName);	
+		
 		return interactiveContent;
 	}
 
@@ -397,7 +284,7 @@ public class CreateZIPForItem {
 
 	public static void writeToZipFile(String mediaPath, String pathOffileToInclude, ZipOutputStream zipOutputStream)
 			throws FileNotFoundException, IOException {
-		System.out.println("Writing file : '" + pathOffileToInclude + "' to zip file");
+		//System.out.println("Writing file : '" + pathOffileToInclude + "' to zip file");
 
 		File file = new File(pathOffileToInclude);
 		FileInputStream fis = new FileInputStream(file);

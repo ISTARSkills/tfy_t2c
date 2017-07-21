@@ -55,7 +55,7 @@ public class AppPOJOUtility {
 
 	public StudentProfile getStudentProfile(IstarUser student) {
 		if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-			System.out.println("POJO service");
+			//System.out.println("POJO service");
 		}
 		String mediaUrlPath = "";
 		int per_assessment_points = 5, per_lesson_points = 5, per_question_points = 1, per_assessment_coins = 5,
@@ -91,7 +91,7 @@ public class AppPOJOUtility {
 
 		if (student.getUserProfile() != null) {
 			if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-				System.out.println("FIRST NAME POJO is->" + student.getUserProfile().getFirstName());
+				//System.out.println("FIRST NAME POJO is->" + student.getUserProfile().getFirstName());
 
 	}			studentProfile.setFirstName(student.getUserProfile().getFirstName());
 			studentProfile.setLastName(student.getUserProfile().getLastName());
@@ -147,7 +147,7 @@ public class AppPOJOUtility {
 				+ student.getId()
 				+ " AND batch_group.is_primary = 't' LIMIT 1 ) ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 GROUP BY istar_user  ) T2 ORDER BY user_points DESC, perc DESC, total_points DESC ) T3 ) T4 WHERE istar_user = "
 				+ student.getId();
-		System.out.println("get getRankPointsForUser" + getRankPointsForUser);
+		//System.out.println("get getRankPointsForUser" + getRankPointsForUser);
 		List<HashMap<String, Object>> rankPointsData = util.executeQuery(getRankPointsForUser);
 		int rank = 0;
 		int coins = 0;
