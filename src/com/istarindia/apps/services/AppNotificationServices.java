@@ -18,6 +18,7 @@ import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.dao.entities.Task;
+import com.viksitpro.core.dao.entities.TaskDAO;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.notification.IstarNotificationServices;
 import com.viksitpro.core.utilities.DBUTILS;
@@ -58,27 +59,44 @@ public class AppNotificationServices {
 		}
 		NotificationPOJO notificationPOJO = null;
 
-		TaskServices taskServices = new TaskServices();
-		Task task = taskServices.getTask(istarNotification.getTaskId());
+		
 
-		if (task != null) {
-			switch (task.getItemType()) {
-			case TaskItemCategory.LESSON:
-				notificationPOJO = getNotificationPOJOForLesson(istarNotification);
-				break;
-			case TaskItemCategory.ASSESSMENT:
-				notificationPOJO = getNotificationPOJOForAssessment(istarNotification);
-				break;
-			case TaskItemCategory.CLASSROOM_SESSION:
-				notificationPOJO = getNotificationPOJOForClassroomSession(istarNotification);
-				break;
-				
-			case TaskItemCategory.REMOTE_CLASS_TRAINER:
-				notificationPOJO = getNotificationPOJOForRemoteClassroomSession(istarNotification);
-				break;
+		if (istarNotification.getTaskId() != null) 
+		{
+			Task task = new TaskDAO().findById(istarNotification.getTaskId());
+			if(task!=null)
+			{
+				switch (task.getItemType()) {
+				case TaskItemCategory.LESSON:
+					notificationPOJO = getNotificationPOJOForLesson(istarNotification);
+					break;
+				case TaskItemCategory.ASSESSMENT:
+					notificationPOJO = getNotificationPOJOForAssessment(istarNotification);
+					break;
+				case TaskItemCategory.CLASSROOM_SESSION:
+					notificationPOJO = getNotificationPOJOForClassroomSession(istarNotification);
+					break;
+				case TaskItemCategory.CLASSROOM_SESSION_STUDENT:
+					notificationPOJO = getNotificationPOJOForClassroomSessionStudent(istarNotification);
+					break;	
+				case TaskItemCategory.REMOTE_CLASS_TRAINER:
+					notificationPOJO = getNotificationPOJOForRemoteClassroomSession(istarNotification);
+					break;
+				case TaskItemCategory.REMOTE_CLASS_STUDENT:
+					notificationPOJO = getNotificationPOJOForRemoteClassroomSessionStudent(istarNotification);
+					break;
+				case TaskItemCategory.WEBINAR_TRAINER:
+					notificationPOJO = getNotificationPOJOForWebinarTrainer(istarNotification);
+					break;
+				case TaskItemCategory.WEBINAR_STUDENT:
+					notificationPOJO = getNotificationPOJOForWebinarStudent(istarNotification);
+					break;	
 
+				}
 			}
-		} else if (istarNotification.getAction() != null && istarNotification.getType() != null) {
+			
+		} 
+		else if (istarNotification.getAction() != null && istarNotification.getType() != null) {
 			switch (istarNotification.getType()) {
 			case "LESSON":
 				notificationPOJO = getNotificationPOJOForLesson(istarNotification);
@@ -106,6 +124,213 @@ public class AppNotificationServices {
 		return notificationPOJO;
 	}
 
+	private NotificationPOJO getNotificationPOJOForWebinarStudent(IstarNotification istarNotification) {
+		NotificationPOJO notificationPOJO = null;
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
+		
+		String getCourseIdEventIt ="select batch_schedule_event.id, batch_schedule_event.course_id from batch_schedule_event, task where task.item_id = batch_schedule_event.id and task.item_type in ('"+TaskItemCategory.WEBINAR_STUDENT+"') and task.id = "+istarNotification.getTaskId();
+		DBUTILS util = new DBUTILS();
+		List<HashMap<String, Object>> ddd = util.executeQuery(getCourseIdEventIt);
+		if(ddd.size()>0)
+		{
+			int itemId = (int)ddd.get(0).get("id");
+			int course_id = (int)ddd.get(0).get("course_id");
+			Course c = new CourseDAO().findById(course_id);
+			TaskServices taskServices = new TaskServices();
+			Task task = taskServices.getTask(istarNotification.getTaskId());
+			notificationPOJO = new NotificationPOJO();
+			notificationPOJO.setId(istarNotification.getId());
+			notificationPOJO.setMessage(istarNotification.getDetails());
+			notificationPOJO.setStatus(istarNotification.getStatus());
+			notificationPOJO.setTime(istarNotification.getCreatedAt());
+			notificationPOJO.setImageURL(mediaUrlPath+c.getImage_url());
+			notificationPOJO.setItemType(NotificationType.WEBINAR_STUDENT);
+			notificationPOJO.setItemId(itemId);
+			
+			CourseContent content = new TrainerWorkflowServices().getCourseContent(course_id, istarNotification.getTaskId());
+			if(content!=null && content.getItems()!=null && content.getItems().size()>0)
+			{
+				notificationPOJO.getItem().put("lessonId", content.getItems().get(content.getCurrentItemOrderId()));
+				
+				notificationPOJO.getItem().put("courseId", course_id);
+				
+				
+			}
+			if(task!=null){
+				notificationPOJO.getItem().put("taskId", task.getId());
+			}
+
+		}
+				
+
+		return notificationPOJO;
+	}
+
+	private NotificationPOJO getNotificationPOJOForWebinarTrainer(IstarNotification istarNotification) {
+		NotificationPOJO notificationPOJO = null;
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
+		
+		String getCourseIdEventIt ="select batch_schedule_event.id, batch_schedule_event.course_id from batch_schedule_event, task where task.item_id = batch_schedule_event.id and task.item_type in ('"+TaskItemCategory.WEBINAR_TRAINER+"') and task.id = "+istarNotification.getTaskId();
+		DBUTILS util = new DBUTILS();
+		List<HashMap<String, Object>> ddd = util.executeQuery(getCourseIdEventIt);
+		if(ddd.size()>0)
+		{
+			int itemId = (int)ddd.get(0).get("id");
+			int course_id = (int)ddd.get(0).get("course_id");
+			Course c = new CourseDAO().findById(course_id);
+			TaskServices taskServices = new TaskServices();
+			Task task = taskServices.getTask(istarNotification.getTaskId());
+			notificationPOJO = new NotificationPOJO();
+			notificationPOJO.setId(istarNotification.getId());
+			notificationPOJO.setMessage(istarNotification.getDetails());
+			notificationPOJO.setStatus(istarNotification.getStatus());
+			notificationPOJO.setTime(istarNotification.getCreatedAt());
+			notificationPOJO.setImageURL(mediaUrlPath+c.getImage_url());
+			notificationPOJO.setItemType(NotificationType.WEBINAR_TRAINER);
+			notificationPOJO.setItemId(itemId);
+			
+			CourseContent content = new TrainerWorkflowServices().getCourseContent(course_id, istarNotification.getTaskId());
+			if(content!=null && content.getItems()!=null && content.getItems().size()>0)
+			{
+				notificationPOJO.getItem().put("lessonId", content.getItems().get(content.getCurrentItemOrderId()));
+				
+				notificationPOJO.getItem().put("courseId", course_id);
+				
+				
+			}
+			if(task!=null){
+				notificationPOJO.getItem().put("taskId", task.getId());
+			}
+
+		}
+				
+
+		return notificationPOJO;
+	}
+
+	private NotificationPOJO getNotificationPOJOForRemoteClassroomSessionStudent(IstarNotification istarNotification) {
+
+		NotificationPOJO notificationPOJO = null;
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
+		
+		String getCourseIdEventIt ="select batch_schedule_event.id, batch_schedule_event.course_id from batch_schedule_event, task where task.item_id = batch_schedule_event.id and task.item_type in ('"+TaskItemCategory.REMOTE_CLASS_STUDENT+"') and task.id = "+istarNotification.getTaskId();
+		DBUTILS util = new DBUTILS();
+		List<HashMap<String, Object>> ddd = util.executeQuery(getCourseIdEventIt);
+		if(ddd.size()>0)
+		{
+			int itemId = (int)ddd.get(0).get("id");
+			int course_id = (int)ddd.get(0).get("course_id");
+			Course c = new CourseDAO().findById(course_id);
+			TaskServices taskServices = new TaskServices();
+			Task task = taskServices.getTask(istarNotification.getTaskId());
+			notificationPOJO = new NotificationPOJO();
+			notificationPOJO.setId(istarNotification.getId());
+			notificationPOJO.setMessage(istarNotification.getDetails());
+			notificationPOJO.setStatus(istarNotification.getStatus());
+			notificationPOJO.setTime(istarNotification.getCreatedAt());
+			notificationPOJO.setImageURL(mediaUrlPath+c.getImage_url());
+			notificationPOJO.setItemType(NotificationType.REMOTE_CLASS_STUDENT);
+			notificationPOJO.setItemId(itemId);
+			
+			CourseContent content = new TrainerWorkflowServices().getCourseContent(course_id, istarNotification.getTaskId());
+			if(content!=null && content.getItems()!=null && content.getItems().size()>0)
+			{
+				notificationPOJO.getItem().put("lessonId", content.getItems().get(content.getCurrentItemOrderId()));
+				
+				notificationPOJO.getItem().put("courseId", course_id);
+				
+				
+			}
+			if(task!=null){
+				notificationPOJO.getItem().put("taskId", task.getId());
+			}
+
+		}
+				
+
+		return notificationPOJO;
+	}
+
+	private NotificationPOJO getNotificationPOJOForClassroomSessionStudent(IstarNotification istarNotification) {
+
+		NotificationPOJO notificationPOJO = null;
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();			
+		}
+		
+		String getCourseIdEventIt ="select batch_schedule_event.id, batch_schedule_event.course_id from batch_schedule_event, task where task.item_id = batch_schedule_event.id and task.item_type in ('"+TaskItemCategory.CLASSROOM_SESSION_STUDENT+"') and task.id = "+istarNotification.getTaskId();
+		DBUTILS util = new DBUTILS();
+		List<HashMap<String, Object>> ddd = util.executeQuery(getCourseIdEventIt);
+		if(ddd.size()>0)
+		{
+			int itemId = (int)ddd.get(0).get("id");
+			int course_id = (int)ddd.get(0).get("course_id");
+			Course c = new CourseDAO().findById(course_id);
+			TaskServices taskServices = new TaskServices();
+			Task task = taskServices.getTask(istarNotification.getTaskId());
+			notificationPOJO = new NotificationPOJO();
+			notificationPOJO.setId(istarNotification.getId());
+			notificationPOJO.setMessage(istarNotification.getDetails());
+			notificationPOJO.setStatus(istarNotification.getStatus());
+			notificationPOJO.setTime(istarNotification.getCreatedAt());
+			notificationPOJO.setImageURL(mediaUrlPath+c.getImage_url());
+			notificationPOJO.setItemType(NotificationType.CLASSROOM_SESSION_STUDENT);
+			notificationPOJO.setItemId(itemId);
+			
+			if(task!=null){
+				notificationPOJO.getItem().put("taskId", task.getId());
+			}
+
+		}				
+
+		return notificationPOJO;
+	}
+
 	private NotificationPOJO getNotificationPOJOForClassroomSession(IstarNotification istarNotification) {
 		NotificationPOJO notificationPOJO = null;
 		String mediaUrlPath ="";
@@ -122,7 +347,7 @@ public class AppNotificationServices {
 			
 		}
 		
-		String getCourseIdEventIt ="select batch_schedule_event.id, batch_schedule_event.course_id from batch_schedule_event, task where task.item_id = batch_schedule_event.id and task.item_type in ('CLASSROOM_SESSION','REMOTE_CLASS_TRAINER') and task.id = "+istarNotification.getTaskId();
+		String getCourseIdEventIt ="select batch_schedule_event.id, batch_schedule_event.course_id from batch_schedule_event, task where task.item_id = batch_schedule_event.id and task.item_type in ('"+TaskItemCategory.CLASSROOM_SESSION+"') and task.id = "+istarNotification.getTaskId();
 		DBUTILS util = new DBUTILS();
 		List<HashMap<String, Object>> ddd = util.executeQuery(getCourseIdEventIt);
 		if(ddd.size()>0)
@@ -177,7 +402,7 @@ public class AppNotificationServices {
 			
 		}
 		
-		String getCourseIdEventIt ="select batch_schedule_event.id, batch_schedule_event.course_id from batch_schedule_event, task where task.item_id = batch_schedule_event.id and task.item_type in ('CLASSROOM_SESSION','REMOTE_CLASS_TRAINER') and task.id = "+istarNotification.getTaskId();
+		String getCourseIdEventIt ="select batch_schedule_event.id, batch_schedule_event.course_id from batch_schedule_event, task where task.item_id = batch_schedule_event.id and task.item_type in ('"+TaskItemCategory.REMOTE_CLASS_TRAINER+"') and task.id = "+istarNotification.getTaskId();
 		DBUTILS util = new DBUTILS();
 		List<HashMap<String, Object>> ddd = util.executeQuery(getCourseIdEventIt);
 		if(ddd.size()>0)
