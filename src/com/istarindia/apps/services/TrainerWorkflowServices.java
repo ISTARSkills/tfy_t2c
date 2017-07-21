@@ -33,7 +33,7 @@ public class TrainerWorkflowServices {
 		String mediaUrlPath =AppProperies.getProperty("media_url_path");
 		ArrayList<GroupStudentPojo> students = new ArrayList<>();
 		DBUTILS utils = new DBUTILS();
-		String sql="SELECT 	istar_user. ID, 	CASE WHEN ( 	user_profile.first_name IS NULL ) THEN 	istar_user.email ELSE 	user_profile.first_name END,  user_profile.profile_image,  CASE WHEN (attendance.status IS NULL) THEN 	'ABSENT' ELSE 	attendance.status END FROM "
+		String sql="SELECT 	distinct istar_user. ID, 	CASE WHEN ( 	user_profile.first_name IS NULL ) THEN 	istar_user.email ELSE 	user_profile.first_name END,  user_profile.profile_image,  CASE WHEN (attendance.status IS NULL) THEN 	'ABSENT' ELSE 	attendance.status END FROM "
 				+ "	task LEFT JOIN batch_schedule_event ON ( 	task.item_id = batch_schedule_event. ID ) "
 				+ "LEFT JOIN batch_students ON ( 	batch_students.batch_group_id = "+groupId+" ) "
 				+ "LEFT JOIN istar_user ON ( 	batch_students.student_id = istar_user. ID )"
