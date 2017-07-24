@@ -106,14 +106,9 @@ public class AppCourseServices {
 			}
 			coursePOJO.setUserPoints(userPoints);
 			coursePOJO.setRank(rank);
-			coursePOJO.setTotalPoints(totalPoints);
-
-		
-			
-			int moduleOrderId = 0;
-			
-			Set<Integer> cmsessionIds = new HashSet<Integer>();
-			
+			coursePOJO.setTotalPoints(totalPoints);					
+			int moduleOrderId = 0;			
+			Set<Integer> cmsessionIds = new HashSet<Integer>();			
 			for(StudentPlaylist studentPlaylist : allStudentPlaylist){
 				ModulePOJO modulePOJO = null;
 				Module module = studentPlaylist.getModule();

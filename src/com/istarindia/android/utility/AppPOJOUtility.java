@@ -105,7 +105,6 @@ public class AppPOJOUtility {
 				studentProfile.setProfileImage(student.getUserProfile().getImage());
 			} else {
 				studentProfile.setProfileImage(mediaUrlPath + student.getUserProfile().getImage());
-
 			}
 			String userCategory = "COLLEGE_STUDENT";
 			if (student.getUserProfile().getUserCategory() != null) {

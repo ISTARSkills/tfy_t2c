@@ -28,6 +28,7 @@ import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Lesson;
+import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.utilities.DBUTILS;
 import com.viksitpro.core.utilities.TaskItemCategory;
@@ -105,10 +106,10 @@ public class TaskSummaryPojoCreator {
 		
 		AppCourseServices appCourseServices= new AppCourseServices();
 		Lesson lesson = appCourseServices.getLesson(task.getItemId());
-		
-		if(lesson!=null){
-			taskSummaryPOJO = new TaskSummaryPOJO();
-			
+		if(!task.getState().equalsIgnoreCase("CREATED"))
+		{
+			if(lesson!=null){
+			taskSummaryPOJO = new TaskSummaryPOJO();			
 			taskSummaryPOJO.setId(task.getId());
 			taskSummaryPOJO.setItemId(task.getItemId());
 			taskSummaryPOJO.setItemType(task.getItemType()+"_"+lesson.getType());
@@ -119,16 +120,14 @@ public class TaskSummaryPojoCreator {
 				taskSummaryPOJO.setStatus("COMPLETED");
 				taskSummaryPOJO.setDate(task.getStartDate());
 				taskSummaryPOJO.setCompletedDate(task.getUpdatedAt());
-			}
-			
-			
-			
+			}			
 			taskSummaryPOJO.setHeader(lesson.getSubject());
 			taskSummaryPOJO.setTitle(lesson.getTitle());
 			taskSummaryPOJO.setDescription(lesson.getDescription());
 			taskSummaryPOJO.setImageURL(mediaUrlPath+lesson.getImage_url());
 			taskSummaryPOJO.setDuration(lesson.getDuration());			
-		}
+			}
+		}		
 		return taskSummaryPOJO;
 	}
 
@@ -234,8 +233,50 @@ public class TaskSummaryPojoCreator {
 	}
 
 	public TaskSummaryPOJO getContentTask(Task task) {
-		// TODO Auto-generated method stub
-		return null;
+
+		String mediaUrlPath ="";
+		try{
+			Properties properties = new Properties();
+			String propertyFileName = "app.properties";
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+				if (inputStream != null) {
+					properties.load(inputStream);
+					mediaUrlPath =  properties.getProperty("media_url_path");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			
+		}
+		
+		TaskSummaryPOJO taskSummaryPOJO = null;
+		
+		if(!task.getState().equalsIgnoreCase("CREATED"))
+		{
+			Lesson lesson = new LessonDAO().findById(task.getItemId());			
+			if(lesson!=null){
+				taskSummaryPOJO = new TaskSummaryPOJO();
+				
+				taskSummaryPOJO.setId(task.getId());
+				taskSummaryPOJO.setItemId(task.getItemId());
+				taskSummaryPOJO.setItemType("CONTENT"+"_"+lesson.getType());
+				if(task.getIsActive()){
+					taskSummaryPOJO.setStatus("INCOMPLETE");
+					taskSummaryPOJO.setDate(task.getStartDate());
+				}else{
+					taskSummaryPOJO.setStatus("COMPLETED");
+					taskSummaryPOJO.setDate(task.getStartDate());
+					taskSummaryPOJO.setCompletedDate(task.getUpdatedAt());
+				}				
+				taskSummaryPOJO.setHeader(lesson.getSubject());
+				taskSummaryPOJO.setTitle(lesson.getTitle());
+				taskSummaryPOJO.setDescription(lesson.getDescription());
+				taskSummaryPOJO.setImageURL(mediaUrlPath+lesson.getImage_url());
+				taskSummaryPOJO.setDuration(lesson.getDuration());			
+			}	
+		}	
+		
+		return taskSummaryPOJO;
+	
 	}
 
 	public TaskSummaryPOJO getClassroomSessionStudent(Task task) {

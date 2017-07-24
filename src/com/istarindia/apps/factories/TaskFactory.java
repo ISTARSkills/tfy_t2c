@@ -29,8 +29,6 @@ public class TaskFactory {
 				return creator.getClassRoomSessionTask(task);
 			case TaskItemCategory.CLASSROOM_ASSESSMENT:
 				return creator.getClassroomAssessmentTask(task);
-			case TaskItemCategory.CONTENT:
-				return creator.getContentTask(task);
 			case TaskItemCategory.CLASSROOM_SESSION_STUDENT:
 				return creator.getClassroomSessionStudent(task);
 			case TaskItemCategory.ZOOM_INTERVIEW_INTERVIEWEE:
