@@ -42,7 +42,7 @@ public class LessonProgressService extends HttpServlet {
 
 			String slideTitle = request.getParameter("title");
 
-			String totalSlideCount = request.getParameter("totoal_slides");
+			String totalSlideCount = request.getParameter("total_slides");
 
 			DBUTILS util = new DBUTILS();
 			
