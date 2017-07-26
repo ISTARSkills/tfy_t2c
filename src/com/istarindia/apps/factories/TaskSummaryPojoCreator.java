@@ -548,12 +548,21 @@ public class TaskSummaryPojoCreator {
 		TaskSummaryPOJO pojo = new TaskSummaryPOJO();
 		pojo.setDate(task.getStartDate());
 		pojo.setHeader(header);
-		pojo.setStatus(task.getState());
+		
+		if(task.getIsActive()){
+			pojo.setStatus("INCOMPLETE");
+			pojo.setDate(task.getStartDate());
+		}else{
+			pojo.setStatus("COMPLETED");
+			pojo.setDate(task.getStartDate());
+			pojo.setCompletedDate(task.getUpdatedAt());
+		}
+		
 		pojo.setId(task.getId());
 		pojo.setItemType("CUSTOM_TASK");
 		pojo.setDescription(task.getDescription());
 		pojo.setItemId(task.getItemId());
-		pojo.setImageURL("http://blog.pickevent.com/wp-content/uploads/2014/01/feedback.jpg");
+		pojo.setImageURL("https://elearningindustry.com/wp-content/uploads/2016/09/ways-facilitate-peer-based-elearning-feedback.jpg");
 		pojo.setTitle(task.getName());
 		return pojo;
 	}
