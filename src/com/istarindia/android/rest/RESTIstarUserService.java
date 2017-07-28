@@ -345,6 +345,7 @@ public class RESTIstarUserService {
 		try {
 
 			AppBatchGroupServices batchGroupServices = new AppBatchGroupServices();
+			batchGroupServices.createOrUpdateOrganization(batchCode,istarUserId);
 			BatchGroup batchGroup = batchGroupServices.getBatchGroupByBatchCode(batchCode);
 
 			IstarUserServices istarUserServices = new IstarUserServices();

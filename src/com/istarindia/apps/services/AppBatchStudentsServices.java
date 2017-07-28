@@ -6,6 +6,7 @@ import com.viksitpro.core.dao.entities.BatchStudents;
 import com.viksitpro.core.dao.entities.BatchStudentsDAO;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
+import com.viksitpro.core.utilities.DBUTILS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,10 @@ public class AppBatchStudentsServices {
 	}
 	
 	public BatchStudents createBatchStudents(IstarUser istarUser, BatchGroup batchGroup, String type){
+		
+		DBUTILS db = new DBUTILS();
+		String deleteIfMappingExist ="DELETE from batch_students where student_id="+istarUser.getId()+" and batch_group_id="+batchGroup.getId();
+		db.executeUpdate(deleteIfMappingExist);
 		
 		BatchStudents batchStudents = new BatchStudents();
 		
