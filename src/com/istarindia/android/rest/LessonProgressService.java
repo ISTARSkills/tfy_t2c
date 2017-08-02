@@ -40,7 +40,7 @@ public class LessonProgressService extends HttpServlet {
 			String istarUserId = request.getParameter("user_id");
 			String slideId = request.getParameter("slide_id");
 
-			String slideTitle = request.getParameter("title");
+			String slideTitle = request.getParameter("title").replaceAll("'", "");
 
 			String totalSlideCount = request.getParameter("total_slides");
 
