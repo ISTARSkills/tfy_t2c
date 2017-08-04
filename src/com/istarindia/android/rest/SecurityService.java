@@ -30,12 +30,17 @@ public class SecurityService {
 					if (name.equalsIgnoreCase("viksit-user-agent")) {
 						System.out.println(value);
 						DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-						Date date = new Date();
-						String timeNow = dateFormat.format(date).toString();
-						timeNow = timeNow.replaceAll("/", "").replaceAll(":", "").replaceAll(" ", "");
+						Date datefrom = new Date();
+						Date dateto = new Date(System.currentTimeMillis()+60*1000);
+						String timeFrom = dateFormat.format(datefrom).toString();
+						String timeTo = dateFormat.format(dateto).toString();
+						
+						timeFrom = timeFrom.replaceAll("/", "").replaceAll(":", "").replaceAll(" ", "");
+						timeTo = timeTo.replaceAll("/", "").replaceAll(":", "").replaceAll(" ", "");
 						value = value.replaceAll("viksit-", "").replaceAll("[^0-9]", "");
-						System.out.println(timeNow + ":" + value);
-						if (timeNow.equals(value)) {
+						
+						System.out.println(timeFrom +":"+ value + ":" + timeTo);
+						if (timeFrom.equals(value) || timeTo.equals(value)) {
 							isTrue = true;
 						}
 					}
