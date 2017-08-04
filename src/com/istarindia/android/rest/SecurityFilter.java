@@ -50,27 +50,30 @@ public class SecurityFilter implements Filter {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		
+		HttpServletResponse res=(HttpServletResponse)response;
 		if (security_token_check.equalsIgnoreCase("true")) {
 			//System.out.println("security_token_check true");
 			if (checkAuth((HttpServletRequest) request)) {
 				System.out.println("Access Approved");
-				chain.doFilter(request, response);
+				chain.doFilter(request, res);
 			} else {
 				System.out.println("Access Denied");
-				chain.doFilter(request, null);
-
+				res.setStatus(500);
+				res.getWriter().print("\"istarViksitProComplexKeySecurity Access Denied.\"");
 			}
 
 		} else {
 
-			chain.doFilter(request, response);
+			chain.doFilter(request, res);
 			System.out.println("security_token_check false");
 		}
 
 	}
+
+	
 
 	private boolean checkAuth(HttpServletRequest request) {
 		System.out.println("Accessed via filter ");
