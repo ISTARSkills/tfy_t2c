@@ -32,15 +32,19 @@ public class SecurityService {
 						DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 						Date datefrom = new Date();
 						Date dateto = new Date(System.currentTimeMillis()+60*1000);
+						Date prevdate = new Date(System.currentTimeMillis()-60*1000);
+						
 						String timeFrom = dateFormat.format(datefrom).toString();
 						String timeTo = dateFormat.format(dateto).toString();
+						String timePrev = dateFormat.format(prevdate).toString();
 						
 						timeFrom = timeFrom.replaceAll("/", "").replaceAll(":", "").replaceAll(" ", "");
 						timeTo = timeTo.replaceAll("/", "").replaceAll(":", "").replaceAll(" ", "");
+						timePrev = timePrev.replaceAll("/", "").replaceAll(":", "").replaceAll(" ", "");
 						value = value.replaceAll("viksit-", "").replaceAll("[^0-9]", "");
 						
-						System.out.println(timeFrom +":"+ value + ":" + timeTo);
-						if (timeFrom.equals(value) || timeTo.equals(value)) {
+						System.out.println(timePrev+":"+timeFrom +":"+ value + ":" + timeTo);
+						if (timeFrom.equals(timePrev) || timeFrom.equals(value) || timeTo.equals(value)) {
 							isTrue = true;
 						}
 					}
