@@ -64,7 +64,7 @@ public class GamificationServices {
 		{
 			int groupId = (int)primaryG.get("id");
 			int orgId = (int)primaryG.get("college_id");
-			String findSkillsInAssesssment = "select skill_objective_id, max_points from assessment_benchmark where item_id = "+lesson.getId()+" and item_type ='LESSON'";
+			String findSkillsInAssesssment = "select skill_objective_id, max_points from assessment_benchmark where item_id = "+lesson.getId()+" and item_type ='LESSON' and course_id="+courseId;
 			//System.out.println("findSkillsInLesson>>>>>>"+findSkillsInAssesssment);
 			List<HashMap<String, Object>> skillsData = util.executeQuery(findSkillsInAssesssment);
 			for(HashMap<String, Object> skills : skillsData)
@@ -183,7 +183,7 @@ public class GamificationServices {
 				int questionId = (int)qRow.get("questionid");
 				
 				
-				String findSkillsInQuestion = "select skill_objective_id, max_points from assessment_benchmark where item_id = "+questionId+" and item_type ='QUESTION'";
+				String findSkillsInQuestion = "select skill_objective_id, max_points from assessment_benchmark where item_id = "+questionId+" and item_type ='QUESTION' and course_id ="+assessment.getCourse()+"";
 				//System.out.println("findSkillsInAssesssment>>>>>>"+findSkillsInQuestion);
 				List<HashMap<String, Object>> skillsData = util.executeQuery(findSkillsInQuestion);
 				for(HashMap<String, Object> skills : skillsData)
