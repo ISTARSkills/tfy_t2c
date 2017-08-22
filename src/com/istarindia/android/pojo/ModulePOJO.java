@@ -19,8 +19,9 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 	private String status;
 	private String imageURL;
 	private Integer orderId;
-	private List<ConcreteItemPOJO> lessons = new ArrayList<ConcreteItemPOJO>();
 	private Set<String> skillObjectives = new HashSet<String>();
+	private List<SessionPOJO> sessions = new ArrayList<SessionPOJO>();
+
 	
 	public ModulePOJO(){
 		
@@ -66,13 +67,16 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 		this.orderId = orderId;
 	}
 	
-	@XmlAttribute(name = "lessons", required = false)
-	public List<ConcreteItemPOJO> getLessons() {
-		return lessons;
+	
+	
+	
+	@XmlElement(name = "sessions", required = false)
+	public List<SessionPOJO> getSessions() {
+		return sessions;
 	}
 
-	public void setLessons(List<ConcreteItemPOJO> lessons) {
-		this.lessons = lessons;
+	public void setSessions(List<SessionPOJO> sessions) {
+		this.sessions = sessions;
 	}
 
 	@XmlElement(name = "skillObjectives", required = false)
@@ -91,7 +95,7 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 		this.status = status;
 	}
 
-	public ModulePOJO sortLessonsAndAssignStatus(){		
+	/*public ModulePOJO sortLessonsAndAssignStatus(){		
 		ModulePOJO modulePOJO = this;		
 		Collections.sort(modulePOJO.getLessons());
 		
@@ -104,7 +108,7 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 		}
 		modulePOJO.setStatus(moduleStatus);	
 	return modulePOJO;
-	}
+	}*/
 	
 	@Override
 	public int compareTo(ModulePOJO o) {

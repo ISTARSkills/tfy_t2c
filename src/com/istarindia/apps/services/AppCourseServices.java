@@ -20,6 +20,7 @@ import com.istarindia.android.pojo.ConcreteItemPOJO;
 import com.istarindia.android.pojo.CoursePOJO;
 import com.istarindia.android.pojo.LessonPOJO;
 import com.istarindia.android.pojo.ModulePOJO;
+import com.istarindia.android.pojo.SessionPOJO;
 import com.istarindia.android.pojo.SkillReportPOJO;
 import com.istarindia.android.pojo.StudentRankPOJO;
 import com.istarindia.android.utility.AppUserRankUtility;
@@ -135,7 +136,7 @@ public class AppCourseServices {
 					}
 
 					try {
-												if (modulePOJO == null) {
+						if (modulePOJO == null) {
 							modulePOJO = new ModulePOJO();
 							modulePOJO.setId(module.getId());
 							modulePOJO.setName(module.getModuleName());
@@ -182,7 +183,7 @@ public class AppCourseServices {
 								} catch (Exception e) {
 
 								}
-								
+
 								if (totalSlide != 0) {
 									int progress = (slide_moved * 100) / totalSlide;
 									ConcreteItemPOJO.setProgress(progress);
@@ -211,7 +212,73 @@ public class AppCourseServices {
 							ConcreteItemPOJO.setOrderId(studentPlaylist.getId());
 							ConcreteItemPOJO.setStatus(studentPlaylist.getStatus());
 							ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
-							modulePOJO.getLessons().add(ConcreteItemPOJO);
+							if (modulePOJO.getSessions() != null && modulePOJO.getSessions().size() != 0) {
+								List<SessionPOJO> sessions = modulePOJO.getSessions();
+								for (SessionPOJO sessionPOJO : sessions) {
+									if (cmsession.getId() == (int) sessionPOJO.getId()) {
+										sessionPOJO.getLessons().add(ConcreteItemPOJO);
+									} else {
+										SessionPOJO pojo = new SessionPOJO();
+										pojo.setId(cmsession.getId());
+										pojo.setName(cmsession.getTitle());
+										pojo.setDescription(cmsession.getDescription() != null
+												? cmsession.getDescription() : "Not Available");
+										pojo.setImageURL(
+												cmsession.getImage_url() != null ? cmsession.getImage_url() : "");
+										pojo.setOrderId(studentPlaylist.getId());
+
+										List<ConcreteItemPOJO> concreteItemPOJOs = new ArrayList();
+										concreteItemPOJOs.add(ConcreteItemPOJO);
+										pojo.setLessons(concreteItemPOJOs);
+										int sessionProgress = 0;
+										int i = 0;
+
+										if (pojo.getLessons() != null && pojo.getLessons().size() != 0) {
+											for (ConcreteItemPOJO itemPOJO : pojo.getLessons()) {
+												i++;
+												sessionProgress += itemPOJO.getProgress() != null
+														? itemPOJO.getProgress() : 0;
+											}
+										}
+
+										if (i == 0) {
+											pojo.setProgress(0);
+										} else {
+											pojo.setProgress(sessionProgress / i);
+										}
+										sessions.add(pojo);
+									}
+								}
+								modulePOJO.setSessions(sessions);
+							} else {
+								SessionPOJO pojo = new SessionPOJO();
+								pojo.setId(cmsession.getId());
+								pojo.setName(cmsession.getTitle());
+								pojo.setDescription(cmsession.getDescription() != null ? cmsession.getDescription()
+										: "Not Available");
+								pojo.setImageURL(cmsession.getImage_url() != null ? cmsession.getImage_url() : "");
+								pojo.setOrderId(studentPlaylist.getId());
+
+								List<ConcreteItemPOJO> concreteItemPOJOs = new ArrayList();
+								concreteItemPOJOs.add(ConcreteItemPOJO);
+								pojo.setLessons(concreteItemPOJOs);
+
+								int sessionProgress = 0;
+								int i = 0;
+								if (pojo.getLessons() != null && pojo.getLessons().size() != 0) {
+									for (ConcreteItemPOJO itemPOJO : pojo.getLessons()) {
+										i++;
+										sessionProgress += itemPOJO.getProgress() != null ? itemPOJO.getProgress() : 0;
+									}
+								}
+
+								if (i == 0) {
+									pojo.setProgress(0);
+								} else {
+									pojo.setProgress(sessionProgress / i);
+								}
+								modulePOJO.getSessions().add(pojo);
+							}
 
 							coursePOJO.getModules().add(modulePOJO);
 						} else {
@@ -283,7 +350,74 @@ public class AppCourseServices {
 							ConcreteItemPOJO.setOrderId(studentPlaylist.getId());
 							ConcreteItemPOJO.setStatus(studentPlaylist.getStatus());
 							ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
-							modulePOJO.getLessons().add(ConcreteItemPOJO);
+							if (modulePOJO.getSessions() != null && modulePOJO.getSessions().size() != 0) {
+								List<SessionPOJO> sessions = modulePOJO.getSessions();
+								for (SessionPOJO sessionPOJO : sessions) {
+									if (cmsession.getId() == (int) sessionPOJO.getId()) {
+										sessionPOJO.getLessons().add(ConcreteItemPOJO);
+									} else {
+
+										SessionPOJO pojo = new SessionPOJO();
+										pojo.setId(cmsession.getId());
+										pojo.setName(cmsession.getTitle());
+										pojo.setDescription(cmsession.getDescription() != null
+												? cmsession.getDescription() : "Not Available");
+										pojo.setImageURL(
+												cmsession.getImage_url() != null ? cmsession.getImage_url() : "");
+										pojo.setOrderId(studentPlaylist.getId());
+
+										List<ConcreteItemPOJO> concreteItemPOJOs = new ArrayList();
+										concreteItemPOJOs.add(ConcreteItemPOJO);
+										pojo.setLessons(concreteItemPOJOs);
+										int sessionProgress = 0;
+										int i = 0;
+
+										if (pojo.getLessons() != null && pojo.getLessons().size() != 0) {
+											for (ConcreteItemPOJO itemPOJO : pojo.getLessons()) {
+												i++;
+												sessionProgress += itemPOJO.getProgress() != null
+														? itemPOJO.getProgress() : 0;
+											}
+										}
+
+										if (i == 0) {
+											pojo.setProgress(0);
+										} else {
+											pojo.setProgress(sessionProgress / i);
+										}
+										sessions.add(pojo);
+									}
+								}
+								modulePOJO.setSessions(sessions);
+							} else {
+								SessionPOJO pojo = new SessionPOJO();
+								pojo.setId(cmsession.getId());
+								pojo.setName(cmsession.getTitle());
+								pojo.setDescription(cmsession.getDescription() != null ? cmsession.getDescription()
+										: "Not Available");
+								pojo.setImageURL(cmsession.getImage_url() != null ? cmsession.getImage_url() : "");
+								pojo.setOrderId(studentPlaylist.getId());
+
+								List<ConcreteItemPOJO> concreteItemPOJOs = new ArrayList();
+								concreteItemPOJOs.add(ConcreteItemPOJO);
+								pojo.setLessons(concreteItemPOJOs);
+								int sessionProgress = 0;
+								int i = 0;
+
+								if (pojo.getLessons() != null && pojo.getLessons().size() != 0) {
+									for (ConcreteItemPOJO itemPOJO : pojo.getLessons()) {
+										i++;
+										sessionProgress += itemPOJO.getProgress() != null ? itemPOJO.getProgress() : 0;
+									}
+								}
+
+								if (i == 0) {
+									pojo.setProgress(0);
+								} else {
+									pojo.setProgress(sessionProgress / i);
+								}
+								modulePOJO.getSessions().add(pojo);
+							}
 						}
 
 						String finModuleStatus = "select cast( count(*) as integer) as incomple_lesssons from student_playlist where student_id = "
@@ -298,7 +432,7 @@ public class AppCourseServices {
 
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
-						//e.printStackTrace();
+						// e.printStackTrace();
 					}
 
 				}
@@ -396,11 +530,19 @@ public class AppCourseServices {
 		}
 
 		String getDataForTree = "SELECT T1. ID, T1.skill_objective, T1.points, T1.max_points, module_skill. ID AS module_id "
-				+ "FROM ( WITH summary AS ( SELECT P . ID, P .skill_objective, custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (P .points, '0'), ':per_lesson_points', '" + per_lesson_points + "' ), ':per_assessment_points', '" + per_assessment_points + "' ), ':per_question_points', '" + per_question_points + "' ) ) AS TEXT ) ) AS points,"
-						+ " custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (P .max_points, '0'), ':per_lesson_points', '" + per_lesson_points + "' ), ':per_assessment_points', '" + per_assessment_points + "' ), ':per_question_points', '" + per_question_points + "' ) ) AS TEXT ) ) AS max_points, ROW_NUMBER () OVER ( PARTITION BY P .skill_objective, P .item_id ORDER BY P . TIMESTAMP DESC ) AS rk "
-								+ "FROM user_gamification P, assessment_question, question "
-								+ "WHERE P .course_id = " + courseId + " AND P .istar_user = " + istarUserId + " AND P .item_id = assessment_question.questionid AND assessment_question.assessmentid IN ( SELECT DISTINCT item_id FROM user_gamification WHERE course_id = " + courseId + " AND istar_user = " + istarUserId + " AND item_type = 'ASSESSMENT' ) AND assessment_question.questionid = question. ID AND P .item_type = 'QUESTION' ) "
-										+ "SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 JOIN skill_objective cmsession_skill ON ( T1.skill_objective = cmsession_skill. ID ) JOIN module_skill_session_skill_map ON ( module_skill_session_skill_map.session_skill_id = cmsession_skill.id ) join skill_objective module_skill on (module_skill_session_skill_map.module_skill_id = module_skill.id )";
+				+ "FROM ( WITH summary AS ( SELECT P . ID, P .skill_objective, custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (P .points, '0'), ':per_lesson_points', '"
+				+ per_lesson_points + "' ), ':per_assessment_points', '" + per_assessment_points
+				+ "' ), ':per_question_points', '" + per_question_points + "' ) ) AS TEXT ) ) AS points,"
+				+ " custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (P .max_points, '0'), ':per_lesson_points', '"
+				+ per_lesson_points + "' ), ':per_assessment_points', '" + per_assessment_points
+				+ "' ), ':per_question_points', '" + per_question_points
+				+ "' ) ) AS TEXT ) ) AS max_points, ROW_NUMBER () OVER ( PARTITION BY P .skill_objective, P .item_id ORDER BY P . TIMESTAMP DESC ) AS rk "
+				+ "FROM user_gamification P, assessment_question, question " + "WHERE P .course_id = " + courseId
+				+ " AND P .istar_user = " + istarUserId
+				+ " AND P .item_id = assessment_question.questionid AND assessment_question.assessmentid IN ( SELECT DISTINCT item_id FROM user_gamification WHERE course_id = "
+				+ courseId + " AND istar_user = " + istarUserId
+				+ " AND item_type = 'ASSESSMENT' ) AND assessment_question.questionid = question. ID AND P .item_type = 'QUESTION' ) "
+				+ "SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 JOIN skill_objective cmsession_skill ON ( T1.skill_objective = cmsession_skill. ID ) JOIN module_skill_session_skill_map ON ( module_skill_session_skill_map.session_skill_id = cmsession_skill.id ) join skill_objective module_skill on (module_skill_session_skill_map.module_skill_id = module_skill.id )";
 		if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
 			// System.out.println("getDataForTree in course"+getDataForTree);
 		}
@@ -480,27 +622,23 @@ public class AppCourseServices {
 
 		List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();
 		DBUTILS utils = new DBUTILS();
-		
+
 		CoreSkillService skillService = new CoreSkillService();
 		CourseLevelSkill courseLevelSkill = skillService.getShellSkillTreeForCourse(courseId);
-		ArrayList<Integer>sessionSkillId = new ArrayList<>();
-		if(courseLevelSkill!=null && courseLevelSkill.getModuleLevelSkill()!=null )
-		{
-			for(ModuleLevelSkill modskill : courseLevelSkill.getModuleLevelSkill())
-			{
+		ArrayList<Integer> sessionSkillId = new ArrayList<>();
+		if (courseLevelSkill != null && courseLevelSkill.getModuleLevelSkill() != null) {
+			for (ModuleLevelSkill modskill : courseLevelSkill.getModuleLevelSkill()) {
 				SkillReportPOJO modPojo = new SkillReportPOJO();
 				modPojo.setName(modskill.getSkillName().trim());
 				modPojo.setId(modskill.getId());
 				modPojo.setSkills(new ArrayList<>());
 				modPojo.setDescription("");
 				modPojo.setImageURL(null);
-				List<SkillReportPOJO> sessionsSkills = new ArrayList<>();	
-				for(SessionLevelSkill sessioLevelSkill : modskill.getSessionLevelSkill())
-				{
-					if(!sessionSkillId.contains(sessioLevelSkill.getId()))
-					{
+				List<SkillReportPOJO> sessionsSkills = new ArrayList<>();
+				for (SessionLevelSkill sessioLevelSkill : modskill.getSessionLevelSkill()) {
+					if (!sessionSkillId.contains(sessioLevelSkill.getId())) {
 						sessionSkillId.add(sessioLevelSkill.getId());
-					}	
+					}
 					SkillReportPOJO sessionSkill = new SkillReportPOJO();
 					sessionSkill.setId(sessioLevelSkill.getId());
 					sessionSkill.setName(sessioLevelSkill.getSkillName());
@@ -509,38 +647,35 @@ public class AppCourseServices {
 				}
 				modPojo.setSkills(sessionsSkills);
 				skillsReport.add(modPojo);
-			}	
+			}
 		}
-		
+
 		HashMap<Integer, Double> sessionSkillMaxPoints = new HashMap<>();
-		if(sessionSkillId.size()>0)
-		{
-			String getMAxPoints = "SELECT skill_objective_id, SUM ( custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (max_points, '0'), ':per_lesson_points', '" + per_lesson_points +"' ), ':per_assessment_points', '" + per_assessment_points + "' ), ':per_question_points', '" + per_question_points + "' ) ) AS TEXT ) ) ) AS max_points "
-					+ "FROM assessment_benchmark where skill_objective_id in ("+StringUtils.join(sessionSkillId,",")+") and course_id ="+courseId+" GROUP BY skill_objective_id";
+		if (sessionSkillId.size() > 0) {
+			String getMAxPoints = "SELECT skill_objective_id, SUM ( custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (max_points, '0'), ':per_lesson_points', '"
+					+ per_lesson_points + "' ), ':per_assessment_points', '" + per_assessment_points
+					+ "' ), ':per_question_points', '" + per_question_points + "' ) ) AS TEXT ) ) ) AS max_points "
+					+ "FROM assessment_benchmark where skill_objective_id in (" + StringUtils.join(sessionSkillId, ",")
+					+ ") and course_id =" + courseId + " GROUP BY skill_objective_id";
 			List<HashMap<String, Object>> treeStructure = utils.executeQuery(getMAxPoints);
 			for (HashMap<String, Object> treeRow : treeStructure) {
-				int skill_objective_id = (int)treeRow.get("skill_objective_id");
+				int skill_objective_id = (int) treeRow.get("skill_objective_id");
 				double maxPoints = (double) treeRow.get("max_points");
 				sessionSkillMaxPoints.put(skill_objective_id, maxPoints);
 			}
 		}
 		ArrayList<SkillReportPOJO> updatedTree = new ArrayList<>();
-		for(SkillReportPOJO modPojo : skillsReport)
-		{
+		for (SkillReportPOJO modPojo : skillsReport) {
 			SkillReportPOJO updatedMod = modPojo;
-			ArrayList<SkillReportPOJO>sessionSkills = new ArrayList<>();
-			for(SkillReportPOJO sessionPojo : modPojo.getSkills())
-			{
+			ArrayList<SkillReportPOJO> sessionSkills = new ArrayList<>();
+			for (SkillReportPOJO sessionPojo : modPojo.getSkills()) {
 				SkillReportPOJO sessionSkill = sessionPojo;
-				if(sessionSkillMaxPoints.containsKey(sessionPojo.getId()))
-				{
+				if (sessionSkillMaxPoints.containsKey(sessionPojo.getId())) {
 					sessionSkill.setTotalPoints(sessionSkillMaxPoints.get(sessionPojo.getId()));
-				}
-				else
-				{
+				} else {
 					sessionSkill.setTotalPoints(0d);
-				}	
-				
+				}
+
 				sessionSkills.add(sessionSkill);
 			}
 			updatedMod.setSkills(sessionSkills);
@@ -548,7 +683,7 @@ public class AppCourseServices {
 			updatedMod.calculateUserPoints();
 			updatedMod.calculateTotalPoints();
 			updatedTree.add(updatedMod);
-		}	
+		}
 		return updatedTree;
 	}
 
