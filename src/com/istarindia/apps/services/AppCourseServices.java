@@ -213,8 +213,9 @@ public class AppCourseServices {
 							ConcreteItemPOJO.setStatus(studentPlaylist.getStatus());
 							ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
 							if (modulePOJO.getSessions() != null && modulePOJO.getSessions().size() != 0) {
-								List<SessionPOJO> sessions = modulePOJO.getSessions();
-								for (SessionPOJO sessionPOJO : sessions) {
+								HashMap<Integer, SessionPOJO> sessions = new HashMap<>();
+								//List<SessionPOJO> sessions = modulePOJO.getSessions();
+								for (SessionPOJO sessionPOJO : modulePOJO.getSessions()) {
 									if (cmsession.getId() == (int) sessionPOJO.getId()) {
 										sessionPOJO.getLessons().add(ConcreteItemPOJO);
 									} else {
@@ -246,10 +247,17 @@ public class AppCourseServices {
 										} else {
 											pojo.setProgress(sessionProgress / i);
 										}
-										sessions.add(pojo);
+										//sessions.add(pojo);
+										sessions.put(pojo.getId(), pojo);
 									}
 								}
-								modulePOJO.setSessions(sessions);
+								
+								ArrayList<SessionPOJO> newSession = new ArrayList<>();
+								for(Integer i : sessions.keySet())
+								{
+									newSession.add(sessions.get(i));
+								}	
+								modulePOJO.setSessions(newSession);
 							} else {
 								SessionPOJO pojo = new SessionPOJO();
 								pojo.setId(cmsession.getId());
@@ -277,7 +285,24 @@ public class AppCourseServices {
 								} else {
 									pojo.setProgress(sessionProgress / i);
 								}
-								modulePOJO.getSessions().add(pojo);
+								
+								ArrayList<SessionPOJO> newSession = new ArrayList<>();
+								boolean alreadyPresent = false;
+								for(SessionPOJO ss :modulePOJO.getSessions())
+								{
+									if(ss.getId()==pojo.getId())
+									{
+										alreadyPresent= true;
+									}	
+									newSession.add(ss);
+								}	
+								if(!alreadyPresent)
+								{
+									newSession.add(pojo);
+								}
+									
+								modulePOJO.setSessions(newSession);
+								
 							}
 
 							coursePOJO.getModules().add(modulePOJO);
@@ -351,43 +376,51 @@ public class AppCourseServices {
 							ConcreteItemPOJO.setStatus(studentPlaylist.getStatus());
 							ConcreteItemPOJO.setTaskId(studentPlaylist.getTaskId());
 							if (modulePOJO.getSessions() != null && modulePOJO.getSessions().size() != 0) {
+								
 								List<SessionPOJO> sessions = modulePOJO.getSessions();
+								boolean alraydyAdded = false;
 								for (SessionPOJO sessionPOJO : sessions) {
 									if (cmsession.getId() == (int) sessionPOJO.getId()) {
 										sessionPOJO.getLessons().add(ConcreteItemPOJO);
-									} else {
-
-										SessionPOJO pojo = new SessionPOJO();
-										pojo.setId(cmsession.getId());
-										pojo.setName(cmsession.getTitle());
-										pojo.setDescription(cmsession.getDescription() != null
-												? cmsession.getDescription() : "Not Available");
-										pojo.setImageURL(
-												cmsession.getImage_url() != null ? cmsession.getImage_url() : "");
-										pojo.setOrderId(studentPlaylist.getId());
-
-										List<ConcreteItemPOJO> concreteItemPOJOs = new ArrayList();
-										concreteItemPOJOs.add(ConcreteItemPOJO);
-										pojo.setLessons(concreteItemPOJOs);
-										int sessionProgress = 0;
-										int i = 0;
-
-										if (pojo.getLessons() != null && pojo.getLessons().size() != 0) {
-											for (ConcreteItemPOJO itemPOJO : pojo.getLessons()) {
-												i++;
-												sessionProgress += itemPOJO.getProgress() != null
-														? itemPOJO.getProgress() : 0;
-											}
-										}
-
-										if (i == 0) {
-											pojo.setProgress(0);
-										} else {
-											pojo.setProgress(sessionProgress / i);
-										}
-										sessions.add(pojo);
-									}
+										alraydyAdded=true;
+									} 
+									
 								}
+								
+								if(!alraydyAdded)
+								{
+									SessionPOJO pojo = new SessionPOJO();
+									pojo.setId(cmsession.getId());
+									pojo.setName(cmsession.getTitle());
+									pojo.setDescription(cmsession.getDescription() != null
+											? cmsession.getDescription() : "Not Available");
+									pojo.setImageURL(
+											cmsession.getImage_url() != null ? cmsession.getImage_url() : "");
+									pojo.setOrderId(studentPlaylist.getId());
+
+									List<ConcreteItemPOJO> concreteItemPOJOs = new ArrayList();
+									concreteItemPOJOs.add(ConcreteItemPOJO);
+									pojo.setLessons(concreteItemPOJOs);
+									int sessionProgress = 0;
+									int i = 0;
+
+									if (pojo.getLessons() != null && pojo.getLessons().size() != 0) {
+										for (ConcreteItemPOJO itemPOJO : pojo.getLessons()) {
+											i++;
+											sessionProgress += itemPOJO.getProgress() != null
+													? itemPOJO.getProgress() : 0;
+										}
+									}
+
+									if (i == 0) {
+										pojo.setProgress(0);
+									} else {
+										pojo.setProgress(sessionProgress / i);
+									}
+									
+									
+									sessions.add(pojo);
+								}	
 								modulePOJO.setSessions(sessions);
 							} else {
 								SessionPOJO pojo = new SessionPOJO();
@@ -416,7 +449,19 @@ public class AppCourseServices {
 								} else {
 									pojo.setProgress(sessionProgress / i);
 								}
-								modulePOJO.getSessions().add(pojo);
+								
+								boolean alreaydthr =false;
+								for(SessionPOJO ss: modulePOJO.getSessions())
+								{
+									if (ss.getId()==pojo.getId()) {
+										alreaydthr=true;
+									}
+								}
+								if(!alreaydthr)
+								{
+									modulePOJO.getSessions().add(pojo);
+								}	
+								
 							}
 						}
 

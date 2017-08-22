@@ -184,12 +184,12 @@ public class RESTAssessmentService {
 				Report report = reportServices.getAssessmentReportForUser(istarUserId, assessmentId);
 				GamificationServices gamificationService = new GamificationServices();
 				if (report == null) {
-					//System.out.println("Report is null, creating new report");
+					//System.err.println("Report is null, creating new report");
 					reportServices.createReport(istarUser, assessment, correctAnswersCount, assessmentDuration,
 							maxPoints.intValue());
 					gamificationService.updateUserGamificationAfterAssessment(istarUser,assessment);
 				} else {
-					//System.out.println("Report exists, updating report");
+					//System.err.println("Report exists, updating report");
 					if(assessment.getRetryAble()!=null && assessment.getRetryAble())
 					{
 						reportServices.updateReport(report, istarUser, assessment, correctAnswersCount, assessmentDuration,maxPoints.intValue());
