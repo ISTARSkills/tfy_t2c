@@ -266,7 +266,7 @@ public class RESTLessonService {
 				String updateStudentPlayList = "update student_playlist set status='COMPLETED' where lesson_id = "+lessonId+" and student_id="+userId;
 				util.executeUpdate(updateStudentPlayList);
 				
-				String updateStudentPlayList1 = "update  task set is_active='f' where id in("+task_id+")";
+				String updateStudentPlayList1 = "update  task set is_active='f', updated_at=now() where id in("+task_id+")";
 				////System.err.println("updateStudentPlayList1--->"+updateStudentPlayList1);
 				util.executeUpdate(updateStudentPlayList1);
 				
