@@ -25,6 +25,7 @@ import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.android.utility.AppUserRankUtility;
 import com.istarindia.apps.factories.TaskFactory;
 import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
@@ -37,17 +38,13 @@ public class AppComplexObjectServices {
 
 		ComplexObject complexObject = null;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUser = istarUserServices.getIstarUser(userId);
+		IstarUser istarUser = new IstarUserDAO().findById(userId);
 		if (istarUser != null) {
 			complexObject = new ComplexObject();
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
-			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
 			AppCourseServices appCourseServices = new AppCourseServices();
 			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
-			AppServices appServices = new AppServices();
 			StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 			TaskServices taskServices = new TaskServices();
 			// Id
@@ -56,19 +53,7 @@ public class AppComplexObjectServices {
 			// Student Profile
 			StudentProfile studentProfile = appPOJOUtility.getStudentProfile(istarUser);
 			complexObject.setStudentProfile(studentProfile);
-			if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-				// System.err.println(
-				// "complexObject StudentProfile " + "Time->" +
-				// (System.currentTimeMillis() - previousTime));
-
-			}
-			// Skills -- to be changed
-			List<SkillReportPOJO> allSkills = appServices.getSkillsMapOfUser(userId);
-			complexObject.setSkills(allSkills);
-
-			// System.err.println("complexObject allSkills->" + allSkills.size()
-			// + "Time->" + (System.currentTimeMillis()-previousTime));
-
+			
 			// Tasks
 			List<Task> allTaskOfUser = taskServices.getAllTaskOfActorForToday(istarUser);
 			List<TaskSummaryPOJO> tasks = new ArrayList<TaskSummaryPOJO>();
@@ -78,12 +63,9 @@ public class AppComplexObjectServices {
 			for (Task task : allTaskOfUser) {
 				TaskSummaryPOJO taskSummaryPOJO = null;
 				taskSummaryPOJO = factory.getTaskSummary(task);
-
 				try {
 					if (taskSummaryPOJO != null) {
-						if (((null != taskSummaryPOJO.getDate() && sdf.parse(sdf.format(taskSummaryPOJO.getDate()))
-								.compareTo(sdf.parse(sdf.format(new Date()))) == 0)
-								|| (null != taskSummaryPOJO.getCompletedDate()
+						if (((null != taskSummaryPOJO.getDate() && sdf.parse(sdf.format(taskSummaryPOJO.getDate())).compareTo(sdf.parse(sdf.format(new Date()))) == 0)	|| (null != taskSummaryPOJO.getCompletedDate()
 										&& (sdf.parse(sdf.format(taskSummaryPOJO.getCompletedDate()))
 												.compareTo(sdf.parse(sdf.format(new Date()))) == 0)))) {
 							if (taskSummaryPOJO.getStatus().equals("COMPLETED")) {
@@ -111,53 +93,37 @@ public class AppComplexObjectServices {
 					taskSummaryPOJO.setMessageForIncompleteTasks(messageForIncompleteTasks);
 				}
 			}
-			// System.err.println("complexObject allTaskSummary->" +
-			// totalTaskSize + "Time->" +
-			// (System.currentTimeMillis()-previousTime));
+			 System.err.println("complexObject allTaskSummary->" +
+			 totalTaskSize + "Time->" +
+			 (System.currentTimeMillis()-previousTime));
 			// Assessment Reports
-			List<AssessmentReportPOJO> allAssessmentReport = appAssessmentServices
-					.getAllAssessmentReportsOfUser(userId);
+			List<AssessmentReportPOJO> allAssessmentReport = appAssessmentServices.getAllAssessmentReportsOfUser(userId);
 			complexObject.setAssessmentReports(allAssessmentReport);
-			// System.err.println("complexObject allAssessmentReport->" +
-			// allAssessmentReport.size() + "Time->" +
-			// (System.currentTimeMillis()-previousTime));
+			System.err.println("complexObject allAssessmentReport->" +allAssessmentReport.size() + "Time->" +(System.currentTimeMillis()-previousTime));
 			// Courses
 			List<CoursePOJO> allCoursePOJO = new ArrayList<CoursePOJO>();
 			List<Integer> allCourseId = studentPlaylistServices.getCoursesforUser(userId);
 			for (Integer courseId : allCourseId) {
-				CoursePOJO coursePOJO = appCourseServices.getCourseOfUser(userId, courseId);
-				if (coursePOJO != null) {
-					coursePOJO.setSkillObjectives(appCourseServices.getSkillsReportForCourseOfUser(userId, courseId));
+				CoursePOJO coursePOJO = appCourseServices.getCoursePojoForUser(userId, courseId);
+				if (coursePOJO != null) {				
 					allCoursePOJO.add(coursePOJO);
 				}
 			}
 			complexObject.setCourses(allCoursePOJO);
-			// System.err.println("complexObject allCoursePOJO->" +
-			// allCoursePOJO.size() + "Time->" +
-			// (System.currentTimeMillis()-previousTime));
-			// CourseRanks - Leaderboard
-			/*
-			 * Set<Integer> allCourseIdSet = new HashSet<Integer>(allCourseId);
-			 */
+			System.err.println("complexObject allCoursePOJO->" +allCoursePOJO.size() + "Time->" +(System.currentTimeMillis()-previousTime));
 			List<CourseRankPOJO> allCourseRanks = appUserRankUtility.getCourseRankPOJOForCoursesOfUsersBatch(userId);
 			complexObject.setLeaderboards(allCourseRanks);
-			// System.err.println("complexObject allCourseRanks->" +
-			// allCourseRanks.size() + "Time->" +
-			// (System.currentTimeMillis()-previousTime));
+			System.err.println("complexObject allCourseRanks->" +allCourseRanks.size() + "Time->" +(System.currentTimeMillis()-previousTime));
 			// Events
 			AppCalendarServices appCalendarServices = new AppCalendarServices();
 			List<DailyTaskPOJO> allTaskEvents = appCalendarServices.getAllTask(userId);
 			complexObject.setEvents(allTaskEvents);
-			// System.err.println("complexObject allTaskEvents->" +
-			// allTaskEvents.size() + "Time->" +
-			// (System.currentTimeMillis()-previousTime));
+			System.err.println("complexObject allTaskEvents->" +allTaskEvents.size() + "Time->" +(System.currentTimeMillis()-previousTime));
 
 			AppNotificationServices appNotificationServices = new AppNotificationServices();
 			List<NotificationPOJO> allNotifications = appNotificationServices.getNotificationsForUser(userId);
 			complexObject.setNotifications(allNotifications);
-			// System.err.println("complexObject allNotifications->" +
-			// allNotifications.size() + "Time->" +
-			// (System.currentTimeMillis()-previousTime));
+			System.err.println("complexObject allNotifications->" +allNotifications.size() + "Time->" +(System.currentTimeMillis()-previousTime));
 		}
 		return complexObject;
 	}

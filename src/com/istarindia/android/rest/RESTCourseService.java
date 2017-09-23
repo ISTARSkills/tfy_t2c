@@ -27,11 +27,11 @@ public class RESTCourseService {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			AppCourseServices appCourseServices = new AppCourseServices();
-			CoursePOJO coursePOJO = appCourseServices.getCourseOfUser(istarUserId, courseId);
+			CoursePOJO coursePOJO = appCourseServices.getCoursePojoForUser(istarUserId, courseId);
 			if(coursePOJO==null){
 				throw new Exception();
 			}
-			coursePOJO.setSkillObjectives(appCourseServices.getSkillsReportForCourseOfUser(istarUserId, courseId));
+			
 
 			String result = gson.toJson(coursePOJO);
 
@@ -54,9 +54,9 @@ public class RESTCourseService {
 			List<Integer> allCourseId = studentPlaylistServices.getCoursesforUser(istarUserId);
 			AppCourseServices appCourseServices = new AppCourseServices();
 			for(Integer courseId : allCourseId){
-				CoursePOJO coursePOJO = appCourseServices.getCourseOfUser(istarUserId, courseId);
+				CoursePOJO coursePOJO = appCourseServices.getCoursePojoForUser(istarUserId, courseId);
 				coursePOJO.setImageURL(coursePOJO.getImageURL().replaceAll("/video//video/", "/video/"));
-				coursePOJO.setSkillObjectives(appCourseServices.getSkillsReportForCourseOfUser(istarUserId, courseId));
+				
 				allCoursePOJO.add(coursePOJO);
 			}
 

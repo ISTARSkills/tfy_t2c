@@ -24,12 +24,14 @@ import com.istarindia.apps.services.AppAssessmentServices;
 import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.TrainerWorkflowServices;
 import com.viksitpro.core.dao.entities.Assessment;
+import com.viksitpro.core.dao.entities.AssessmentDAO;
 import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Task;
+import com.viksitpro.core.utilities.AppProperies;
 import com.viksitpro.core.utilities.DBUTILS;
 import com.viksitpro.core.utilities.TaskItemCategory;
 
@@ -44,11 +46,10 @@ public class TaskSummaryPojoCreator {
 		TaskSummaryPOJO taskSummaryPOJO = null;
 		
 		AppAssessmentServices appAssessmentServices= new AppAssessmentServices();
-		Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());
-		AppCourseServices appCourseServices = new AppCourseServices();
+		Assessment assessment = new AssessmentDAO().findById(task.getItemId());
 
 		if(assessment!=null && assessment.getAssessmentQuestions().size()>0){
-			Course course = appCourseServices.getCourse(assessment.getCourse());
+			Lesson lesson = assessment.getLesson();
 			taskSummaryPOJO = new TaskSummaryPOJO();
 			
 			taskSummaryPOJO.setId(task.getId());
@@ -78,7 +79,7 @@ public class TaskSummaryPojoCreator {
 			}	
 			
 			if(assessment.getDescription()==null){
-				taskSummaryPOJO.setDescription(course.getCourseDescription());
+				taskSummaryPOJO.setDescription(lesson.getDescription());
 			}else{
 				taskSummaryPOJO.setDescription(assessment.getDescription());
 			}
@@ -88,24 +89,9 @@ public class TaskSummaryPojoCreator {
 	}
 
 	public TaskSummaryPOJO getLessonTask(Task task) {
-		String mediaUrlPath ="";
-		try{
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-				if (inputStream != null) {
-					properties.load(inputStream);
-					mediaUrlPath =  properties.getProperty("media_url_path");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			
-		}
-		
+		String mediaUrlPath =AppProperies.getProperty("media_url_path");				
 		TaskSummaryPOJO taskSummaryPOJO = null;
-		
-		AppCourseServices appCourseServices= new AppCourseServices();
-		Lesson lesson = appCourseServices.getLesson(task.getItemId());
+		Lesson lesson = new LessonDAO().findById(task.getItemId());
 		if(!task.getState().equalsIgnoreCase("CREATED"))
 		{
 			if(lesson!=null){
@@ -138,28 +124,11 @@ public class TaskSummaryPojoCreator {
 
 	public TaskSummaryPOJO getClassRoomSessionTask(Task task) {
 		
-		String mediaUrlPath ="";
-		try{
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-				if (inputStream != null) {
-					properties.load(inputStream);
-					mediaUrlPath =  properties.getProperty("media_url_path");
-					//System.out.println("media_url_path"+mediaUrlPath);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			
-		}
-		
+		String mediaUrlPath =AppProperies.getProperty("media_url_path");;		
 		TaskSummaryPOJO taskSummaryPOJO = null;		
-		AppCourseServices appCourseServices= new AppCourseServices();
-		//Lesson lesson = appCourseServices.getLesson(task.getItemId());
 		DBUTILS util = new DBUTILS();
 		String getEventdetails="select T1.*, pincode.lattiude, pincode.longitude,address.addressline1|| ' ' ||address.addressline2 as address from  (select batch_schedule_event.eventhour, batch_schedule_event.eventminute, batch_group.name as group_name, batch_group.id as group_id, classroom_details.id as classroom_id, classroom_details.classroom_identifier  as classroom_name, organization.address_id as address_id, organization.name as org_name, course.course_name as course_name, batch_schedule_event.eventdate, course.image_url   from task, batch_schedule_event, classroom_details, organization, course	, batch_group where task.item_id = batch_schedule_event.id and batch_schedule_event.classroom_id = classroom_details.id and classroom_details.organization_id = organization.id and batch_schedule_event.batch_group_id = batch_group.id and batch_schedule_event.course_id = course.id and task.item_type ='CLASSROOM_SESSION' and task.id = "+task.getId()+" )T1 left join address on (address.id = T1.address_id) join pincode on (address.pincode_id = pincode.id)";		
-		List<HashMap<String, Object>> eventData = util.executeQuery(getEventdetails);
-		
+		List<HashMap<String, Object>> eventData = util.executeQuery(getEventdetails);		
 		if(eventData.size()>0)
 		{
 			for(HashMap<String, Object> row: eventData)
@@ -282,23 +251,9 @@ public class TaskSummaryPojoCreator {
 	public TaskSummaryPOJO getClassroomSessionStudent(Task task) {
 
 		
-		String mediaUrlPath ="";
-		try{
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-				if (inputStream != null) {
-					properties.load(inputStream);
-					mediaUrlPath =  properties.getProperty("media_url_path");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			
-		}
+		String mediaUrlPath =AppProperies.getProperty("media_url_path");;
 		
 		TaskSummaryPOJO taskSummaryPOJO = null;		
-		AppCourseServices appCourseServices= new AppCourseServices();
-		//Lesson lesson = appCourseServices.getLesson(task.getItemId());
 		DBUTILS util = new DBUTILS();
 		String getEventdetails="select T1.*, pincode.lattiude, pincode.longitude,address.addressline1|| ' ' ||address.addressline2 as address from  (select batch_schedule_event.eventhour, batch_schedule_event.eventminute, batch_group.name as group_name, batch_group.id as group_id, classroom_details.id as classroom_id, classroom_details.classroom_identifier  as classroom_name, organization.address_id as address_id, organization.name as org_name, course.course_name as course_name, batch_schedule_event.eventdate, course.image_url   from task, batch_schedule_event, classroom_details, organization, course	, batch_group where task.item_id = batch_schedule_event.id and batch_schedule_event.classroom_id = classroom_details.id and classroom_details.organization_id = organization.id and batch_schedule_event.batch_group_id = batch_group.id and batch_schedule_event.course_id = course.id and task.item_type ='CLASSROOM_SESSION_STUDENT' and task.id = "+task.getId()+" )T1 left join address on (address.id = T1.address_id) join pincode on (address.pincode_id = pincode.id)";		
 		List<HashMap<String, Object>> eventData = util.executeQuery(getEventdetails);
@@ -371,19 +326,7 @@ public class TaskSummaryPojoCreator {
 	}
 
 	public TaskSummaryPOJO getZoomIntervieweeTask(Task task) {
-		String mediaUrlPath ="";
-		try{
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-				if (inputStream != null) {
-					properties.load(inputStream);
-					mediaUrlPath =  properties.getProperty("media_url_path");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			
-		}
+		String mediaUrlPath =AppProperies.getProperty("media_url_path");
 		TaskSummaryPOJO taskSummaryPOJO = null;
 		DBUTILS util = new DBUTILS();
 		String getTaskDetails ="SELECT 	interviewer.first_name AS interviewer_name, 	interviewee.first_name AS interviewee_name, 	course.course_name, start_url, join_url FROM 	interview_task_details, 	task, 	user_profile interviewer, 	user_profile interviewee, 	course WHERE 	interview_task_details.task_id = "+task.getId()+" AND interview_task_details.course_id = course. ID AND interview_task_details.interviewee_id = interviewee.user_id AND interview_task_details.interviewer_id = interviewer.user_id";
@@ -404,8 +347,6 @@ public class TaskSummaryPojoCreator {
 				joinUrl =row.get("join_url").toString();
 			}
 			
-			
-			AppCourseServices appCourseServices= new AppCourseServices();
 			taskSummaryPOJO = new TaskSummaryPOJO();
 			taskSummaryPOJO.setId(task.getId());
 			taskSummaryPOJO.setItemId(task.getItemId());
@@ -448,19 +389,8 @@ public class TaskSummaryPojoCreator {
 
 	public TaskSummaryPOJO getZoomInterviewerTask(Task task) {
 
-		String mediaUrlPath ="";
-		try{
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-				if (inputStream != null) {
-					properties.load(inputStream);
-					mediaUrlPath =  properties.getProperty("media_url_path");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			
-		}
+		String mediaUrlPath =AppProperies.getProperty("media_url_path");
+
 		TaskSummaryPOJO taskSummaryPOJO = null;
 		DBUTILS util = new DBUTILS();
 		String getTaskDetails ="SELECT 	interviewer.first_name AS interviewer_name, 	interviewee.first_name AS interviewee_name, 	course.course_name, start_url, join_url, interviewer_id,interviewee_id, course_id FROM 	interview_task_details, 	task, 	user_profile interviewer, 	user_profile interviewee, 	course WHERE 	interview_task_details.task_id = "+task.getId()+" AND interview_task_details.course_id = course. ID AND interview_task_details.interviewee_id = interviewee.user_id AND interview_task_details.interviewer_id = interviewer.user_id";
@@ -486,10 +416,6 @@ public class TaskSummaryPojoCreator {
 				interviewerId =row.get("interviewer_id").toString();
 				intervieweeId =row.get("interviewee_id").toString();
 			}
-			
-			  
-			
-			AppCourseServices appCourseServices= new AppCourseServices();
 			taskSummaryPOJO = new TaskSummaryPOJO();
 			taskSummaryPOJO.setId(task.getId());
 			taskSummaryPOJO.setItemId(task.getItemId());
@@ -569,24 +495,8 @@ public class TaskSummaryPojoCreator {
 	public TaskSummaryPOJO getTrainerWebinarTask(Task task) {
 
 		
-		String mediaUrlPath ="";
-		try{
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-				if (inputStream != null) {
-					properties.load(inputStream);
-					mediaUrlPath =  properties.getProperty("media_url_path");
-					//System.out.println("media_url_path"+mediaUrlPath);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			
-		}
-		
+		String mediaUrlPath =AppProperies.getProperty("media_url_path");		
 		TaskSummaryPOJO taskSummaryPOJO = null;		
-		AppCourseServices appCourseServices= new AppCourseServices();
-		//Lesson lesson = appCourseServices.getLesson(task.getItemId());
 		DBUTILS util = new DBUTILS();
 		String getEventdetails="select T1.*, pincode.lattiude, pincode.longitude,address.addressline1|| ' ' ||address.addressline2 as address from  (select batch_schedule_event.eventhour, batch_schedule_event.eventminute, batch_group.name as group_name, batch_group.id as group_id, classroom_details.id as classroom_id, classroom_details.classroom_identifier  as classroom_name, organization.address_id as address_id, organization.name as org_name, course.course_name as course_name, batch_schedule_event.eventdate, course.image_url   from task, batch_schedule_event, classroom_details, organization, course	, batch_group where task.item_id = batch_schedule_event.id and batch_schedule_event.classroom_id = classroom_details.id and classroom_details.organization_id = organization.id and batch_schedule_event.batch_group_id = batch_group.id and batch_schedule_event.course_id = course.id and task.item_type ='"+TaskItemCategory.WEBINAR_TRAINER+"' and task.id = "+task.getId()+" )T1 left join address on (address.id = T1.address_id) join pincode on (address.pincode_id = pincode.id)";		
 		List<HashMap<String, Object>> eventData = util.executeQuery(getEventdetails);		
@@ -671,23 +581,8 @@ public class TaskSummaryPojoCreator {
 
 
 		
-		String mediaUrlPath ="";
-		try{
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-				if (inputStream != null) {
-					properties.load(inputStream);
-					mediaUrlPath =  properties.getProperty("media_url_path");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			
-		}
-		
+		String mediaUrlPath =AppProperies.getProperty("media_url_path");
 		TaskSummaryPOJO taskSummaryPOJO = null;		
-		AppCourseServices appCourseServices= new AppCourseServices();
-		//Lesson lesson = appCourseServices.getLesson(task.getItemId());
 		DBUTILS util = new DBUTILS();
 		String getEventdetails="select T1.*, pincode.lattiude, pincode.longitude,address.addressline1|| ' ' ||address.addressline2 as address from  (select batch_schedule_event.eventhour, batch_schedule_event.eventminute, batch_group.name as group_name, batch_group.id as group_id, classroom_details.id as classroom_id, classroom_details.classroom_identifier  as classroom_name, organization.address_id as address_id, organization.name as org_name, course.course_name as course_name, batch_schedule_event.eventdate, course.image_url   from task, batch_schedule_event, classroom_details, organization, course	, batch_group where task.item_id = batch_schedule_event.id and batch_schedule_event.classroom_id = classroom_details.id and classroom_details.organization_id = organization.id and batch_schedule_event.batch_group_id = batch_group.id and batch_schedule_event.course_id = course.id and task.item_type ='"+TaskItemCategory.WEBINAR_STUDENT+"' and task.id = "+task.getId()+" )T1 left join address on (address.id = T1.address_id) join pincode on (address.pincode_id = pincode.id)";		
 		List<HashMap<String, Object>> eventData = util.executeQuery(getEventdetails);
@@ -769,27 +664,8 @@ public class TaskSummaryPojoCreator {
 	}
 
 	public TaskSummaryPOJO getTrainerRemoteTask(Task task) {
-
-
-
-		
-		String mediaUrlPath ="";
-		try{
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-				if (inputStream != null) {
-					properties.load(inputStream);
-					mediaUrlPath =  properties.getProperty("media_url_path");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			
-		}
-		
+		String mediaUrlPath =AppProperies.getProperty("media_url_path");		
 		TaskSummaryPOJO taskSummaryPOJO = null;		
-		AppCourseServices appCourseServices= new AppCourseServices();
-		//Lesson lesson = appCourseServices.getLesson(task.getItemId());
 		DBUTILS util = new DBUTILS();
 		String getEventdetails="select T1.*, pincode.lattiude, pincode.longitude,address.addressline1|| ' ' ||address.addressline2 as address from  (select batch_schedule_event.eventhour, batch_schedule_event.eventminute, batch_group.name as group_name, batch_group.id as group_id, classroom_details.id as classroom_id, classroom_details.classroom_identifier  as classroom_name, organization.address_id as address_id, organization.name as org_name, course.course_name as course_name, batch_schedule_event.eventdate, course.image_url   from task, batch_schedule_event, classroom_details, organization, course	, batch_group where task.item_id = batch_schedule_event.id and batch_schedule_event.classroom_id = classroom_details.id and classroom_details.organization_id = organization.id and batch_schedule_event.batch_group_id = batch_group.id and batch_schedule_event.course_id = course.id and task.item_type ='"+TaskItemCategory.REMOTE_CLASS_TRAINER+"' and task.id = "+task.getId()+" )T1 left join address on (address.id = T1.address_id) join pincode on (address.pincode_id = pincode.id)";		
 		List<HashMap<String, Object>> eventData = util.executeQuery(getEventdetails);
@@ -852,9 +728,7 @@ public class TaskSummaryPojoCreator {
 				taskSummaryPOJO.setTitle(title);
 				taskSummaryPOJO.setDescription(null);
 				taskSummaryPOJO.setImageURL(mediaUrlPath+taskImage);
-				taskSummaryPOJO.setDuration(totalduration);
-				
-			
+				taskSummaryPOJO.setDuration(totalduration);							
 			}
 		}
 		
@@ -862,27 +736,9 @@ public class TaskSummaryPojoCreator {
 	}
 
 	public TaskSummaryPOJO getStudentRemoteTask(Task task) {
-
-
-
-		
-		String mediaUrlPath ="";
-		try{
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-				if (inputStream != null) {
-					properties.load(inputStream);
-					mediaUrlPath =  properties.getProperty("media_url_path");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			
-		}
+		String mediaUrlPath =AppProperies.getProperty("media_url_path");
 		
 		TaskSummaryPOJO taskSummaryPOJO = null;		
-		AppCourseServices appCourseServices= new AppCourseServices();
-		//Lesson lesson = appCourseServices.getLesson(task.getItemId());
 		DBUTILS util = new DBUTILS();
 		String getEventdetails="select T1.*, pincode.lattiude, pincode.longitude,address.addressline1|| ' ' ||address.addressline2 as address from  (select batch_schedule_event.eventhour, batch_schedule_event.eventminute, batch_group.name as group_name, batch_group.id as group_id, classroom_details.id as classroom_id, classroom_details.classroom_identifier  as classroom_name, organization.address_id as address_id, organization.name as org_name, course.course_name as course_name, batch_schedule_event.eventdate, course.image_url   from task, batch_schedule_event, classroom_details, organization, course	, batch_group where task.item_id = batch_schedule_event.id and batch_schedule_event.classroom_id = classroom_details.id and classroom_details.organization_id = organization.id and batch_schedule_event.batch_group_id = batch_group.id and batch_schedule_event.course_id = course.id and task.item_type ='"+TaskItemCategory.REMOTE_CLASS_STUDENT+"' and task.id = "+task.getId()+" )T1 left join address on (address.id = T1.address_id) join pincode on (address.pincode_id = pincode.id)";		
 		List<HashMap<String, Object>> eventData = util.executeQuery(getEventdetails);

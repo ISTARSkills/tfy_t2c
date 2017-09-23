@@ -214,7 +214,7 @@ public class RESTDashboardService {
 					appDashboardUtility.updateStudentPlaylistStatus(task.getItemId(), userId, "COMPLETED");
 					GamificationServices gmService = new GamificationServices();
 					Lesson lesson = new LessonDAO().findById(task.getItemId());
-					gmService.updatePointsAndCoinsOnLessonComplete(istarUser, lesson);
+					gmService.updatePointsAndCoinsOnLessonComplete(istarUser, lesson);					
 				}
 
 			}else{

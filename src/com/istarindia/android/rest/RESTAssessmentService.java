@@ -178,7 +178,7 @@ public class RESTAssessmentService {
 					}
 				}
 
-				Double maxPoints = appAssessmentServices.getMaxPointsOfAssessment(assessment.getId());
+				Double maxPoints = 0d;
 
 				ReportServices reportServices = new ReportServices();
 				Report report = reportServices.getAssessmentReportForUser(istarUserId, assessmentId);
@@ -188,12 +188,18 @@ public class RESTAssessmentService {
 					reportServices.createReport(istarUser, assessment, correctAnswersCount, assessmentDuration,
 							maxPoints.intValue());
 					gamificationService.updateUserGamificationAfterAssessment(istarUser,assessment);
+					gamificationService.updateUserPointsCoinsStatsTable(istarUserId);
+					gamificationService.updateLeaderBoard(istarUserId);
+					gamificationService.updateUserAssessmentPointsCoinsTable(istarUserId, assessmentId);
 				} else {
 					//System.err.println("Report exists, updating report");
 					if(assessment.getRetryAble()!=null && assessment.getRetryAble())
 					{
 						reportServices.updateReport(report, istarUser, assessment, correctAnswersCount, assessmentDuration,maxPoints.intValue());
 						gamificationService.updateUserGamificationAfterAssessment(istarUser,assessment);
+						gamificationService.updateUserPointsCoinsStatsTable(istarUserId);
+						gamificationService.updateLeaderBoard(istarUserId);
+						gamificationService.updateUserAssessmentPointsCoinsTable(istarUserId, assessmentId);
 					}	
 				}
 
@@ -286,7 +292,7 @@ public class RESTAssessmentService {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
-			AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReport(userId, assessmentId);
+			AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReportNew(userId, assessmentId);
 			String result = gson.toJson(assessmentReportPOJO);
 
 			return Response.ok(result).build();

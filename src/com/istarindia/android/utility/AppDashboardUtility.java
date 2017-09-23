@@ -2,6 +2,7 @@ package com.istarindia.android.utility;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -17,6 +18,7 @@ import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Task;
+import com.viksitpro.core.utilities.DBUTILS;
 
 public class AppDashboardUtility {
 
@@ -112,6 +114,8 @@ public class AppDashboardUtility {
 		
 		}
 	}
+
+
 
 /*	public Object getDashboardCardForLessonTest(Task task) {
 
