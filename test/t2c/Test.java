@@ -17,6 +17,7 @@ import com.viksitpro.core.dao.entities.AssessmentDAO;
 import com.viksitpro.core.dao.entities.Cmsession;
 import com.viksitpro.core.dao.entities.Context;
 import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Module;
@@ -36,13 +37,59 @@ public class Test {
 			//updateleaderboard();
 			//checkLessonAssessMap();
 			//checkarraytostring();
-			updateAsessmentStats();
+			//updateAsessmentStats();
+			updateUserGamificationForLesson();
+			updateUserGamificationForAssess();
+			updateLeaderBoard();
 			System.out.println("end");
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	private static void updateLeaderBoard() {
+		// TODO Auto-generated method stub
+		DBUTILS util =new DBUTILS();
+		GamificationServices serv =  new GamificationServices();
+		String sql ="select distinct user_id from user_points_coins";
+		List<HashMap<String, Object>> dd= util.executeQuery(sql);
+		for(HashMap<String, Object> row: dd)
+		{
+			int userId = (int)row.get("user_id");
+			serv.updateLeaderBoard(userId);
+		}
+	}
+
+	private static void updateUserGamificationForAssess() {
+		// TODO Auto-generated method stub
+		DBUTILS util = new DBUTILS();
+		GamificationServices serv= new GamificationServices();
+		String sql="select DISTINCT user_id, assessment_id from report";
+		List<HashMap<String, Object>> dd = util.executeQuery(sql);
+		for(HashMap<String, Object> row: dd)
+		{
+			int stuId = (int)row.get("user_id");
+			int assessment_id = (int)row.get("assessment_id");
+			System.out.println("assessment_id "+assessment_id+" student id "+stuId);
+			serv.updateUserGamificationAfterAssessment(new IstarUserDAO().findById(stuId), new AssessmentDAO().findById(assessment_id));
+		}
+	}
+
+	private static void updateUserGamificationForLesson() {
+		// TODO Auto-generated method stub
+		DBUTILS util = new DBUTILS();
+		GamificationServices serv= new GamificationServices();
+		String sql="select DISTINCT student_id, lesson_id from student_playlist where status ='COMPLETED'";
+		List<HashMap<String, Object>> dd = util.executeQuery(sql);
+		for(HashMap<String, Object> row: dd)
+		{
+			int stuId = (int)row.get("student_id");
+			int lessonId = (int)row.get("lesson_id");
+			System.out.println("lesson "+lessonId+" student id "+stuId);
+			serv.updatePointsAndCoinsOnLessonComplete(new IstarUserDAO().findById(stuId), new LessonDAO().findById(lessonId));
+		}
 	}
 	
 	private static void updateAsessmentStats() {
@@ -94,24 +141,6 @@ public class Test {
 
 	public static void test(){
 		
-		AppCourseServices appCourseServices = new AppCourseServices();
-		StudentPlaylistServices StudentPlaylistServices= new StudentPlaylistServices();
-		for(StudentPlaylist sp : (new StudentPlaylistDAO()).findAll()){
-			if(sp.getModule()!=null || sp.getCmsession()!=null){
-			////System.out.println("Updating--->"+ sp.getId());
-			Module module = appCourseServices.getModuleOfLesson(sp.getLesson().getId());
-			if(module!=null){
-				List<Cmsession> allCmsessions =  appCourseServices.getCmsessionsOfModule(module.getId());
-				if(allCmsessions.size()>0){
-/*					sp.setModule(module);
-					sp.setCmsession(allCmsessions.get(0));
-					StudentPlaylistServices.updateStudentPlaylistToDAO(sp);
-					//System.out.println("Updated--->"+ sp.getId());*/
-					//System.out.println("UPDATE student_playlist SET module_id="+module.getId()+" , cmsession_id="+allCmsessions.get(0).getId()+" WHERE (id="+sp.getId()+");");
-				}
-			}
-			}
-		}
 		//System.out.println("Finished");
 	}
 }

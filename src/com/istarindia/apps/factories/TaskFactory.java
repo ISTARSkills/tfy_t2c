@@ -4,7 +4,6 @@
 package com.istarindia.apps.factories;
 
 import com.istarindia.android.pojo.TaskSummaryPOJO;
-import com.istarindia.android.pojo.task.AssessmentTask;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.utilities.TaskItemCategory;
 

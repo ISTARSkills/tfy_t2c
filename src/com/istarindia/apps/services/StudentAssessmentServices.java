@@ -81,7 +81,7 @@ public class StudentAssessmentServices {
 	
 		List<Integer> allAssessmentIds = new ArrayList<Integer>();
 		
-		String sql = "select distinct assessment_id from student_assessment where student_id= :istarUserId";
+		String sql = "select distinct assessment_id from report where user_id= :istarUserId";
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();

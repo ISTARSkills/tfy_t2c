@@ -31,8 +31,6 @@ public class RESTCourseService {
 			if(coursePOJO==null){
 				throw new Exception();
 			}
-			
-
 			String result = gson.toJson(coursePOJO);
 
 			return Response.ok(result).build();
@@ -77,15 +75,7 @@ public class RESTCourseService {
 	public Response getLeaderboardOfAllCoursesOfUser(@PathParam("userId") int userId){
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try{			
-		/*	StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
-			List<StudentPlaylist> allStudentPlaylist = studentPlaylistServices.getStudentPlaylistOfUser(userId);
-			
-			Set<Integer> allCourseId = new HashSet<Integer>();
-			
-			for(StudentPlaylist StudentPlaylist : allStudentPlaylist){
-				allCourseId.add(StudentPlaylist.getCourse().getId());
-			}
-			*/
+
 			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
 			List<CourseRankPOJO> allCourseRanks = appUserRankUtility.getCourseRankPOJOForCoursesOfUsersBatch(userId);
 
@@ -123,50 +113,5 @@ public class RESTCourseService {
 			return Response.status(Response.Status.OK).entity(result).build();
 		}		
 	}
-	
-
-/*	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllCourseOfUser(@PathParam("userId") int istarUserId) {
-
-		try {
-			AppCourseServices appCourseServices = new AppCourseServices();
-			AppUserRankUtility appUserRankUtility = new AppUserRankUtility();
-
-			List<CoursePOJO> coursesWithoutModuleStatus = appCourseServices.getCoursesOfUser(istarUserId);
-			List<CoursePOJO> courses = new ArrayList<CoursePOJO>();
-			for(CoursePOJO coursePOJO : coursesWithoutModuleStatus){
-				coursePOJO = coursePOJO.sortModulesAndAssignStatus();
-				
-				coursePOJO.setProgress(appCourseServices.getProgressOfUserForCourse(istarUserId, coursePOJO.getId()));
-				coursePOJO.setTotalPoints(appCourseServices.getMaxPointsOfCourse(coursePOJO.getId()));
-								
-				StudentRankPOJO studentRankPOJO = appUserRankUtility.getStudentRankPOJOForCourseOfAUser(istarUserId, coursePOJO.getId());
-				
-				if(studentRankPOJO!=null){
-					coursePOJO.setUserPoints(studentRankPOJO.getPoints()*1.0);
-					coursePOJO.setRank(studentRankPOJO.getBatchRank());
-				}
-				
-				//coursePOJO.setSkillObjectives(appCourseServices.getSkillsReportForCourseOfUser(istarUserId, coursePOJO.getId()));
-				
-				for(SkillReportPOJO skillReport : coursePOJO.getSkillObjectives()){
-					skillReport.calculateUserPoints();
-					skillReport.calculateTotalPoints();
-					skillReport.calculatePercentage();
-				}				
-				courses.add(coursePOJO);
-			}
-			
-			Gson gson = new Gson();
-			String result = gson.toJson(courses);
-
-			return Response.ok(result).build();
-		}catch(Exception e){
-			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-		}
-	}*/
-	
 	
 }

@@ -1,13 +1,9 @@
 package com.istarindia.android.utility;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import org.hibernate.SQLQuery;
@@ -15,14 +11,11 @@ import org.hibernate.Session;
 
 import com.istarindia.android.pojo.CourseRankPOJO;
 import com.istarindia.android.pojo.StudentRankPOJO;
-import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.StudentPlaylistServices;
-import com.istarindia.apps.services.UserGamificationServices;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.CourseDAO;
 import com.viksitpro.core.dao.entities.IstarUser;
-import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.UserGamification;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
 import com.viksitpro.core.utilities.AppProperies;
@@ -30,50 +23,9 @@ import com.viksitpro.core.utilities.DBUTILS;
 
 public class AppUserRankUtility {
 	
-	public HashMap<String, Integer> getPointsAndCoinsOfUser(int istarUserId){
-		
-		HashMap<String, Integer> pointAndCoins = new HashMap<String, Integer>();
-		
-		IstarUserServices istarUserServices = new IstarUserServices();
-		IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
-		
-		Set<UserGamification> allUserGamifications = istarUser.getUserGamifications();
-		
-		Double totalPoints = 0.0;
-		int totalCoins = 0;
-		
-		for(UserGamification userGamification : allUserGamifications){			
-			totalPoints = totalPoints + userGamification.getPoints();
-			totalCoins = totalCoins + userGamification.getCoins();
-		}
 
-		pointAndCoins.put("points", totalPoints.intValue());
-		pointAndCoins.put("coins", totalCoins);
 	
-		return pointAndCoins;
-	}
-	
-	public HashMap<String, Integer> getPoinstsAndCoinsOfUserForAssessment(int istarUserId, int assesmentId){
-		
-		HashMap<String, Integer> pointAndCoins = new HashMap<String, Integer>();
-		
-		UserGamificationServices userGamificationServices= new UserGamificationServices();
-		List<UserGamification> allUserGamifications = userGamificationServices.getUserGamificationsOfUserForItem(istarUserId, assesmentId, "ASSESSMENT");
-		
-		Double totalPoints = 0.0;
-		int totalCoins = 0;
-		
-		for(UserGamification userGamification : allUserGamifications){			
-			totalPoints = totalPoints + userGamification.getPoints();
-			totalCoins = totalCoins + userGamification.getCoins();
-		}
 
-		pointAndCoins.put("points", totalPoints.intValue());
-		pointAndCoins.put("coins", totalCoins);
-	
-		return pointAndCoins;
-	}
-	
 	
 	public CourseRankPOJO getLeaderboardForCourseOfUser(int istarUserId, int courseId) {
 		String mediaUrlPath =AppProperies.getProperty("media_url_path");;

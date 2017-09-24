@@ -1,33 +1,25 @@
 package com.istarindia.android.utility;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import com.istarindia.android.pojo.AssessmentPOJO;
-import com.istarindia.android.pojo.CoursePOJO;
 import com.istarindia.android.pojo.LessonPOJO;
 import com.istarindia.android.pojo.ModulePOJO;
 import com.istarindia.android.pojo.OptionPOJO;
 import com.istarindia.android.pojo.QuestionPOJO;
 import com.istarindia.android.pojo.StudentProfile;
-import com.istarindia.android.pojo.StudentRankPOJO;
 import com.istarindia.apps.services.AppAssessmentServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.AssessmentOption;
 import com.viksitpro.core.dao.entities.AssessmentQuestion;
-import com.viksitpro.core.dao.entities.Cmsession;
-import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Module;
 import com.viksitpro.core.dao.entities.ProfessionalProfile;
 import com.viksitpro.core.dao.entities.Question;
-import com.viksitpro.core.dao.entities.StudentPlaylist;
 import com.viksitpro.core.dao.entities.UserProfile;
 import com.viksitpro.core.pojo.recruiter.IstarUserPOJO;
 import com.viksitpro.core.utilities.AppProperies;

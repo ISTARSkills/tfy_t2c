@@ -5,22 +5,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.Session;
-
-import com.istarindia.android.pojo.AssessmentPOJO;
 import com.istarindia.android.pojo.AssessmentReportPOJO;
-import com.istarindia.android.pojo.AssessmentResponsePOJO;
 import com.istarindia.android.pojo.ComplexObject;
 import com.istarindia.android.pojo.CoursePOJO;
 import com.istarindia.android.pojo.CourseRankPOJO;
 import com.istarindia.android.pojo.DailyTaskPOJO;
 import com.istarindia.android.pojo.NotificationPOJO;
-import com.istarindia.android.pojo.SkillReportPOJO;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.pojo.TaskSummaryPOJO;
-import com.istarindia.android.pojo.task.AssessmentTask;
-import com.istarindia.android.pojo.task.ClassRoomSessionTask;
-import com.istarindia.android.utility.AppDashboardUtility;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.android.utility.AppUserRankUtility;
 import com.istarindia.apps.factories.TaskFactory;
@@ -28,9 +20,6 @@ import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
-import com.viksitpro.core.dao.utils.user.IstarUserServices;
-import com.viksitpro.core.utilities.AppProperies;
-import com.viksitpro.core.utilities.TaskItemCategory;
 
 public class AppComplexObjectServices {
 

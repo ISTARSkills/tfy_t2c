@@ -6,9 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
@@ -16,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -28,11 +24,6 @@ import org.apache.commons.io.FileUtils;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
-import com.istarindia.apps.services.AppCourseServices;
-import com.viksitpro.core.cms.interactive.CardContent;
-import com.viksitpro.core.cms.interactive.Entity;
-import com.viksitpro.core.cms.interactive.EntityOption;
-import com.viksitpro.core.cms.interactive.InfoCard;
 import com.viksitpro.core.cms.interactive.InteractiveContent;
 import com.viksitpro.core.cms.lesson.VideoLesson;
 import com.viksitpro.core.cms.oldcontent.CMSLesson;
@@ -41,7 +32,6 @@ import com.viksitpro.core.cms.oldcontent.services.ZipFiles;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Task;
-
 import com.viksitpro.core.utilities.TaskItemCategory;
 
 public class CreateZIPForItem {

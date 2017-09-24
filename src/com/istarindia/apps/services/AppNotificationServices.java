@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Comparator;
 import java.util.Properties;
 
 import com.istarindia.android.pojo.NotificationPOJO;
@@ -23,6 +23,7 @@ import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.entities.TaskDAO;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.notification.IstarNotificationServices;
+import com.viksitpro.core.utilities.AppProperies;
 import com.viksitpro.core.utilities.DBUTILS;
 import com.viksitpro.core.utilities.NotificationType;
 import com.viksitpro.core.utilities.TaskItemCategory;
@@ -35,12 +36,17 @@ public class AppNotificationServices {
 
 		IstarNotificationServices istarNotificationServices = new IstarNotificationServices();
 		List<IstarNotification> allNotifications = istarNotificationServices.getAllNotificationOfUser(istarUserId);
-
+		int totalNotification = 0;	
 		for (IstarNotification istarNotification : allNotifications) {
 			NotificationPOJO notificationPOJO = getNotificationPOJO(istarNotification);
 			if (notificationPOJO != null) {
 				allNotificationPOJOs.add(notificationPOJO);
 			}
+			if(totalNotification==20)
+			{
+				break;
+			}
+			totalNotification++;
 		}
 
 		try {
@@ -68,19 +74,8 @@ public class AppNotificationServices {
 	}
 
 	public NotificationPOJO getNotificationPOJO(IstarNotification istarNotification) {
-		String mediaUrlPath = "";
-		try {
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-			if (inputStream != null) {
-				properties.load(inputStream);
-				mediaUrlPath = properties.getProperty("media_url_path");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-
-		}
+		String mediaUrlPath = AppProperies.getProperty("media_url_path");;
+		
 		NotificationPOJO notificationPOJO = null;
 
 		if (istarNotification.getTaskId() != null) {

@@ -10,15 +10,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import com.istarindia.android.pojo.ConcreteItemPOJO;
 import com.istarindia.android.pojo.CoursePOJO;
@@ -26,8 +23,6 @@ import com.istarindia.android.pojo.LessonPOJO;
 import com.istarindia.android.pojo.ModulePOJO;
 import com.istarindia.android.pojo.SessionPOJO;
 import com.istarindia.android.pojo.SkillReportPOJO;
-import com.istarindia.android.pojo.StudentRankPOJO;
-import com.istarindia.android.utility.AppUserRankUtility;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.Cmsession;
@@ -39,12 +34,7 @@ import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Module;
 import com.viksitpro.core.dao.entities.ModuleDAO;
-import com.viksitpro.core.dao.entities.SkillObjective;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
-import com.viksitpro.core.skill.pojo.CourseLevelSkill;
-import com.viksitpro.core.skill.pojo.ModuleLevelSkill;
-import com.viksitpro.core.skill.pojo.SessionLevelSkill;
-import com.viksitpro.core.skill.services.CoreSkillService;
 import com.viksitpro.core.utilities.AppProperies;
 import com.viksitpro.core.utilities.DBUTILS;
 
@@ -118,17 +108,17 @@ public class AppCourseServices {
 					+ "from user_lesson_progress "
 					+ "where user_id = "+istarUserId+" and course_id= "+courseId+" "
 			+ "union "
-					+ "select DISTINCT session_id as item_id, 0, avg(progress) as progress, 'SESSION' as type "
+					+ "select DISTINCT session_id as item_id, 0, cast (avg(progress) as float4) as progress, 'SESSION' as type "
 					+ "from user_lesson_progress "
 					+ "where user_id = "+istarUserId+" and course_id= "+courseId+" "
 					+ "group by session_id "
 			+ "union "
-					+ "select DISTINCT module_id as item_id,0,  avg(progress) as progress, 'MODULE' as type "
+					+ "select DISTINCT module_id as item_id,0,   cast (avg(progress) as float4) as progress, 'MODULE' as type "
 					+ "from user_lesson_progress "
 					+ "where user_id = "+istarUserId+"  and course_id= "+courseId+" "
 					+ "group by module_id "
 			+ "union "
-					+ "select DISTINCT course_id as item_id,0,  avg(progress) as progress, 'COURSE' as type "
+					+ "select DISTINCT course_id as item_id,0,   cast (avg(progress) as float4) as progress, 'COURSE' as type "
 					+ "from user_lesson_progress "
 					+ "where user_id = "+istarUserId+" and course_id= "+courseId+" "
 					+ "group by course_id"; 
@@ -338,17 +328,19 @@ public class AppCourseServices {
 						+ "course_id = "+courseId+" "
 						+ "and assessment_benchmark.skill_id in ("+skillIds+") "
 						+ "group by assessment_benchmark.skill_id;";
+				//System.err.println("getSesssionSkillPoints >>>>>>>"+getSesssionSkillPoints);
 				List<HashMap<String, Object>> sessionSkillData = util.executeQuery(getSesssionSkillPoints);
 				for(HashMap<String, Object> row: sessionSkillData)
 				{
 					int skillId = (int) row.get("skill_id");
-					double userPointsPerSkill =(double) row.get("skill_id");
-					double totalPointsPerSkill =(double) row.get("skill_id");
-					double percentagePerSkill =0;
+					double userPointsPerSkill =(double) row.get("user_points");
+					double totalPointsPerSkill =(double) row.get("total_points");
+					double percentagePerSkill =0d;
 					if(totalPointsPerSkill!=0)
 					{
-						percentagePerSkill = (userPointsPerSkill*100)/totalPoints;
+						percentagePerSkill = (userPointsPerSkill*100)/totalPointsPerSkill;
 					}
+					//System.out.println("percentagePerSkill  "+percentagePerSkill);
 					skillUserPoints.put(skillId, Double.parseDouble(decimalFormat.format(userPointsPerSkill)));
 					skillTotalPoints.put(skillId, Double.parseDouble(decimalFormat.format(totalPointsPerSkill)));
 					skillPercentage.put(skillId, Double.parseDouble(decimalFormat.format(percentagePerSkill)));

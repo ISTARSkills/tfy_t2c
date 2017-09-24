@@ -14,6 +14,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.hibernate.Query;
+import org.hibernate.Session;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -25,20 +28,20 @@ import com.istarindia.android.pojo.QuestionResponsePOJO;
 import com.istarindia.android.utility.AppContentServiceUtility;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.apps.services.AppAssessmentServices;
-import com.istarindia.apps.services.AppBatchStudentsServices;
 import com.istarindia.apps.services.AppComplexObjectServices;
 import com.istarindia.apps.services.GamificationServices;
 import com.istarindia.apps.services.ReportServices;
 import com.istarindia.apps.services.StudentAssessmentServices;
 import com.viksitpro.core.dao.entities.Assessment;
-import com.viksitpro.core.dao.entities.BatchGroup;
+import com.viksitpro.core.dao.entities.AssessmentDAO;
+import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Question;
 import com.viksitpro.core.dao.entities.Report;
 import com.viksitpro.core.dao.entities.StudentAssessment;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.utils.task.TaskServices;
-import com.viksitpro.core.dao.utils.user.IstarUserServices;
 
 @Path("assessments/user/{userId}")
 public class RESTAssessmentService {
@@ -50,22 +53,27 @@ public class RESTAssessmentService {
 		try {
 			List<AssessmentPOJO> allAssessmentsOfUser = new ArrayList<AssessmentPOJO>();
 
-			IstarUserServices istarUserServices = new IstarUserServices();
-			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+			IstarUser istarUser = new IstarUserDAO().findById(userId);
 
-			TaskServices taskServices = new TaskServices();
-			List<Task> allTaskOfUser = taskServices.getAllTaskOfActor(istarUser);
+			String hql = "from Task task where actor= :actor and item_type='ASSESSMENT'";
+			
+			BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
+			Session session = baseHibernateDAO.getSession();
+			
+			Query query = session.createQuery(hql);
+			query.setParameter("actor", istarUser.getId());
+			
+			List<Task> allTaskOfUser = query.list();
+
 
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 
 			for (Task task : allTaskOfUser) {
-				if (task.getItemType().equals("ASSESSMENT")) {
-					Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());
-					if (assessment != null && assessment.getAssessmentQuestions()!=null && assessment.getAssessmentQuestions().size() > 0) {
-						AssessmentPOJO assessmentPOJO = appPOJOUtility.getAssessmentPOJO(assessment);
-						allAssessmentsOfUser.add(assessmentPOJO);
-					}
+				Assessment assessment = appAssessmentServices.getAssessment(task.getItemId());
+				if (assessment != null && assessment.getAssessmentQuestions()!=null && assessment.getAssessmentQuestions().size() > 0) {
+					AssessmentPOJO assessmentPOJO = appPOJOUtility.getAssessmentPOJO(assessment);
+					allAssessmentsOfUser.add(assessmentPOJO);
 				}
 			}
 
@@ -87,8 +95,7 @@ public class RESTAssessmentService {
 		////System.err.println("--------------------------------------------------------I LOVE KAMINI");
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
-			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
-			Assessment assessment = appAssessmentServices.getAssessment(assessmentId);
+			Assessment assessment = new AssessmentDAO().findById(assessmentId);
 			AssessmentPOJO assessmentPOJO = null;
 			AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 			if (assessment != null && assessment.getAssessmentQuestions().size() > 0) {
@@ -123,24 +130,11 @@ public class RESTAssessmentService {
 			List<QuestionResponsePOJO> questionResponses = (List<QuestionResponsePOJO>) gsonRequest
 					.fromJson(questionResponsesString, listType);
 
-			IstarUserServices istarUserServices = new IstarUserServices();
-			IstarUser istarUser = istarUserServices.getIstarUser(istarUserId);
+			IstarUser istarUser = new IstarUserDAO().findById(istarUserId);
 
-			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
-			Assessment assessment = appAssessmentServices.getAssessment(assessmentId);
-
+			Assessment assessment = new AssessmentDAO().findById(assessmentId);
 			
 				StudentAssessmentServices studentAssessmentServices = new StudentAssessmentServices();
-
-				AppBatchStudentsServices appBatchStudentsServices = new AppBatchStudentsServices();
-				BatchGroup batchGroupOfStudent = appBatchStudentsServices.getBatchGroupOfStudent(istarUser.getId());
-
-				Integer batchGroupId = null;
-
-				if (batchGroupOfStudent != null) {
-					batchGroupId = batchGroupOfStudent.getId();
-				}
-
 				AppContentServiceUtility appContentServiceUtility = new AppContentServiceUtility();
 
 				int correctAnswersCount = 0;
@@ -160,14 +154,14 @@ public class RESTAssessmentService {
 							studentAssessment = studentAssessmentServices.updateStudentAssessment(studentAssessment,
 									optionsMap.get("isCorrect"), optionsMap.get("option0"), optionsMap.get("option1"),
 									optionsMap.get("option2"), optionsMap.get("option3"), optionsMap.get("option4"), null, null,
-									batchGroupId, questionResponsePOJO.getDuration());
+									null, questionResponsePOJO.getDuration());
 						}
 						
 					} else {
 						studentAssessment = studentAssessmentServices.createStudentAssessment(assessment, question,
 								istarUser, optionsMap.get("isCorrect"), optionsMap.get("option0"),
 								optionsMap.get("option1"), optionsMap.get("option2"), optionsMap.get("option3"),
-								optionsMap.get("option4"), null, null, batchGroupId, questionResponsePOJO.getDuration());
+								optionsMap.get("option4"), null, null, null, questionResponsePOJO.getDuration());
 					}
 
 					if (optionsMap.get("isCorrect")) {
@@ -178,15 +172,13 @@ public class RESTAssessmentService {
 					}
 				}
 
-				Double maxPoints = 0d;
+				
 
 				ReportServices reportServices = new ReportServices();
 				Report report = reportServices.getAssessmentReportForUser(istarUserId, assessmentId);
 				GamificationServices gamificationService = new GamificationServices();
 				if (report == null) {
-					//System.err.println("Report is null, creating new report");
-					reportServices.createReport(istarUser, assessment, correctAnswersCount, assessmentDuration,
-							maxPoints.intValue());
+					reportServices.createReport(istarUser, assessment, correctAnswersCount, assessmentDuration,0);
 					gamificationService.updateUserGamificationAfterAssessment(istarUser,assessment);
 					gamificationService.updateUserPointsCoinsStatsTable(istarUserId);
 					gamificationService.updateLeaderBoard(istarUserId);
@@ -195,7 +187,7 @@ public class RESTAssessmentService {
 					//System.err.println("Report exists, updating report");
 					if(assessment.getRetryAble()!=null && assessment.getRetryAble())
 					{
-						reportServices.updateReport(report, istarUser, assessment, correctAnswersCount, assessmentDuration,maxPoints.intValue());
+						reportServices.updateReport(report, istarUser, assessment, correctAnswersCount, assessmentDuration,0);
 						gamificationService.updateUserGamificationAfterAssessment(istarUser,assessment);
 						gamificationService.updateUserPointsCoinsStatsTable(istarUserId);
 						gamificationService.updateLeaderBoard(istarUserId);
@@ -206,12 +198,6 @@ public class RESTAssessmentService {
 				TaskServices taskServices = new TaskServices();
 				taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
 
-			
-			
-			/*AssessmentReportPOJO assessmentReportPOJO = appAssessmentServices.getAssessmentReport(istarUserId,
-					assessment.getId());
-			String result = gson.toJson(assessmentReportPOJO);
-			 */
 			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
 			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(istarUserId);
 
