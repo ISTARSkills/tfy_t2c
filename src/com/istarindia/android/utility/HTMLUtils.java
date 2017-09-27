@@ -52,9 +52,10 @@ public class HTMLUtils {
 				String imageURL = course.getImage_url();
 				courseSkillPOJO.setImageURL(imageURL);
 
-				
+				List<SkillReportPOJO> moduleLevelSkillReport = appCourseServices
+						.getSkillsReportForCourseOfUser(5128, courseId);
 
-				
+				courseSkillPOJO.setSkills(moduleLevelSkillReport);
 				courseSkillPOJO.calculateUserPoints();
 				courseSkillPOJO.calculateTotalPoints();
 				courseSkillPOJO.calculatePercentage();

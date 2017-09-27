@@ -1,6 +1,7 @@
 package com.istarindia.android.pojo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,9 +19,8 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 	private String status;
 	private String imageURL;
 	private Integer orderId;
+	private List<ConcreteItemPOJO> lessons = new ArrayList<ConcreteItemPOJO>();
 	private Set<String> skillObjectives = new HashSet<String>();
-	private List<SessionPOJO> sessions = new ArrayList<SessionPOJO>();
-
 	
 	public ModulePOJO(){
 		
@@ -66,16 +66,13 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 		this.orderId = orderId;
 	}
 	
-	
-	
-	
-	@XmlElement(name = "sessions", required = false)
-	public List<SessionPOJO> getSessions() {
-		return sessions;
+	@XmlAttribute(name = "lessons", required = false)
+	public List<ConcreteItemPOJO> getLessons() {
+		return lessons;
 	}
 
-	public void setSessions(List<SessionPOJO> sessions) {
-		this.sessions = sessions;
+	public void setLessons(List<ConcreteItemPOJO> lessons) {
+		this.lessons = lessons;
 	}
 
 	@XmlElement(name = "skillObjectives", required = false)
@@ -94,7 +91,7 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 		this.status = status;
 	}
 
-	/*public ModulePOJO sortLessonsAndAssignStatus(){		
+	public ModulePOJO sortLessonsAndAssignStatus(){		
 		ModulePOJO modulePOJO = this;		
 		Collections.sort(modulePOJO.getLessons());
 		
@@ -107,7 +104,7 @@ public class ModulePOJO implements Comparable<ModulePOJO>{
 		}
 		modulePOJO.setStatus(moduleStatus);	
 	return modulePOJO;
-	}*/
+	}
 	
 	@Override
 	public int compareTo(ModulePOJO o) {

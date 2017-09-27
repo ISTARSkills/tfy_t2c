@@ -3,10 +3,13 @@
  */
 package com.istarindia.android.rest;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -20,11 +23,21 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.istarindia.android.pojo.DailyTaskPOJO;
+import com.istarindia.android.pojo.NotificationPOJO;
+import com.istarindia.android.pojo.QuestionResponsePOJO;
 import com.istarindia.android.pojo.trainerworkflow.ClassFeedbackByTrainer;
 import com.istarindia.android.pojo.trainerworkflow.CourseContent;
+import com.istarindia.android.pojo.trainerworkflow.CourseItem;
 import com.istarindia.android.pojo.trainerworkflow.GroupPojo;
 import com.istarindia.android.pojo.trainerworkflow.GroupStudentPojo;
+import com.istarindia.apps.services.AppCalendarServices;
+import com.istarindia.apps.services.AppNotificationServices;
 import com.istarindia.apps.services.TrainerWorkflowServices;
+import com.viksitpro.core.dao.entities.IstarNotification;
+import com.viksitpro.core.dao.entities.Task;
+import com.viksitpro.core.dao.utils.task.TaskServices;
+import com.viksitpro.core.notification.IstarNotificationServices;
 import com.viksitpro.core.utilities.DBUTILS;
 import com.viksitpro.core.utilities.TaskItemCategory;
 import com.viksitpro.core.utilities.TrainerWorkflowStages;

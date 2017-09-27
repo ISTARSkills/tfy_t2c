@@ -3,7 +3,11 @@
  */
 package com.istarindia.android.pojo.task;
 
+import java.sql.Time;
+import java.util.ArrayList;
+
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 import com.istarindia.android.pojo.TaskSummaryPOJO;
 

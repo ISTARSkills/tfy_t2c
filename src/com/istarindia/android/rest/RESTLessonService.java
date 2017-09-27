@@ -2,10 +2,13 @@ package com.istarindia.android.rest;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.List;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -21,18 +24,23 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.istarindia.android.pojo.ComplexObject;
 import com.istarindia.android.pojo.LessonPOJO;
+import com.istarindia.android.utility.AppDashboardUtility;
 import com.istarindia.android.utility.CreateZIPForItem;
 import com.istarindia.apps.services.AppComplexObjectServices;
 import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.GamificationServices;
 import com.istarindia.apps.services.StudentPlaylistServices;
+import com.viksitpro.core.cms.interactive.InteractiveContent;
+import com.viksitpro.core.cms.lesson.VideoLesson;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
+import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.utilities.DBUTILS;
+import com.viksitpro.core.utilities.TaskItemCategory;
 
 @Path("lessons/user/{userId}")
 public class RESTLessonService {
@@ -187,15 +195,15 @@ public class RESTLessonService {
 			if (studentPlaylist == null) {
 				throw new Exception();
 			}
-			int userId =studentPlaylist.getIstarUser().getId(); 
+
 			studentPlaylistServices.updateStatus(studentPlaylist, "COMPLETED");
 			GamificationServices gmService = new GamificationServices();
 			gmService.updatePointsAndCoinsOnLessonComplete(studentPlaylist.getIstarUser(), studentPlaylist.getLesson());
-			gmService.updateUserPointsCoinsStatsTable(userId);
-			gmService.updateLeaderBoard(userId);
-
+			//AppCourseServices appCourseServices = new AppCourseServices();
+			//appCourseServices.insertIntoUserGamificationOnCompletitionOfLessonByUser(studentPlaylist.getIstarUser().getId(), studentPlaylist.getLesson().getId(), studentPlaylist.getCourse().getId());
+			
 			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
-			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(userId);
+			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(studentPlaylist.getIstarUser().getId());
 
 			if (complexObject == null) {
 				throw new Exception();
@@ -231,8 +239,7 @@ public class RESTLessonService {
 			IstarUser user = new IstarUserDAO().findById(userId);
 			Lesson lesson = new LessonDAO().findById(lessonId);
 			gmService.updatePointsAndCoinsOnLessonComplete(user, lesson);
-			gmService.updateUserPointsCoinsStatsTable(userId);
-			gmService.updateLeaderBoard(userId);
+	
 			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
 			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(userId);
 
@@ -259,7 +266,7 @@ public class RESTLessonService {
 				String updateStudentPlayList = "update student_playlist set status='COMPLETED' where lesson_id = "+lessonId+" and student_id="+userId;
 				util.executeUpdate(updateStudentPlayList);
 				
-				String updateStudentPlayList1 = "update  task set is_active='f', updated_at=now() where id in("+task_id+")";
+				String updateStudentPlayList1 = "update  task set is_active='f' where id in("+task_id+")";
 				////System.err.println("updateStudentPlayList1--->"+updateStudentPlayList1);
 				util.executeUpdate(updateStudentPlayList1);
 				
@@ -268,8 +275,7 @@ public class RESTLessonService {
 				IstarUser user = new IstarUserDAO().findById(userId);
 				Lesson lesson = new LessonDAO().findById(lessonId);
 				gmService.updatePointsAndCoinsOnLessonComplete(user, lesson);
-				gmService.updateUserPointsCoinsStatsTable(userId);
-				gmService.updateLeaderBoard(userId);
+		
 				AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
 				ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(userId);
 

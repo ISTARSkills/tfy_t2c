@@ -21,7 +21,6 @@ import com.istarindia.apps.factories.TaskFactory;
 import com.istarindia.apps.services.AppComplexObjectServices;
 import com.istarindia.apps.services.GamificationServices;
 import com.viksitpro.core.dao.entities.IstarUser;
-import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Task;
@@ -45,6 +44,7 @@ public class RESTDashboardService {
 			List<Task> allTaskOfUser = taskServices.getAllTaskOfActorForToday(istarUser);
 			List<TaskSummaryPOJO> allTaskSummary = new ArrayList<TaskSummaryPOJO>();
 			TaskFactory factory = new TaskFactory();
+			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
 			int completedTasks = 0;
 			for (Task task : allTaskOfUser) {
 				TaskSummaryPOJO taskSummaryPOJO = null;
@@ -85,14 +85,16 @@ public class RESTDashboardService {
 	public Response getTaskDetails(@PathParam("userId") int userId, @PathParam("taskId") int taskId) {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
-			IstarUser istarUser = new IstarUserDAO().findById(userId);
-			Task task = new TaskDAO().findById(taskId);
+			IstarUserServices istarUserServices = new IstarUserServices();
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+
+			TaskServices taskServices = new TaskServices();
+			Task task = taskServices.getTask(taskId);
 
 			Object result = null;
 			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
 
 			if (task == null || task.getIstarUserByActor().getId() != istarUser.getId()) {
-				System.out.println("invalid task id is "+taskId);
 				throw new Exception();
 			}
 			String itemType = task.getItemType();
@@ -127,8 +129,10 @@ public class RESTDashboardService {
 				throw new Exception("Invlaid Task ID" + taskId);
 			}
 			TaskFactory factory = new TaskFactory();
+			AppDashboardUtility dashboardUtility = new AppDashboardUtility();
 
 			TaskSummaryPOJO taskSummaryPOJO = null;
+			String itemType = task.getItemType();
 
 			taskSummaryPOJO = factory.getTaskSummary(task);
 
@@ -147,6 +151,39 @@ public class RESTDashboardService {
 		}
 	}
 
+	/*
+	 * @GET
+	 * 
+	 * @Path("{taskId}")
+	 * 
+	 * @Produces(MediaType.APPLICATION_JSON) public Response
+	 * getTaskDetails(@PathParam("userId") int userId, @PathParam("taskId") int
+	 * taskId) { Gson gson = new
+	 * GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create(); try {
+	 * IstarUserServices istarUserServices = new IstarUserServices(); IstarUser
+	 * istarUser = istarUserServices.getIstarUser(userId);
+	 * 
+	 * TaskServices taskServices = new TaskServices(); Task task =
+	 * taskServices.getTask(taskId);
+	 * 
+	 * Object result = null; AppDashboardUtility dashboardUtility = new
+	 * AppDashboardUtility();
+	 * 
+	 * if (task == null || task.getIstarUserByActor().getId() !=
+	 * istarUser.getId()) { throw new Exception(); } String itemType =
+	 * task.getItemType();
+	 * 
+	 * switch (itemType) { case TaskItemCategory.ASSESSMENT: result =
+	 * (AssessmentPOJO) dashboardUtility.getAssessmentForTask(task); return
+	 * Response.ok(result).build(); case TaskItemCategory.LESSON: result =
+	 * (String) dashboardUtility.getLessonForTask(task); return
+	 * Response.ok(gson.toJson(result)).build(); } throw new Exception(); }
+	 * catch (Exception e) { e.printStackTrace(); String result = e.getMessage()
+	 * != null ? gson.toJson(e.getMessage()) : gson.toJson(
+	 * "istarViksitProComplexKeyBad Request or Internal Server Error"); return
+	 * Response.status(Response.Status.OK).entity(result).build(); } }
+	 */
+
 	@PUT
 	@Path("{taskId}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -154,7 +191,7 @@ public class RESTDashboardService {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
-			IstarUser istarUser = new IstarUserDAO().findById(userId);
+			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
 			String role = "";
 
@@ -177,7 +214,7 @@ public class RESTDashboardService {
 					appDashboardUtility.updateStudentPlaylistStatus(task.getItemId(), userId, "COMPLETED");
 					GamificationServices gmService = new GamificationServices();
 					Lesson lesson = new LessonDAO().findById(task.getItemId());
-					gmService.updatePointsAndCoinsOnLessonComplete(istarUser, lesson);					
+					gmService.updatePointsAndCoinsOnLessonComplete(istarUser, lesson);
 				}
 
 			}else{
@@ -201,4 +238,142 @@ public class RESTDashboardService {
 		}
 	}
 
+	/*
+	 * @GET
+	 * 
+	 * @Produces(MediaType.APPLICATION_JSON) public Response
+	 * getAllTaskIds(@PathParam("userId") int userId) {
+	 * 
+	 * try { IstarUserServices istarUserServices = new IstarUserServices();
+	 * IstarUser istarUser = istarUserServices.getIstarUser(userId);
+	 * 
+	 * TaskServices taskServices = new TaskServices(); List<Task> allTaskOfUser
+	 * = taskServices.getAllTaskOfActor(istarUser);
+	 * 
+	 * List<Integer> allTasks = new ArrayList<Integer>();
+	 * 
+	 * for(Task task : allTaskOfUser){ if(task.getIsActive()){ String itemType =
+	 * task.getItemType(); Integer itemId = task.getItemId();
+	 * if(itemType.equals(TaskItemCategory.ASSESSMENT)){ AppAssessmentServices
+	 * appAssessmentServices = new AppAssessmentServices(); Assessment
+	 * assessment = appAssessmentServices.getAssessment(itemId); if (assessment
+	 * != null && assessment.getAssessmentQuestions().size() > 0) {
+	 * allTasks.add(task.getId()); } }else{ allTasks.add(task.getId()); } } }
+	 * Gson gson = new Gson(); String result = gson.toJson(allTasks);
+	 * 
+	 * return Response.ok(result).build(); } catch (Exception e) {
+	 * e.printStackTrace(); return
+	 * Response.status(Response.Status.INTERNAL_SERVER_ERROR).build(); } }
+	 */
+
+	/*
+	 * @GET
+	 * 
+	 * @Path("summary")
+	 * 
+	 * @Produces(MediaType.APPLICATION_JSON) public Response
+	 * getSummaryOfTasks(@PathParam("userId") int userId, @PathParam("taskId")
+	 * int taskId){
+	 * 
+	 * try{ IstarUserServices istarUserServices = new IstarUserServices();
+	 * IstarUser istarUser = istarUserServices.getIstarUser(userId);
+	 * 
+	 * TaskServices taskServices = new TaskServices(); List<Task> allTaskOfUser
+	 * = taskServices.getAllTaskOfActorForToday(istarUser);
+	 * List<TaskSummaryPOJO> allTaskSummary = new ArrayList<TaskSummaryPOJO>();
+	 * 
+	 * for(Task task : allTaskOfUser){ TaskSummaryPOJO taskSummaryPOJO = new
+	 * TaskSummaryPOJO();
+	 * 
+	 * taskSummaryPOJO.setId(task.getId());
+	 * taskSummaryPOJO.setItemId(task.getItemId());
+	 * taskSummaryPOJO.setItemType(task.getItemType()); if(task.getIsActive()){
+	 * taskSummaryPOJO.setStatus("INCOMPLETE");
+	 * taskSummaryPOJO.setDate(task.getEndDate()); }else{
+	 * taskSummaryPOJO.setStatus("COMPLETED");
+	 * taskSummaryPOJO.setDate(task.getUpdatedAt()); }
+	 * 
+	 * 
+	 * taskSummaryPOJO.setName(task.getName());
+	 * allTaskSummary.add(taskSummaryPOJO); } Gson gson = new Gson(); String
+	 * result = gson.toJson(allTaskSummary);
+	 * 
+	 * return Response.ok(result).build(); }catch(Exception e){
+	 * e.printStackTrace(); return
+	 * Response.status(Response.Status.INTERNAL_SERVER_ERROR).build(); } }
+	 */
+
+	/*
+	 * @GET
+	 * 
+	 * @Path("{taskId}")
+	 * 
+	 * @Produces(MediaType.APPLICATION_JSON) public Response
+	 * getDashboardCardOfTask(@PathParam("userId") int
+	 * userId, @PathParam("taskId") int taskId) {
+	 * 
+	 * try { IstarUserServices istarUserServices = new IstarUserServices();
+	 * IstarUser istarUser = istarUserServices.getIstarUser(userId);
+	 * 
+	 * TaskServices taskServices = new TaskServices(); Task task =
+	 * taskServices.getTask(taskId);
+	 * 
+	 * AppDashboardUtility dashboardUtility = new AppDashboardUtility(); Object
+	 * dashboardCard = null;
+	 * 
+	 * if (task!=null && task.getIsActive() &&
+	 * task.getIstarUserByActor().getId()==istarUser.getId()) { String itemType
+	 * = task.getItemType(); Integer itemId = task.getItemId();
+	 * 
+	 * switch (itemType) { case TaskItemCategory.ASSESSMENT: dashboardCard =
+	 * dashboardUtility.getAssessment(task); break; case
+	 * TaskItemCategory.LESSON: //dashboardCard =
+	 * dashboardUtility.getDashboardCardForLesson(task); break; case
+	 * TaskItemCategory.JOB: dashboardCard =
+	 * dashboardUtility.getDashboardCardForJob(task); break; } }else{ return
+	 * Response.status(Response.Status.BAD_REQUEST).build(); }
+	 * 
+	 * Gson gson = new Gson(); String result = gson.toJson(dashboardCard);
+	 * 
+	 * return Response.ok(result).build(); } catch (Exception e) {
+	 * e.printStackTrace(); return
+	 * Response.status(Response.Status.INTERNAL_SERVER_ERROR).build(); } }
+	 */
+
+	/*
+	 * @GET
+	 * 
+	 * @Path("{taskId}/test")
+	 * 
+	 * @Produces(MediaType.APPLICATION_XML) public Response
+	 * getDashboardCardOfTaskTEST(@PathParam("userId") int
+	 * userId, @PathParam("taskId") int taskId) {
+	 * 
+	 * try { IstarUserServices istarUserServices = new IstarUserServices();
+	 * IstarUser istarUser = istarUserServices.getIstarUser(userId);
+	 * 
+	 * TaskServices taskServices = new TaskServices(); Task task =
+	 * taskServices.getTask(taskId);
+	 * 
+	 * AppDashboardUtility dashboardUtility = new AppDashboardUtility(); Object
+	 * dashboardCard = null;
+	 * 
+	 * if (task!=null && task.getIsActive() &&
+	 * task.getIstarUserByActor().getId()==istarUser.getId()) { String itemType
+	 * = task.getItemType();
+	 * 
+	 * switch (itemType) { case TaskItemCategory.ASSESSMENT: dashboardCard =
+	 * dashboardUtility.getDashboardCardForAssessment(task); break; case
+	 * TaskItemCategory.LESSON: dashboardCard =
+	 * dashboardUtility.getDashboardCardForLessonTest(task); break; case
+	 * TaskItemCategory.JOB: dashboardCard =
+	 * dashboardUtility.getDashboardCardForJob(task); break; } }else{ return
+	 * Response.status(Response.Status.BAD_REQUEST).build(); }
+	 * 
+	 * Gson gson = new Gson(); String result = gson.toJson(dashboardCard);
+	 * 
+	 * return Response.ok(result).build(); } catch (Exception e) {
+	 * e.printStackTrace(); return
+	 * Response.status(Response.Status.INTERNAL_SERVER_ERROR).build(); } }
+	 */
 }

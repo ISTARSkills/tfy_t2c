@@ -3,6 +3,7 @@
  */
 package com.istarindia.apps.services;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -17,6 +18,9 @@ import com.istarindia.android.pojo.trainerworkflow.CourseItem;
 import com.istarindia.android.pojo.trainerworkflow.FeedbackPojo;
 import com.istarindia.android.pojo.trainerworkflow.GroupPojo;
 import com.istarindia.android.pojo.trainerworkflow.GroupStudentPojo;
+import com.istarindia.android.utility.CreateZIPForItem;
+import com.viksitpro.core.dao.entities.Lesson;
+import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.utilities.AppProperies;
 import com.viksitpro.core.utilities.DBUTILS;
 import com.viksitpro.core.utilities.TaskItemCategory;
@@ -111,6 +115,9 @@ public class TrainerWorkflowServices {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		String mediaLessonPath=AppProperies.getProperty("mediaLessonPath");
+		
 		DBUTILS util = new DBUTILS();
 		CourseContent courseContent = new CourseContent();
 		Integer prevItemOrderId = null;
@@ -131,16 +138,26 @@ public class TrainerWorkflowServices {
 		//System.err.println("getCourseId>>>"+getCourseId);
 		List<HashMap<String, Object>> courseData = util.executeQuery(getCourseId);
 		
-		
-		if(courseData.size()>0)
-		{
+		if (courseData.size() > 0) {
 			ArrayList<CourseItem> courseItems = new ArrayList<>();
-			for(HashMap<String, Object> row: courseData)
-			{
+			for (HashMap<String, Object> row : courseData) {
 				CourseItem item = new CourseItem();
-				int itemId = (int)row.get("id");
+				int itemId = (int) row.get("id");
+
+				File zipFile = new File(mediaLessonPath + itemId + ".zip");
+
+				if (!zipFile.exists()) {
+					System.out.println("Newly created Zip for lesson ---> "+itemId);
+					CreateZIPForItem createZIPForItem = new CreateZIPForItem();
+					try {
+						Lesson lesson = new LessonDAO().findById(itemId);
+						createZIPForItem.generateXMLForLesson(lesson);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 				String itemName = row.get("title").toString().trim();
-				int orderId = (int)row.get("order_id");
+				int orderId = (int) row.get("order_id");
 				item.setItemId(itemId);
 				item.setItemName(itemName);
 				item.setItemType(TaskItemCategory.LESSON);

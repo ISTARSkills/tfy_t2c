@@ -1,6 +1,7 @@
 package com.istarindia.android.rest;
 
 import java.util.HashSet;
+import java.util.List;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -16,6 +17,7 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.istarindia.android.pojo.ComplexObject;
+import com.istarindia.android.pojo.SkillReportPOJO;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppPOJOUtility;
 import com.istarindia.android.utility.AppUtility;
@@ -373,6 +375,25 @@ public class RESTIstarUserService {
 		}
 	}
 
+	@GET
+	@Path("{userId}/skills")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getSkillsMap(@PathParam("userId") int istarUserId) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		try {
+			AppServices appServices = new AppServices();
+			List<SkillReportPOJO> allSkills = appServices.getSkillsMapOfUser(istarUserId);
+
+			String result = gson.toJson(allSkills);
+
+			return Response.ok(result).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
+					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
+			return Response.status(Response.Status.OK).entity(result).build();
+		}
+	}
 
 	@GET
 	@Path("{userId}/complex")

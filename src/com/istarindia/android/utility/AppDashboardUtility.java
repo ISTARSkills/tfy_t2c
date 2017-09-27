@@ -14,6 +14,7 @@ import com.istarindia.apps.services.AppAssessmentServices;
 import com.istarindia.apps.services.AppCourseServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
+import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Task;
 
@@ -111,8 +112,6 @@ public class AppDashboardUtility {
 		
 		}
 	}
-
-
 
 /*	public Object getDashboardCardForLessonTest(Task task) {
 

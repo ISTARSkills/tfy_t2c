@@ -68,7 +68,7 @@ public class SecurityFilter implements Filter {
 		} else {
 
 			chain.doFilter(request, res);
-			System.out.println("security_token_check false");
+			//System.out.println("security_token_check false");
 		}
 
 	}
