@@ -88,8 +88,8 @@ public class AppBatchGroupServices {
 						+ urseId + " and organization_id=" + orgId + " GROUP BY user_org_mapping.id";
 				List<HashMap<String, Object>> orgMappins = db.executeQuery(checkIfExistInOrgMapping);
 				if (orgMappins.size() == 0 || (int) orgMappins.get(0).get("cnt") == 0) {
-					String insertIntoUserOrg = "INSERT INTO user_org_mapping (user_id, organization_id, id) VALUES ("
-							+ urseId + ", " + orgId + ", ((select COALESCE(max(id),0)+1 from user_org_mapping)));";
+					String insertIntoUserOrg = "INSERT INTO user_org_mapping (user_id, organization_id) VALUES ("
+							+ urseId + ", " + orgId + ");";
 					db.executeUpdate(insertIntoUserOrg);
 				} else if (orgMappins.size() > 0 && orgMappins.get(0).get("id") != null) {
 					String updateIntoUserOrg = "UPDATE user_org_mapping SET user_id='" + urseId + "', organization_id='"

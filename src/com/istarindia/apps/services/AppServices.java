@@ -28,7 +28,7 @@ public class AppServices {
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();	
 		session.clear();
-		String sql = "INSERT INTO login (id, user_id, created_at, jsession_id, action) VALUES ((select max(id)+1 from login), "+istarUser.getId()+", now(), '"+istarUser.getAuthToken()+"', '"+action+"')";
+		String sql = "INSERT INTO login ( user_id, created_at, jsession_id, action) VALUES ( "+istarUser.getId()+", now(), '"+istarUser.getAuthToken()+"', '"+action+"')";
 		System.out.println(sql);
 		SQLQuery query = session.createSQLQuery(sql);
 		query.executeUpdate();

@@ -41,26 +41,8 @@ public class AppCourseServices {
 
 	public CoursePOJO getCourseOfUser(int istarUserId, int courseId) {
 		String mediaUrlPath = "";
-		int per_assessment_points = 5, per_lesson_points = 5, per_question_points = 1, per_assessment_coins = 5,
-				per_lesson_coins = 5, per_question_coins = 1;
-		try {
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-			if (inputStream != null) {
-				properties.load(inputStream);
-				mediaUrlPath = properties.getProperty("media_url_path");
-				per_assessment_points = Integer.parseInt(properties.getProperty("per_assessment_points"));
-				per_lesson_points = Integer.parseInt(properties.getProperty("per_lesson_points"));
-				per_question_points = Integer.parseInt(properties.getProperty("per_question_points"));
-				per_assessment_coins = Integer.parseInt(properties.getProperty("per_assessment_coins"));
-				per_lesson_coins = Integer.parseInt(properties.getProperty("per_lesson_coins"));
-				per_question_coins = Integer.parseInt(properties.getProperty("per_question_coins"));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-
-		}
+		AppProperies prop = new AppProperies();
+		mediaUrlPath = prop.getProperty("media_url_path");
 
 		CoursePOJO coursePOJO = null;
 		StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
@@ -81,16 +63,9 @@ public class AppCourseServices {
 
 			coursePOJO.setProgress(getProgressOfUserForCourse(istarUserId, courseId));
 
-			String getRankPointsForUser = "SELECT * FROM ( SELECT istar_user, user_points, total_points, perc, CAST ( Rank () OVER (order by user_points desc) AS INTEGER ) AS user_rank FROM ( SELECT istar_user, user_points, total_points, CAST ( (user_points * 100) / total_points AS INTEGER ) AS perc FROM ( SELECT T1.istar_user, SUM (T1.user_points) AS user_points, SUM (T1.max_points) AS total_points FROM ( WITH summary AS ( SELECT P .istar_user, P .skill_objective, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.points,'0'),':per_lesson_points','"
-					+ per_lesson_points + "'),':per_assessment_points','" + per_assessment_points
-					+ "'),':per_question_points','" + per_question_points
-					+ "'))  as text)) as user_points, custom_eval(cast (trim (replace(replace(replace( COALESCE(P.max_points,'0'),':per_lesson_points','"
-					+ per_lesson_points + "'),':per_assessment_points','" + per_assessment_points
-					+ "'),':per_question_points','" + per_question_points
-					+ "'))  as text)) as max_points, ROW_NUMBER () OVER ( PARTITION BY P .istar_user, P .skill_objective, P.item_id ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P WHERE item_type IN ('QUESTION', 'LESSON') AND batch_group_id = ( SELECT batch_group. ID FROM batch_students, batch_group WHERE batch_students.batch_group_id = batch_group. ID AND batch_students.student_id = "
-					+ istarUserId + " AND batch_group.is_primary = 't' LIMIT 1 ) AND course_id = " + courseId
-					+ " ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 GROUP BY istar_user HAVING (SUM(T1.max_points) > 0) ) T2 ORDER BY  user_points DESC, perc DESC, total_points DESC ) T3 ) T4 WHERE istar_user = "
-					+ istarUserId + "";
+			String getRankPointsForUser = "SELECT * FROM ( SELECT istar_user, user_points, total_points, perc, CAST ( RANK () OVER (ORDER BY user_points DESC) AS INTEGER ) AS user_rank FROM ( SELECT istar_user, user_points, total_points, CAST ( (user_points * 100) / total_points AS INTEGER ) AS perc FROM ( SELECT T1.istar_user, SUM (T1.user_points) AS user_points, SUM (T1.max_points) AS total_points FROM ( WITH summary AS ( SELECT P .istar_user, P .skill_objective, custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (P .points, '0'), ':per_lesson_points', ( SELECT property_value FROM constant_properties WHERE property_name = 'per_lesson_points' ) ), ':per_assessment_points', ( SELECT property_value FROM constant_properties WHERE property_name = 'per_assessment_points' ) ), ':per_question_points', ( SELECT property_value FROM constant_properties WHERE property_name = 'per_question_points' ) ) ) AS TEXT ) ) AS user_points, custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (P .max_points, '0'), ':per_lesson_points',  (SELECT property_value FROM constant_properties WHERE property_name = 'per_lesson_points' ) ), ':per_assessment_points',  (SELECT property_value FROM constant_properties WHERE property_name = 'per_assessment_points' ) ), ':per_question_points',  (SELECT property_value FROM constant_properties WHERE property_name = 'per_question_points' ) ) ) AS TEXT ) ) AS max_points, ROW_NUMBER () OVER ( PARTITION BY P .istar_user, P .skill_objective, P .item_id ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P WHERE item_type IN ('QUESTION', 'LESSON') AND batch_group_id = ( SELECT batch_group. ID FROM batch_students, batch_group WHERE batch_students.batch_group_id = batch_group. ID AND "
+					+ "batch_students.student_id = "+istarUserId+" AND batch_group.is_primary = 't' LIMIT 1 ) AND "
+					+ "course_id = "+courseId+" ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 GROUP BY istar_user HAVING (SUM(T1.max_points) > 0) ) T2 ORDER BY user_points DESC, perc DESC, total_points DESC ) T3 ) T4 WHERE istar_user = "+istarUserId+"";
 			if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
 				// System.out.println("getRankPointsForUser>>>>>>>>>>"+getRankPointsForUser);
 			}
@@ -368,47 +343,11 @@ public class AppCourseServices {
 
 	private List<SkillReportPOJO> fillShellTreeWithData(List<SkillReportPOJO> shellTree, int istarUserId,
 			int courseId) {
-		int per_assessment_points = 5, per_lesson_points = 5, per_question_points = 1, per_assessment_coins = 5,
-				per_lesson_coins = 5, per_question_coins = 1;
-		try {
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-			if (inputStream != null) {
-				properties.load(inputStream);
 
-				per_assessment_points = Integer.parseInt(properties.getProperty("per_assessment_points"));
-				per_lesson_points = Integer.parseInt(properties.getProperty("per_lesson_points"));
-				per_question_points = Integer.parseInt(properties.getProperty("per_question_points"));
-				per_assessment_coins = Integer.parseInt(properties.getProperty("per_assessment_coins"));
-				per_lesson_coins = Integer.parseInt(properties.getProperty("per_lesson_coins"));
-				per_question_coins = Integer.parseInt(properties.getProperty("per_question_coins"));
-
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-
-		}
-
-		String getDataForTree = "SELECT 	T1. ID, 	T1.skill_objective, 	T1.points, 	T1.max_points, 	module_skill. ID AS module_id FROM 	( 		WITH summary AS ( 			SELECT 				P . ID, 				P .skill_objective, 				custom_eval ( 					CAST ( 						TRIM ( 							REPLACE ( 								REPLACE ( 									REPLACE ( 										COALESCE (P .points, '0'), 										':per_lesson_points', 										'"
-				+ per_lesson_points
-				+ "' 									), 									':per_assessment_points', 									'"
-				+ per_assessment_points
-				+ "' 								), 								':per_question_points', 								'"
-				+ per_question_points
-				+ "' 							) 						) AS TEXT 					) 				) AS points, 				custom_eval ( 					CAST ( 						TRIM ( 							REPLACE ( 								REPLACE ( 									REPLACE ( 										COALESCE (P .max_points, '0'), 										':per_lesson_points', 										'"
-				+ per_lesson_points
-				+ "' 									), 									':per_assessment_points', 									'"
-				+ per_assessment_points
-				+ "' 								), 								':per_question_points', 								'"
-				+ per_question_points
-				+ "' 							) 						) AS TEXT 					) 				) AS max_points, 				ROW_NUMBER () OVER ( 					PARTITION BY P .skill_objective, 					P .item_id 				ORDER BY 					P . TIMESTAMP DESC 				) AS rk 			FROM 				user_gamification P, 				assessment_question, 				question 			WHERE 				P .course_id = "
-				+ courseId + " 			AND P .istar_user = " + istarUserId
-				+ " 			AND P .item_id = assessment_question.questionid 			AND assessment_question.assessmentid in (select distinct item_id from user_gamification where course_id = "
-				+ courseId + " and istar_user = " + istarUserId
-				+ " and item_type='ASSESSMENT') 			AND assessment_question.questionid = question. ID 			AND question.context_id = "
-				+ courseId
-				+ " 			AND P .item_type = 'QUESTION' 		) SELECT 			s.* 		FROM 			summary s 		WHERE 			s.rk = 1 	) T1 JOIN skill_objective cmsession_skill ON ( 	T1.skill_objective = cmsession_skill. ID ) JOIN skill_objective module_skill ON ( 	module_skill. ID = cmsession_skill.parent_skill )";
+		String getDataForTree = "SELECT T1. ID, T1.skill_objective, T1.points, T1.max_points, module_skill. ID AS module_id FROM ( WITH summary AS ( SELECT P . ID, P .skill_objective, custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (P .points, '0'), ':per_lesson_points', ( SELECT property_value FROM constant_properties WHERE property_name = 'per_lesson_points' ) ), ':per_assessment_points', ( SELECT property_value FROM constant_properties WHERE property_name = 'per_assessment_points' ) ), ':per_question_points', ( SELECT property_value FROM constant_properties WHERE property_name = 'per_question_points' ) ) ) AS TEXT ) ) AS points, custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (P .max_points, '0'), ':per_lesson_points', ( SELECT property_value FROM constant_properties WHERE property_name = 'per_lesson_points' ) ), ':per_assessment_points', ( SELECT property_value FROM constant_properties WHERE property_name = 'per_assessment_points' ) ), ':per_question_points', ( SELECT property_value FROM constant_properties WHERE property_name = 'per_question_points' ) ) ) AS TEXT ) ) AS max_points, ROW_NUMBER () OVER ( PARTITION BY P .skill_objective, P .item_id ORDER BY P . TIMESTAMP DESC ) AS rk FROM user_gamification P, assessment_question, question WHERE "
+				+ "P .course_id = "+courseId+" AND P .istar_user = "+istarUserId+" AND P .item_id = assessment_question.questionid AND assessment_question.assessmentid IN ( SELECT DISTINCT item_id FROM user_gamification WHERE "
+				+ "course_id = "+courseId+" AND istar_user = "+istarUserId+" AND item_type = 'ASSESSMENT' ) AND assessment_question.questionid = question. ID AND "
+				+ "question.context_id = "+courseId+" AND P .item_type = 'QUESTION' ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 JOIN skill_objective cmsession_skill ON ( T1.skill_objective = cmsession_skill. ID ) JOIN skill_objective module_skill ON ( module_skill. ID = cmsession_skill.parent_skill )";
 		if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
 			// System.out.println("getDataForTree in course"+getDataForTree);
 		}
@@ -466,35 +405,14 @@ public class AppCourseServices {
 
 	private List<SkillReportPOJO> getShellSkillTreeForCourse(int courseId) {
 		String mediaUrlPath = "";
-		int per_assessment_points = 5, per_lesson_points = 5, per_question_points = 1, per_assessment_coins = 5,
-				per_lesson_coins = 5, per_question_coins = 1;
-		try {
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-			if (inputStream != null) {
-				properties.load(inputStream);
-				mediaUrlPath = properties.getProperty("media_url_path");
-				per_assessment_points = Integer.parseInt(properties.getProperty("per_assessment_points"));
-				per_lesson_points = Integer.parseInt(properties.getProperty("per_lesson_points"));
-				per_question_points = Integer.parseInt(properties.getProperty("per_question_points"));
-				per_assessment_coins = Integer.parseInt(properties.getProperty("per_assessment_coins"));
-				per_lesson_coins = Integer.parseInt(properties.getProperty("per_lesson_coins"));
-				per_question_coins = Integer.parseInt(properties.getProperty("per_question_coins"));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+		AppProperies prop = new AppProperies();
+		mediaUrlPath = prop.getProperty("media_url_path");
 		List<SkillReportPOJO> skillsReport = new ArrayList<SkillReportPOJO>();
 		DBUTILS utils = new DBUTILS();
-		String getEmptyTreeStructure = "select * from  (SELECT distinct module_skill.id as module_id, module_skill.name as module_name, cmsession_skill.id as cmsession_skill_id, cmsession_skill.name as cmsession_skill_name FROM skill_objective module_skill, skill_objective cmsession_skill WHERE module_skill.context = "
-				+ courseId + " AND module_skill.context = " + courseId
-				+ " AND module_skill.id = cmsession_skill.parent_skill AND cmsession_skill.skill_level_type ='CMSESSION' and module_skill.skill_level_type ='MODULE' order by module_id ) T1 JOIN ( SELECT skill_objective_id, SUM ( custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (max_points, '0'), ':per_lesson_points', '"
-				+ per_lesson_points + "' ), ':per_assessment_points', '" + per_assessment_points
-				+ "' ), ':per_question_points', '" + per_question_points
-				+ "' ) ) AS TEXT ) ) ) AS max_points FROM assessment_benchmark WHERE context_id = " + courseId
-				+ " GROUP BY skill_objective_id ) AB ON ( AB.skill_objective_id = T1.cmsession_skill_id )";
+		String getEmptyTreeStructure = "SELECT * FROM ( SELECT DISTINCT module_skill. ID AS module_id, module_skill. NAME AS module_name, cmsession_skill. ID AS cmsession_skill_id, cmsession_skill. NAME AS cmsession_skill_name FROM skill_objective module_skill, skill_objective cmsession_skill WHERE "
+				+ "module_skill.context = "+courseId+" AND module_skill.context = "+courseId+" AND module_skill. ID = cmsession_skill.parent_skill AND cmsession_skill.skill_level_type = 'CMSESSION' AND module_skill.skill_level_type = 'MODULE' ORDER BY module_id ) T1 JOIN ( SELECT skill_objective_id, SUM ( custom_eval ( CAST ( TRIM ( REPLACE ( REPLACE ( REPLACE ( COALESCE (max_points, '0'), ':per_lesson_points', ( SELECT property_value FROM constant_properties WHERE property_name = 'per_lesson_points' ) ), ':per_assessment_points', ( SELECT property_value FROM constant_properties WHERE property_name = 'per_assessment_points' ) ), ':per_question_points', ( SELECT property_value FROM constant_properties WHERE property_name = 'per_question_points' ) ) ) AS TEXT ) ) ) AS max_points FROM assessment_benchmark WHERE "
+				+ "context_id = "+courseId+" GROUP BY skill_objective_id ) AB ON ( AB.skill_objective_id = T1.cmsession_skill_id )";
+		
 		if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
 			// System.out.println("getEmptyTreeStructure>>>"+getEmptyTreeStructure);
 		}
