@@ -216,7 +216,7 @@ public class CreateZIPForItem {
 		filesListInDir.clear();
 		filesListInDir.addAll(hs);
 
-		System.out.println("Zip path for Lesson:" + lesson.getId());
+		//System.out.println("Zip path for Lesson:" + lesson.getId());
 		/*for (String key : filesListInDir) {
 			System.out.println(key);
 		}*/

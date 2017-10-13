@@ -92,8 +92,8 @@ public class AppServices {
 	
 	
 	public List<SkillReportPOJO> getSkillsMapOfUser(int istarUserId) {
-
-		String mediaUrlPath ="";
+		List<SkillReportPOJO> allSkills = new ArrayList<SkillReportPOJO>();
+		/*String mediaUrlPath ="";
 		try{
 			Properties properties = new Properties();
 			String propertyFileName = "app.properties";
@@ -134,7 +134,7 @@ public class AppServices {
 				}
 				allSkills.add(courseSkillPOJO);
 			}
-		}
+		}*/
 		return allSkills;
 	}
 	

@@ -27,6 +27,7 @@ import com.istarindia.apps.services.AppComplexObjectServices;
 import com.istarindia.apps.services.AppServices;
 import com.viksitpro.core.dao.entities.BatchGroup;
 import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Role;
 import com.viksitpro.core.dao.entities.UserProfile;
 import com.viksitpro.core.dao.entities.UserRole;
@@ -278,15 +279,15 @@ public class RESTIstarUserService {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			IstarUserServices istarUserServices = new IstarUserServices();
-			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+			IstarUser istarUser = new IstarUserDAO().findById(userId);
 
 			Long mobileNumber = Long.parseLong(mobile);
 
 			IstarUser mobileIstarUser = istarUserServices.getIstarUserByMobile(mobileNumber);
-
+			
 			if (istarUser == null) {
 				throw new Exception();
-			} else if (mobileIstarUser != null && mobileIstarUser.getId() != istarUser.getId()) {
+			} else if (mobileIstarUser != null && mobileIstarUser.getId().intValue() != istarUser.getId().intValue()) {
 				throw new Exception(
 						"istarViksitProComplexKeyA user already exits with this mobile. Please try with another mobile number or raise a ticket.");
 			}
@@ -403,6 +404,7 @@ public class RESTIstarUserService {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
+			//System.out.println("error for "+istarUserId);
 			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(istarUserId);
 
 			if (complexObject == null) {

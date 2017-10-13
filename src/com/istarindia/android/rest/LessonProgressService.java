@@ -51,8 +51,8 @@ public class LessonProgressService extends HttpServlet {
 			int moduleId = l.getCmsessions().iterator().next().getModules().iterator().next().getId();
 			int cmsessionId = l.getCmsessions().iterator().next().getId();
 			
-			String insertIntoLog = "INSERT INTO user_session_log (id, cmsession_id, course_id, created_at, lesson_id, lesson_type, module_id,  slide_id, updated_at, url, user_id,total_slide_count)"
-					+ " VALUES ((select COALESCE(max(id),0)+1 from user_session_log), "+cmsessionId+","
+			String insertIntoLog = "INSERT INTO user_session_log ( cmsession_id, course_id, created_at, lesson_id, lesson_type, module_id,  slide_id, updated_at, url, user_id,total_slide_count)"
+					+ " VALUES ( "+cmsessionId+","
 							+ " "+courseId+", now(), "+lessonId+", '"+l.getType()+"', "+moduleId+", "+slideId+", "
 									+ " now(), '"+slideTitle+"', "+istarUserId+","+totalSlideCount+");";
 			util.executeUpdate(insertIntoLog);

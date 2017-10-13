@@ -18,9 +18,11 @@ import java.util.UUID;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 
+import com.viksitpro.core.utilities.AppProperies;
+
 public class AppUtility {
 
-	public String imageUpload(String profileImage, String fileFormat, String type, String context) throws IOException{
+	public String imageUpload(String profileImage, String fileFormat, String type, String context) throws IOException {
 		Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
 		// add owners permission
 		perms.add(PosixFilePermission.OWNER_READ);
@@ -34,59 +36,50 @@ public class AppUtility {
 		perms.add(PosixFilePermission.OTHERS_READ);
 		perms.add(PosixFilePermission.OTHERS_WRITE);
 		perms.add(PosixFilePermission.OTHERS_EXECUTE);
-		
-		
-		
-		String imageUploadPath ="";
-		String subDirectory = "users"+"/";
-		
+
+		String imageUploadPath = AppProperies.getProperty("mediaPath");
+		String subDirectory = "users" + "/";
+
+		String serverType = AppProperies.getProperty("server_type");
+
 		String fileExtension = fileFormat;
 
-			Properties properties = new Properties();
-			String propertyFileName = "app.properties";
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
-				if (inputStream != null) {
-					properties.load(inputStream);
-					String benchmark = properties.getProperty("pointsBenchmark");
-					imageUploadPath = properties.getProperty("mediaPath");					
-					//System.out.println("imageUploadPath"+imageUploadPath);
-					//System.out.println("benchmark"+benchmark);
-				}
+		File rootUploadFolder = new File(imageUploadPath + subDirectory);
+		if (!rootUploadFolder.exists()) {
+			// System.out.println("RootUploadFolder does not exists, creating new one");
+			rootUploadFolder.mkdir();
 
-				File rootUploadFolder = new File(imageUploadPath+subDirectory);
-				if(!rootUploadFolder.exists()){
-					//System.out.println("RootUploadFolder does not exists, creating new one");
-					rootUploadFolder.mkdir();
-					Files.setPosixFilePermissions(Paths.get(rootUploadFolder.getAbsolutePath()), perms);
-				}				
-				if(context!=null){
-					subDirectory = subDirectory + context + "/";
-				}										
-				//System.out.println("subDirectory"+subDirectory);
-		imageUploadPath = imageUploadPath+subDirectory;
+			if (serverType.equalsIgnoreCase("linux"))
+				Files.setPosixFilePermissions(Paths.get(rootUploadFolder.getAbsolutePath()), perms);
+
+		}
+		if (context != null) {
+			subDirectory = subDirectory + context + "/";
+		}
+		// System.out.println("subDirectory"+subDirectory);
+		imageUploadPath = imageUploadPath + subDirectory;
 		File uploadFolder = new File(imageUploadPath);
-		//System.out.println(uploadFolder.getAbsolutePath());
-		if(!uploadFolder.exists()){
-			//System.out.println("Folder does not exists");
+		// System.out.println(uploadFolder.getAbsolutePath());
+		if (!uploadFolder.exists()) {
+			// System.out.println("Folder does not exists");
 			uploadFolder.mkdir();
-			Files.setPosixFilePermissions(Paths.get(uploadFolder.getAbsolutePath()), perms);
-			
-		}								
-		String fileName = UUID.randomUUID().toString()+"."+fileExtension;
-		String filePath = uploadFolder.getAbsolutePath()+"/"+fileName;
+			if (serverType.equalsIgnoreCase("linux"))
+				Files.setPosixFilePermissions(Paths.get(uploadFolder.getAbsolutePath()), perms);
+
+		}
+		String fileName = UUID.randomUUID().toString() + "." + fileExtension;
+		String filePath = uploadFolder.getAbsolutePath() + "/" + fileName;
 		byte[] imgByteArray = Base64.decodeBase64(profileImage);
-        FileOutputStream file = new FileOutputStream(filePath);
-        String fileURL = subDirectory +fileName;
-        file.write(imgByteArray);              
-        file.close();
-        File f = new File(filePath);        
-        //System.out.println("absouolte file path ->"+f.getAbsolutePath());
-        //System.out.println("fileURL ->"+fileURL);
-        try {
+		FileOutputStream file = new FileOutputStream(filePath);
+		String fileURL = subDirectory + fileName;
+		file.write(imgByteArray);
+		file.close();
+		File f = new File(filePath);
+		// System.out.println("absouolte file path ->"+f.getAbsolutePath());
+		// System.out.println("fileURL ->"+fileURL);
+		if (serverType.equalsIgnoreCase("linux"))
 			Files.setPosixFilePermissions(Paths.get(f.getAbsolutePath()), perms);
-		} catch (Exception e) {
-			
-		}		
+
 		return fileURL;
 	}
 	
