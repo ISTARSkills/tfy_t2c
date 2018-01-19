@@ -233,6 +233,116 @@ public class TrainerWorkflowServices {
 		
 		
 	}
+	
+	public void submitFeedbackByStudent(Integer taskId, Integer student_id, Integer eventId,
+			ClassFeedbackByTrainer feedbackResponse) {
+
+		HashMap<String, String> feedbackData = new HashMap<>();
+		DBUTILS dbutils = new DBUTILS();
+		Integer trainer_id = null;
+		Integer batch_id = null;
+
+		String sql = "SELECT actor_id,batch_group_id from batch_schedule_event where type ='BATCH_SCHEDULE_EVENT_TRAINER' and batch_group_code in (SELECT batch_group_code from batch_schedule_event where id="
+				+ eventId + ")";
+
+		List<HashMap<String, Object>> hashMaps = dbutils.executeQuery(sql);
+
+		for (HashMap<String, Object> hashMap : hashMaps) {
+			trainer_id = (int) hashMap.get("actor_id");
+			batch_id = (int) hashMap.get("batch_group_id");
+		}
+
+		feedbackData.put("", "0");
+		for (FeedbackPojo pojo : feedbackResponse.getFeedbacks()) {
+			feedbackData.put(pojo.getName().toLowerCase(), pojo.getRating());
+		}
+
+		float projector = 0;
+		float internet = 0;
+		float trainer_knowledge = 0;
+		float trainer_too_fast = 0;
+		float class_control_by_trainer = 0;
+		float too_tough_content = 0;
+		float too_much_theoritic = 0;
+		float no_fun_in_class = 0;
+		float enough_examples = 0;
+		float outside_disturbance = 0;
+		float rating = 0;
+
+		String comments = "";
+
+		if (feedbackData != null && feedbackData.size() != 0) {
+			for (String key : feedbackData.keySet()) {
+				if (!key.equalsIgnoreCase("comment")) {
+					float skill_value = Float.parseFloat(feedbackData.get(key));
+
+					switch (key) {
+					case "projector":
+						projector = skill_value;
+						break;
+					case "internet":
+						internet = skill_value;
+						break;
+					case "trainer_knowledge":
+						trainer_knowledge = skill_value;
+						break;
+					case "trainer_too_fast":
+						trainer_too_fast = skill_value;
+						break;
+					case "class_control_by_trainer":
+						class_control_by_trainer = skill_value;
+						break;
+					case "too_tough_content":
+						too_tough_content = skill_value;
+						break;
+					case "too_much_theoritic":
+						too_much_theoritic = skill_value;
+						break;
+					case "no_fun_in_class":
+						no_fun_in_class = skill_value;
+						break;
+					case "enough_examples":
+						enough_examples = skill_value;
+						break;
+					case "outside_disturbance":
+						outside_disturbance = skill_value;
+						break;
+					}
+				} else {
+					comments = feedbackData.get(key);
+				}
+
+			}
+		}
+
+		rating = ((projector + internet + trainer_knowledge + trainer_too_fast + class_control_by_trainer
+				+ too_tough_content + too_much_theoritic + no_fun_in_class + enough_examples + outside_disturbance)
+				/ 10);
+
+		// check if exist ---> delete existed data
+		String checkAlreadyGiven = "SELECT * from student_feedback where student_id=" + student_id + " and event_id="
+				+ eventId + " and trainer_id=" + trainer_id;
+		List<HashMap<String, Object>> data = dbutils.executeQuery(checkAlreadyGiven);
+		if (data != null && data.size() != 0) {
+			String deleteFeedback = "DELETE from student_feedback where student_id=" + student_id + " and event_id="
+					+ eventId + " and trainer_id=" + trainer_id;
+			dbutils.executeUpdate(deleteFeedback);
+		}
+
+		// insert
+		sql = "INSERT INTO student_feedback (id, batch_id, student_id, projector, internet, trainer_knowledge, trainer_too_fast, class_control_by_trainer, too_tough_content, too_much_theoritic, no_fun_in_class, enough_examples, outside_disturbance, rating, event_id, trainer_id, comment) VALUES ((select COALESCE(max(id),0)+1 from student_feedback),"
+				+ " " + batch_id + ", " + student_id + ", " + projector + ", " + internet + ", " + trainer_knowledge
+				+ ", " + trainer_too_fast + ", " + class_control_by_trainer + ", " + too_tough_content + ", "
+				+ too_much_theoritic + ", " + no_fun_in_class + ", " + enough_examples + ", " + outside_disturbance
+				+ ", " + rating + ", " + eventId + ", " + trainer_id + ", '" + comments + "');";
+
+		System.err.println(sql);
+		dbutils.executeUpdate(sql);
+
+		String updateTaskAsCompleted = "update task set is_active = 'f' where id=" + taskId;
+		dbutils.executeUpdate(updateTaskAsCompleted);
+
+	}
 
 	public void updateState(int taskId, int istarUserId, String state) {
 		
