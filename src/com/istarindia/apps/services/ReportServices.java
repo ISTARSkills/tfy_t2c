@@ -1,11 +1,7 @@
 package com.istarindia.apps.services;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -17,7 +13,6 @@ import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.Report;
 import com.viksitpro.core.dao.entities.ReportDAO;
-import com.viksitpro.core.utilities.DBUTILS;
 
 public class ReportServices {
 	

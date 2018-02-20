@@ -15,6 +15,8 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.viksitpro.core.logger.ViksitLogger;
+
 /**
  * Servlet Filter implementation class SecurityFilter
  */
@@ -55,12 +57,13 @@ public class SecurityFilter implements Filter {
 			throws IOException, ServletException {
 		HttpServletResponse res=(HttpServletResponse)response;
 		if (security_token_check.equalsIgnoreCase("true")) {
-			//System.out.println("security_token_check true");
+			//ViksitLogger.logMSG(this.getClass().getName(),"security_token_check true");
 			if (checkAuth((HttpServletRequest) request)) {
-				System.out.println("Access Approved");
+				
+				ViksitLogger.logMSG(this.getClass().getName(), "Access Approved");
 				chain.doFilter(request, res);
 			} else {
-				System.out.println("Access Denied");
+				ViksitLogger.logMSG(this.getClass().getName(),"Access Denied");
 				res.setStatus(500);
 				res.getWriter().print("\"istarViksitProComplexKeySecurity Access Denied.\"");
 			}
@@ -68,7 +71,7 @@ public class SecurityFilter implements Filter {
 		} else {
 
 			chain.doFilter(request, res);
-			//System.out.println("security_token_check false");
+			//ViksitLogger.logMSG(this.getClass().getName(),"security_token_check false");
 		}
 
 	}
@@ -76,7 +79,7 @@ public class SecurityFilter implements Filter {
 	
 
 	private boolean checkAuth(HttpServletRequest request) {
-		System.out.println("Accessed via filter ");
+		ViksitLogger.logMSG(this.getClass().getName(),"Accessed via filter ");
 		return SecurityService.checkAuth(request);
 
 	}

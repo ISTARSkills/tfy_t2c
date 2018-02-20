@@ -10,12 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-
-import com.viksitpro.core.dao.entities.BaseHibernateDAO;
-import com.viksitpro.core.dao.entities.IstarUser;
-import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.utilities.DBUTILS;
 
 @WebServlet("/update_attendance")
@@ -38,7 +32,7 @@ public class UpdateAttendanceController extends HttpServlet {
 		
 			String sql = "SELECT 	actor_id, 	ID FROM 	batch_schedule_event WHERE 	batch_group_code IN ( 		SELECT 			batch_group_code 		FROM 			batch_schedule_event 		WHERE 			ID IN ( 				SELECT 					item_id 				FROM 					task 				WHERE 					actor = "+user_id+" 				AND item_type = 'CLASSROOM_SESSION_STUDENT' 				AND ID = "+taskID+" 			) 	) AND TYPE = 'BATCH_SCHEDULE_EVENT_TRAINER'";
 
-			////System.err.println(sql);
+			////ViksitLogger.logMSG(this.getClass().getName(),(sql);
 
 			List<HashMap<String, Object>> data = db.executeQuery(sql);
 
@@ -54,7 +48,7 @@ public class UpdateAttendanceController extends HttpServlet {
 					if((int)data2.get(0).get("ispresent") == 0){
 						
 						String sqqll = "INSERT INTO attendance ( 	id, 	taken_by, 	user_id, 	status, 	created_at, 	updated_at, 	event_id ) VALUES 	( 		(SELECT MAX(id)+1 FROM attendance), 		"+taken_by+", 		"+user_id+", 		'PRESENT', 		now(), 		now(), 		"+event_id+" 	);";
-						////System.err.println(sqqll);
+						////ViksitLogger.logMSG(this.getClass().getName(),(sqqll);
 						db.executeUpdate(sqqll);
 						
 					}

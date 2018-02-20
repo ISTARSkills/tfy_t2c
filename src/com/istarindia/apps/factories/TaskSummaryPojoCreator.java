@@ -6,27 +6,20 @@ package com.istarindia.apps.factories;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Date;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 
 import com.istarindia.android.pojo.TaskSummaryPOJO;
-import com.istarindia.android.pojo.task.AssessmentTask;
-import com.istarindia.android.pojo.task.ClassRoomSessionTask;
-import com.istarindia.android.pojo.trainerworkflow.GroupStudentPojo;
 import com.istarindia.apps.services.AppAssessmentServices;
 import com.istarindia.apps.services.AppCourseServices;
-import com.istarindia.apps.services.TrainerWorkflowServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.IstarUser;
-import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Task;
@@ -146,7 +139,7 @@ public class TaskSummaryPojoCreator {
 				if (inputStream != null) {
 					properties.load(inputStream);
 					mediaUrlPath =  properties.getProperty("media_url_path");
-					//System.out.println("media_url_path"+mediaUrlPath);
+					//ViksitLogger.logMSG(this.getClass().getName(),"media_url_path"+mediaUrlPath);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -577,7 +570,7 @@ public class TaskSummaryPojoCreator {
 				if (inputStream != null) {
 					properties.load(inputStream);
 					mediaUrlPath =  properties.getProperty("media_url_path");
-					//System.out.println("media_url_path"+mediaUrlPath);
+					//ViksitLogger.logMSG(this.getClass().getName(),"media_url_path"+mediaUrlPath);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

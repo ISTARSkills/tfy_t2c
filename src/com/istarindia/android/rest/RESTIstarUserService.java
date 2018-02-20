@@ -85,7 +85,7 @@ public class RESTIstarUserService {
 			appServices.logEntryToLoginTable(istarUser, "LOGIN");
 			return Response.ok(result).build();
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
 					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
 			return Response.status(Response.Status.OK).entity(result).build();
@@ -130,7 +130,7 @@ public class RESTIstarUserService {
 			IstarUser istarUser = istarUserServices.getIstarUser(userId);
 
 			Gson requestGson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-			//System.out.println("profule json---"+profile);
+			//ViksitLogger.logMSG(this.getClass().getName(),"profule json---"+profile);
 			StudentProfile requestStudentProfile = requestGson.fromJson(profile, StudentProfile.class);
 
 			if (istarUser == null) {
@@ -404,7 +404,7 @@ public class RESTIstarUserService {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
-			//System.out.println("error for "+istarUserId);
+			//ViksitLogger.logMSG(this.getClass().getName(),"error for "+istarUserId);
 			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(istarUserId);
 
 			if (complexObject == null) {

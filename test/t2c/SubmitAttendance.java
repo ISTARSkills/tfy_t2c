@@ -9,20 +9,16 @@ import java.util.Random;
 
 import com.istarindia.android.pojo.trainerworkflow.ClassFeedbackByTrainer;
 import com.istarindia.android.pojo.trainerworkflow.FeedbackPojo;
-import com.istarindia.android.pojo.trainerworkflow.GroupPojo;
-import com.istarindia.android.pojo.trainerworkflow.GroupStudentPojo;
 import com.istarindia.apps.services.TrainerWorkflowServices;
 import com.viksitpro.core.utilities.DBUTILS;
-import com.viksitpro.core.utilities.TaskItemCategory;
-import com.viksitpro.core.utilities.TrainerWorkflowStages;
 
 public class SubmitAttendance {
 
 	public static void main(String[] args) throws ParseException {
 		// TODO Auto-generated method stub
-		System.err.println("START");
+		
 		submitFeedback(271);
-		System.err.println("END");
+		
 	}
 
 	private static void submitFeedback(int orgId) {

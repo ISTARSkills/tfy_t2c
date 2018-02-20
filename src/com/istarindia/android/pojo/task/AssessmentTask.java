@@ -4,7 +4,6 @@
 package com.istarindia.android.pojo.task;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
 
 import com.istarindia.android.pojo.TaskSummaryPOJO;
 

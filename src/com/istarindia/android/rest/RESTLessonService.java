@@ -2,13 +2,10 @@ package com.istarindia.android.rest;
 
 import java.io.File;
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.List;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -24,23 +21,18 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.istarindia.android.pojo.ComplexObject;
 import com.istarindia.android.pojo.LessonPOJO;
-import com.istarindia.android.utility.AppDashboardUtility;
 import com.istarindia.android.utility.CreateZIPForItem;
 import com.istarindia.apps.services.AppComplexObjectServices;
 import com.istarindia.apps.services.AppCourseServices;
 import com.istarindia.apps.services.GamificationServices;
 import com.istarindia.apps.services.StudentPlaylistServices;
-import com.viksitpro.core.cms.interactive.InteractiveContent;
-import com.viksitpro.core.cms.lesson.VideoLesson;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.StudentPlaylist;
-import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.utilities.DBUTILS;
-import com.viksitpro.core.utilities.TaskItemCategory;
 
 @Path("lessons/user/{userId}")
 public class RESTLessonService {
@@ -71,7 +63,7 @@ public class RESTLessonService {
 			{
 				//create zip every time
 				object = createZIPForItem.generateXMLForLesson(lesson);				
-				//System.out.println("oject string in case of lessonXML"+object.toString());
+				//ViksitLogger.logMSG(this.getClass().getName(),"oject string in case of lessonXML"+object.toString());
 			}
 			else if(lesson.getType().equalsIgnoreCase("INTERACTIVE"))
 			{
@@ -148,7 +140,7 @@ public class RESTLessonService {
 			Session session = baseHibernateDAO.getSession();
 			
 			String sql = "select id, status from student_playlist where student_id="+istarUserId+" and lesson_id="+lessonId;
-			//System.out.println("Lesson SP-->"+sql);
+			//ViksitLogger.logMSG(this.getClass().getName(),"Lesson SP-->"+sql);
 			SQLQuery query = session.createSQLQuery(sql);
 			List<Object[]> queryResult = query.list();
 			
@@ -191,7 +183,7 @@ public class RESTLessonService {
 		try {
 			StudentPlaylistServices studentPlaylistServices = new StudentPlaylistServices();
 			StudentPlaylist studentPlaylist = studentPlaylistServices.getStudentPlaylist(playlistId);
-			////System.err.println(studentPlaylist.getLesson().getId());
+			////ViksitLogger.logMSG(this.getClass().getName(),(studentPlaylist.getLesson().getId());
 			if (studentPlaylist == null) {
 				throw new Exception();
 			}
@@ -231,7 +223,7 @@ public class RESTLessonService {
 			
 			String updateStudentPlayList1 = "update  task set is_active='f' where id in(select task_id from student_playlist where student_id = "+userId+" "
 					+ " and lesson_id = "+lessonId+")";
-			////System.err.println("updateStudentPlayList1--->"+updateStudentPlayList1);
+			////ViksitLogger.logMSG(this.getClass().getName(),("updateStudentPlayList1--->"+updateStudentPlayList1);
 			util.executeUpdate(updateStudentPlayList1);
 			
 			
@@ -267,7 +259,7 @@ public class RESTLessonService {
 				util.executeUpdate(updateStudentPlayList);
 				
 				String updateStudentPlayList1 = "update  task set is_active='f' where id in("+task_id+")";
-				////System.err.println("updateStudentPlayList1--->"+updateStudentPlayList1);
+				////ViksitLogger.logMSG(this.getClass().getName(),("updateStudentPlayList1--->"+updateStudentPlayList1);
 				util.executeUpdate(updateStudentPlayList1);
 				
 				

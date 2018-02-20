@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Comparator;
 import java.util.Properties;
 
 import com.istarindia.android.pojo.NotificationPOJO;
@@ -447,7 +447,7 @@ public class AppNotificationServices {
 	}
 
 	public NotificationPOJO getNotificationPOJOForLesson(IstarNotification istarNotification) {
-		// System.err.println("istarNotification
+		// ViksitLogger.logMSG(this.getClass().getName(),("istarNotification
 		// id>>>>>>"+istarNotification.getId());
 		NotificationPOJO notificationPOJO = null;
 		String mediaUrlPath = "";
@@ -458,7 +458,7 @@ public class AppNotificationServices {
 			if (inputStream != null) {
 				properties.load(inputStream);
 				mediaUrlPath = properties.getProperty("media_url_path");
-				// System.out.println("media_url_path"+mediaUrlPath);
+				// ViksitLogger.logMSG(this.getClass().getName(),"media_url_path"+mediaUrlPath);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

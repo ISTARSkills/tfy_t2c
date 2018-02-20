@@ -17,10 +17,9 @@ import com.istarindia.android.pojo.SkillReportPOJO;
 import com.istarindia.android.pojo.StudentProfile;
 import com.istarindia.android.utility.AppUtility;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
-import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.IstarUser;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
-import com.viksitpro.core.utilities.AppProperies;
+import com.viksitpro.core.logger.ViksitLogger;
 
 public class AppServices {
 	
@@ -29,7 +28,7 @@ public class AppServices {
 		Session session = baseHibernateDAO.getSession();	
 		session.clear();
 		String sql = "INSERT INTO login ( user_id, created_at, jsession_id, action) VALUES ( "+istarUser.getId()+", now(), '"+istarUser.getAuthToken()+"', '"+action+"')";
-		System.out.println(sql);
+		ViksitLogger.logMSG(this.getClass().getName(),sql);
 		SQLQuery query = session.createSQLQuery(sql);
 		query.executeUpdate();
 		session.close();
@@ -129,8 +128,8 @@ public class AppServices {
 				courseSkillPOJO.calculateTotalPoints();
 				courseSkillPOJO.calculatePercentage();
 				if(AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-				System.err.println("courseSkillPOJO.gettotal points"+courseSkillPOJO.getTotalPoints());
-				System.err.println("courseSkillPOJO.getUserPoints points"+courseSkillPOJO.getUserPoints());
+				ViksitLogger.logMSG(this.getClass().getName(),("courseSkillPOJO.gettotal points"+courseSkillPOJO.getTotalPoints());
+				ViksitLogger.logMSG(this.getClass().getName(),("courseSkillPOJO.getUserPoints points"+courseSkillPOJO.getUserPoints());
 				}
 				allSkills.add(courseSkillPOJO);
 			}
@@ -273,7 +272,7 @@ public class AppServices {
 		Integer difficultyLevelSum = (Integer) result[0];
 		Integer numberOfLessons = (Integer) result[1];
 				
-				System.out.println("difficultyLevelSum->"+difficultyLevelSum+" numberOfLessons->" + numberOfLessons);
+				ViksitLogger.logMSG(this.getClass().getName(),"difficultyLevelSum->"+difficultyLevelSum+" numberOfLessons->" + numberOfLessons);
 				
 				try{
 				Properties properties = new Properties();
@@ -293,7 +292,7 @@ public class AppServices {
 	}
 	
 	public IstarUser assignToken(IstarUser istarUser) {
-		System.out.println("Assigning Token");
+		ViksitLogger.logMSG(this.getClass().getName(),"Assigning Token for user "+ istarUser.getId());
 		String authenticationToken = AppUtility.getRandomString(20);
 
 		IstarUserServices istarUserServices = new IstarUserServices();
@@ -303,7 +302,7 @@ public class AppServices {
 	}
 	
 	public IstarUser invalidateToken(IstarUser istarUser) {
-		System.out.println("Invalidate Token");
+		ViksitLogger.logMSG(this.getClass().getName(),"Invalidate Token");
 
 		IstarUserServices istarUserServices = new IstarUserServices();
 		istarUser = istarUserServices.updateAuthenticationTokenForIstarUser(istarUser.getId(), null);
@@ -320,18 +319,18 @@ public class AppServices {
 		
 		String message = "One Time Password to login to Talentify is " + OTP;
 
-		System.out.println(message);
+		ViksitLogger.logMSG(this.getClass().getName(),message);
 		
 		String smsURL = mobTextingURLBase + "&to="+URLEncoder.encode(mobile, "UTF-8")+"&message="+URLEncoder.encode(message, "UTF-8");
 
-		System.out.println(smsURL);
+		ViksitLogger.logMSG(this.getClass().getName(),smsURL);
 		URL urlObject = new URL(smsURL);
 		InputStream inputStream = urlObject.openConnection().getInputStream();
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
 		String line = null;
 		while ((line = bufferedReader.readLine()) != null) {
-			System.out.println(line);
+			ViksitLogger.logMSG(this.getClass().getName(),line);
 		}
 		bufferedReader.close();
 

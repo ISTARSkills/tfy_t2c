@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.Random;
 
 import org.junit.Test;
+
+import com.viksitpro.core.logger.ViksitLogger;
 public class ResponseTokenTestService {
 	private final String USER_AGENT = "Mozilla/5.0";
 	String viksit_user_agent = getTockent();
@@ -18,7 +20,7 @@ public class ResponseTokenTestService {
 
 		
 		
-		System.out.println("Testing 1 - Send Http GET request");
+		ViksitLogger.logMSG(this.getClass().getName(),"Testing 1 - Send Http GET request");
 		http.sendGet();*/
 		
 		
@@ -42,8 +44,8 @@ public class ResponseTokenTestService {
 		con.setRequestProperty("User-Agent", USER_AGENT);
 
 		int responseCode = con.getResponseCode();
-		System.out.println("\nSending 'GET' request to URL : " + url);
-		System.out.println("Response Code : " + responseCode);
+		ViksitLogger.logMSG(this.getClass().getName(),"\nSending 'GET' request to URL : " + url);
+		ViksitLogger.logMSG(this.getClass().getName(),"Response Code : " + responseCode);
 
 		BufferedReader in = new BufferedReader(
 		        new InputStreamReader(con.getInputStream()));
@@ -56,7 +58,7 @@ public class ResponseTokenTestService {
 		in.close();
 
 		//print result
-		System.out.println(">>>>>>> "+response.toString());
+		ViksitLogger.logMSG(this.getClass().getName(),">>>>>>> "+response.toString());
 
 	}
 
@@ -66,7 +68,7 @@ public class ResponseTokenTestService {
 		Date date = new Date();
 		String timeNow = dateFormat.format(date).toString();
 		timeNow = timeNow.replaceAll("/", "").replaceAll(":", "").replaceAll(" ", "");
-		System.err.println(timeNow);
+		ViksitLogger.logMSG(this.getClass().getName(),timeNow);
 
 		Random r = new Random();
 		int Low = 1;

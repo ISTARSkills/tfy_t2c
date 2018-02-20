@@ -7,7 +7,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
+
 import javax.servlet.http.HttpServletRequest;
+
+import com.viksitpro.core.logger.ViksitLogger;
 
 /**
  * @author Sumanth-Istar
@@ -28,7 +31,7 @@ public class SecurityService {
 					String value = (String) values.nextElement();
 					
 					if (name.equalsIgnoreCase("viksit-user-agent")) {
-						System.out.println(value);
+						
 						DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 						Date datefrom = new Date();
 						Date dateto = new Date(System.currentTimeMillis()+60*1000);
@@ -43,7 +46,7 @@ public class SecurityService {
 						timePrev = timePrev.replaceAll("/", "").replaceAll(":", "").replaceAll(" ", "");
 						value = value.replaceAll("viksit-", "").replaceAll("[^0-9]", "");
 						
-						System.out.println(timePrev+":"+timeFrom +":"+ value + ":" + timeTo);
+						
 						if (timeFrom.equals(timePrev) || timeFrom.equals(value) || timeTo.equals(value)) {
 							isTrue = true;
 						}

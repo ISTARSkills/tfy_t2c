@@ -84,7 +84,6 @@ public class RESTAssessmentService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAssessment(@PathParam("assessmentId") int assessmentId) {
 	
-		////System.err.println("--------------------------------------------------------I LOVE KAMINI");
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
 			AppAssessmentServices appAssessmentServices = new AppAssessmentServices();
@@ -114,7 +113,7 @@ public class RESTAssessmentService {
 			@FormParam("response") String questionResponsesString) {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		try {
-			//System.out.println("questionResponsesString-->" + questionResponsesString);
+			//ViksitLogger.logMSG(this.getClass().getName(),"questionResponsesString-->" + questionResponsesString);
 
 			Type listType = new TypeToken<List<QuestionResponsePOJO>>() {
 			}.getType();
@@ -184,12 +183,12 @@ public class RESTAssessmentService {
 				Report report = reportServices.getAssessmentReportForUser(istarUserId, assessmentId);
 				GamificationServices gamificationService = new GamificationServices();
 				if (report == null) {
-					//System.out.println("Report is null, creating new report");
+					//ViksitLogger.logMSG(this.getClass().getName(),"Report is null, creating new report");
 					reportServices.createReport(istarUser, assessment, correctAnswersCount, assessmentDuration,
 							maxPoints.intValue());
 					gamificationService.updateUserGamificationAfterAssessment(istarUser,assessment);
 				} else {
-					//System.out.println("Report exists, updating report");
+					//ViksitLogger.logMSG(this.getClass().getName(),"Report exists, updating report");
 					if(assessment.getRetryAble()!=null && assessment.getRetryAble())
 					{
 						reportServices.updateReport(report, istarUser, assessment, correctAnswersCount, assessmentDuration,maxPoints.intValue());

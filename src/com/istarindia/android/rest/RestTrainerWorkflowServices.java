@@ -3,13 +3,10 @@
  */
 package com.istarindia.android.rest;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -23,21 +20,12 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.istarindia.android.pojo.DailyTaskPOJO;
-import com.istarindia.android.pojo.NotificationPOJO;
-import com.istarindia.android.pojo.QuestionResponsePOJO;
 import com.istarindia.android.pojo.trainerworkflow.ClassFeedbackByTrainer;
 import com.istarindia.android.pojo.trainerworkflow.CourseContent;
-import com.istarindia.android.pojo.trainerworkflow.CourseItem;
 import com.istarindia.android.pojo.trainerworkflow.GroupPojo;
 import com.istarindia.android.pojo.trainerworkflow.GroupStudentPojo;
-import com.istarindia.apps.services.AppCalendarServices;
-import com.istarindia.apps.services.AppNotificationServices;
 import com.istarindia.apps.services.TrainerWorkflowServices;
-import com.viksitpro.core.dao.entities.IstarNotification;
-import com.viksitpro.core.dao.entities.Task;
-import com.viksitpro.core.dao.utils.task.TaskServices;
-import com.viksitpro.core.notification.IstarNotificationServices;
+import com.viksitpro.core.logger.ViksitLogger;
 import com.viksitpro.core.utilities.DBUTILS;
 import com.viksitpro.core.utilities.TaskItemCategory;
 import com.viksitpro.core.utilities.TrainerWorkflowStages;
@@ -59,7 +47,7 @@ public class RestTrainerWorkflowServices {
 			TrainerWorkflowServices service = new TrainerWorkflowServices();
 			DBUTILS util = new DBUTILS();
 			String getGroupId ="select batch_group_id, batch_group.name from task,batch_schedule_event, batch_group where batch_group.id = batch_schedule_event.batch_group_id and batch_schedule_event.id = task.item_id and task.id ="+taskId+" and item_type in ('"+TaskItemCategory.CLASSROOM_SESSION+"' , '"+TaskItemCategory.REMOTE_CLASS_TRAINER+"') ";
-			//System.out.println("getGroupId>>>"+getGroupId);
+			//ViksitLogger.logMSG(this.getClass().getName(),"getGroupId>>>"+getGroupId);
 			List<HashMap<String, Object>> groupData = util.executeQuery(getGroupId);
 			GroupPojo group = new GroupPojo();
 			if(groupData.size()>0)
@@ -105,7 +93,7 @@ public class RestTrainerWorkflowServices {
 			@PathParam("taskId") int taskId,
 			@FormParam("response") String attendanceResponsesString) {
 	
-		//System.out.println("attendanceResponsesString-->" + attendanceResponsesString);
+		//ViksitLogger.logMSG(this.getClass().getName(),"attendanceResponsesString-->" + attendanceResponsesString);
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		Type listType = new TypeToken<GroupPojo>() {}.getType();
 		Gson gsonRequest = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -127,7 +115,7 @@ public class RestTrainerWorkflowServices {
 			@PathParam("taskId") int taskId,
 			@FormParam("response") String FeedbackResponsesString) {
 	
-		//System.out.println("attendanceResponsesString-->" + FeedbackResponsesString);
+		//ViksitLogger.logMSG(this.getClass().getName(),"attendanceResponsesString-->" + FeedbackResponsesString);
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		Type listType = new TypeToken<ClassFeedbackByTrainer>() {}.getType();
 		Gson gsonRequest = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -153,7 +141,6 @@ public class RestTrainerWorkflowServices {
 			DBUTILS util = new DBUTILS();
 			Integer courseId= null;
 			String GetCourseId ="select course_id from task,batch_schedule_event where batch_schedule_event.id = task.item_id and item_type in ('"+TaskItemCategory.CLASSROOM_SESSION+"','"+TaskItemCategory.REMOTE_CLASS_TRAINER+"')  and task.id = "+taskId;
-			//System.out.println("getCourseId-------------"+GetCourseId);
 			List<HashMap<String, Object>> courseIdData = util.executeQuery(GetCourseId);
 			if(courseIdData.size()>0)
 			{
@@ -188,10 +175,8 @@ public class RestTrainerWorkflowServices {
 			DBUTILS util = new DBUTILS();
 			Integer courseId= null;
 			String GetCourseId ="select course_id from task,batch_schedule_event where batch_schedule_event.id = task.item_id and item_type in ('"+TaskItemCategory.CLASSROOM_SESSION_STUDENT+"','"+TaskItemCategory.REMOTE_CLASS_STUDENT+"') and task.id = "+taskId;
-			//System.out.println("getCourseId-------------"+GetCourseId);
 			List<HashMap<String, Object>> courseIdData = util.executeQuery(GetCourseId);
 			String getTrainerTaskId = "select id from task where item_type in ('"+TaskItemCategory.CLASSROOM_SESSION+"','"+TaskItemCategory.REMOTE_CLASS_TRAINER+"') and project_id in (select project_id from task where id = "+taskId+")";
-			//System.out.println("getTrainerTaskId-------------"+getTrainerTaskId);
 			List<HashMap<String, Object>> trainerTaskIdData = util.executeQuery(getTrainerTaskId);
 			
 			if(courseIdData.size()>0)
@@ -256,7 +241,7 @@ public class RestTrainerWorkflowServices {
 		Type listType = new TypeToken<ClassFeedbackByTrainer>() {
 		}.getType();
 		Gson gsonRequest = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-		System.out.println("submit_student feedback");
+		ViksitLogger.logMSG(this.getClass().getName(),"submit_student feedback");
 		ClassFeedbackByTrainer feedbackResponse = (ClassFeedbackByTrainer) gsonRequest.fromJson(FeedbackResponsesString,
 				listType);
 		TrainerWorkflowServices serv = new TrainerWorkflowServices();

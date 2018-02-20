@@ -20,7 +20,6 @@ import com.istarindia.android.pojo.CoursePOJO;
 import com.istarindia.android.pojo.LessonPOJO;
 import com.istarindia.android.pojo.ModulePOJO;
 import com.istarindia.android.pojo.SkillReportPOJO;
-import com.istarindia.android.pojo.StudentRankPOJO;
 import com.istarindia.android.utility.AppUserRankUtility;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
@@ -67,7 +66,7 @@ public class AppCourseServices {
 					+ "batch_students.student_id = "+istarUserId+" AND batch_group.is_primary = 't' LIMIT 1 ) AND "
 					+ "course_id = "+courseId+" ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 GROUP BY istar_user HAVING (SUM(T1.max_points) > 0) ) T2 ORDER BY user_points DESC, perc DESC, total_points DESC ) T3 ) T4 WHERE istar_user = "+istarUserId+"";
 			if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-				// System.out.println("getRankPointsForUser>>>>>>>>>>"+getRankPointsForUser);
+				// ViksitLogger.logMSG(this.getClass().getName(),"getRankPointsForUser>>>>>>>>>>"+getRankPointsForUser);
 			}
 			List<HashMap<String, Object>> rankPointsData = util.executeQuery(getRankPointsForUser);
 			int rank = 0;
@@ -79,8 +78,8 @@ public class AppCourseServices {
 				totalPoints = (double) rankPointsData.get(0).get("total_points");
 			}
 			if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-				// System.out.println("userPoints>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+userPoints);
-				// System.out.println("totalPoints>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+totalPoints);
+				// ViksitLogger.logMSG(this.getClass().getName(),"userPoints>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+userPoints);
+				// ViksitLogger.logMSG(this.getClass().getName(),"totalPoints>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+totalPoints);
 			}
 			coursePOJO.setUserPoints(userPoints);
 			coursePOJO.setRank(rank);
@@ -115,7 +114,7 @@ public class AppCourseServices {
 							int cmsId = cmsession.getId();
 							if (!cmsessionIds.contains(cmsId)) {
 								if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-									// System.out.println("Adding CMSession
+									// ViksitLogger.logMSG(this.getClass().getName(),"Adding CMSession
 									// Skill");
 								}
 								Set<String> allSkillObjectivesOfModule = new HashSet<String>();
@@ -188,7 +187,7 @@ public class AppCourseServices {
 
 							if (!cmsessionIds.contains(cmsession.getId())) {
 								if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-									// System.out.println("Adding CMSession
+									// ViksitLogger.logMSG(this.getClass().getName(),"Adding CMSession
 									// Skill");
 								}
 								Set<String> allSkillObjectivesOfModule = new HashSet<String>();
@@ -298,18 +297,18 @@ public class AppCourseServices {
 		List<SkillReportPOJO> shellTree = getShellSkillTreeForCourse(courseId);
 		for (SkillReportPOJO dd : shellTree) {
 			if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-				// System.err.println("in mod shell tree " + dd.getName() + " -
+				// ViksitLogger.logMSG(this.getClass().getName(),("in mod shell tree " + dd.getName() + " -
 				// " + dd.getId());
-				// System.err.println("in mod shell tree " + " " +
+				// ViksitLogger.logMSG(this.getClass().getName(),("in mod shell tree " + " " +
 				// dd.getUserPoints() + " " + dd.getTotalPoints() + " "
 				// + dd.getPercentage());
 
 			}
 			for (SkillReportPOJO ll : dd.getSkills()) {
 				if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-					// //System.err.println("in cmsession shell tree " +
+					// //ViksitLogger.logMSG(this.getClass().getName(),("in cmsession shell tree " +
 					// ll.getName() + " - " + ll.getId());
-					//// System.err.println("in cmsession shell tree " + " " +
+					//// ViksitLogger.logMSG(this.getClass().getName(),("in cmsession shell tree " + " " +
 					// ll.getUserPoints() + " " + ll.getTotalPoints()
 					// + " " + ll.getPercentage());
 				}
@@ -321,17 +320,17 @@ public class AppCourseServices {
 
 		for (SkillReportPOJO dd : skillReportForCourse) {
 			if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-				// System.err.println("in filled mod tree "+dd.getName()+" -
+				// ViksitLogger.logMSG(this.getClass().getName(),("in filled mod tree "+dd.getName()+" -
 				// "+dd.getId());
-				// System.err.println("in filled mod tree "+"
+				// ViksitLogger.logMSG(this.getClass().getName(),("in filled mod tree "+"
 				// "+dd.getUserPoints()+" "+dd.getTotalPoints()+"
 				// "+dd.getPercentage());
 			}
 			for (SkillReportPOJO ll : dd.getSkills()) {
 				if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-					// System.err.println("in filled sms tree "+ll.getName()+" -
+					// ViksitLogger.logMSG(this.getClass().getName(),("in filled sms tree "+ll.getName()+" -
 					// "+ll.getId());
-					// System.err.println("in filled sms tree "+"
+					// ViksitLogger.logMSG(this.getClass().getName(),("in filled sms tree "+"
 					// "+ll.getUserPoints()+" "+ll.getTotalPoints()+"
 					// "+ll.getPercentage());
 				}
@@ -349,7 +348,7 @@ public class AppCourseServices {
 				+ "course_id = "+courseId+" AND istar_user = "+istarUserId+" AND item_type = 'ASSESSMENT' ) AND assessment_question.questionid = question. ID AND "
 				+ "question.context_id = "+courseId+" AND P .item_type = 'QUESTION' ) SELECT s.* FROM summary s WHERE s.rk = 1 ) T1 JOIN skill_objective cmsession_skill ON ( T1.skill_objective = cmsession_skill. ID ) JOIN skill_objective module_skill ON ( module_skill. ID = cmsession_skill.parent_skill )";
 		if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-			// System.out.println("getDataForTree in course"+getDataForTree);
+			// ViksitLogger.logMSG(this.getClass().getName(),"getDataForTree in course"+getDataForTree);
 		}
 		DBUTILS util = new DBUTILS();
 		List<HashMap<String, Object>> data = util.executeQuery(getDataForTree);
@@ -372,7 +371,7 @@ public class AppCourseServices {
 								cmsSkill.setAccessedFirstTime(false);
 							} else {
 								if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-									// System.err.println(cmsSkill.getId()+" is
+									// ViksitLogger.logMSG(this.getClass().getName(),(cmsSkill.getId()+" is
 									// accessed for the second
 									// time"+cmsSkill.getAccessedFirstTime());
 								}
@@ -414,7 +413,7 @@ public class AppCourseServices {
 				+ "context_id = "+courseId+" GROUP BY skill_objective_id ) AB ON ( AB.skill_objective_id = T1.cmsession_skill_id )";
 		
 		if (AppProperies.getProperty("serverConfig").equalsIgnoreCase("dev")) {
-			// System.out.println("getEmptyTreeStructure>>>"+getEmptyTreeStructure);
+			// ViksitLogger.logMSG(this.getClass().getName(),"getEmptyTreeStructure>>>"+getEmptyTreeStructure);
 		}
 		List<HashMap<String, Object>> treeStructure = utils.executeQuery(getEmptyTreeStructure);
 		for (HashMap<String, Object> treeRow : treeStructure) {
@@ -482,11 +481,11 @@ public class AppCourseServices {
 	}
 
 	public void insertIntoUserGamificationOnCompletitionOfLessonByUser(int istarUserId, int lessonId, int courseId) {
-		// System.out.println("Starting to update UG");
+		// ViksitLogger.logMSG(this.getClass().getName(),"Starting to update UG");
 		String sqlBatch = "select batch_group_id from batch where course_id=" + courseId
 				+ " and batch_group_id in (select batch_group_id from batch_students where student_id=" + istarUserId
 				+ ")";
-		// System.out.println(sqlBatch);
+		// ViksitLogger.logMSG(this.getClass().getName(),sqlBatch);
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
 
@@ -500,7 +499,7 @@ public class AppCourseServices {
 				+ " group by student_playlist.student_id,student_playlist.course_id,student_playlist.module_id,student_playlist.cmsession_id, student_playlist.lesson_id, skill_objective.parent_skill) select *, cast("
 				+ benchmark
 				+ "*1.0/count(parent_skill) over (partition by lesson_id) as numeric) as points from temptable group by student_id, course_id, module_id, cmsession_id, lesson_id, parent_skill";
-		// System.out.println(dataForUserGamificationSQL);
+		// ViksitLogger.logMSG(this.getClass().getName(),dataForUserGamificationSQL);
 		SQLQuery queryDataUG = session.createSQLQuery(dataForUserGamificationSQL);
 
 		List<Object[]> resultUG = queryDataUG.list();
@@ -523,7 +522,7 @@ public class AppCourseServices {
 						+ cmsessionSkillObjectiveId + ", " + points + ", 0, '" + current + "', '" + current + "', "
 						+ lessonId + ", 'LESSON', " + cmsessionId + ", " + moduleId + ", " + courseId + ","
 						+ batchGroupId + ", 0, '" + current + "');";
-				// System.out.println(sql);
+				// ViksitLogger.logMSG(this.getClass().getName(),sql);
 				SQLQuery query = session.createSQLQuery(sql);
 				query.executeUpdate();
 			}
@@ -620,7 +619,7 @@ public class AppCourseServices {
 	 * moduleSkillReportPOJO.calculatePercentage();
 	 * moduleSkillReportPOJO.generateMessage();
 	 * skillsReport.add(moduleSkillReportPOJO); }else{
-	 * //System.out.println("Module is null with id->"+moduleId); } }
+	 * //ViksitLogger.logMSG(this.getClass().getName(),"Module is null with id->"+moduleId); } }
 	 * 
 	 * } } return null; }
 	 */
@@ -628,7 +627,7 @@ public class AppCourseServices {
 	/*
 	 * public List<SkillReportPOJO> getSkillsReportForCourseOfUser(int
 	 * istarUserId, int courseId){ //long previousTime =
-	 * System.currentTimeMillis(); ////System.err.println("500000000->" +
+	 * System.currentTimeMillis(); ////ViksitLogger.logMSG(this.getClass().getName(),("500000000->" +
 	 * "Time->"+(System.currentTimeMillis()-previousTime));
 	 * List<SkillReportPOJO> allSkillsReport = new ArrayList<SkillReportPOJO>();
 	 * HashMap<Integer, HashMap<String, Object>> skillsMap =
@@ -656,15 +655,15 @@ public class AppCourseServices {
 	 * 
 	 * cmsessionSkillReportPOJO.setId(cmsessionSkillObjective.getId());
 	 * cmsessionSkillReportPOJO.setName(cmsessionSkillObjective.getName());
-	 * ////System.err.println("5->" +
+	 * ////ViksitLogger.logMSG(this.getClass().getName(),("5->" +
 	 * "Time->"+(System.currentTimeMillis()-previousTime));
 	 * cmsessionSkillReportPOJO.setTotalPoints(getMaxPointsOfCmsessionSkill(
-	 * cmsessionSkillObjective.getId())); ////System.err.println("6->" +
+	 * cmsessionSkillObjective.getId())); ////ViksitLogger.logMSG(this.getClass().getName(),("6->" +
 	 * "Time->"+(System.currentTimeMillis()-previousTime));
 	 * if(skillsMap.containsKey(cmsessionSkillObjective.getId())){
 	 * cmsessionSkillReportPOJO.setUserPoints((Double)
 	 * skillsMap.get(cmsessionSkillObjective.getId()).get("points")); }else{
-	 * //System.out.println("CMSESSION SKILL NOT PRESENT->" +
+	 * //ViksitLogger.logMSG(this.getClass().getName(),"CMSESSION SKILL NOT PRESENT->" +
 	 * cmsessionSkillObjective.getId());
 	 * cmsessionSkillReportPOJO.setUserPoints(0.0); }
 	 * allCmsessionSkills.add(cmsessionSkillReportPOJO); } }
@@ -795,7 +794,7 @@ public class AppCourseServices {
 	 * getNumberOfLessonsForCmsessionOfUserForCourse(cmsessionId, courseId,
 	 * istarUserId);
 	 * 
-	 * //System.out.println("difficultyLevelSum->"+difficultyLevelSum+
+	 * //ViksitLogger.logMSG(this.getClass().getName(),"difficultyLevelSum->"+difficultyLevelSum+
 	 * " numberOfLessons->" + numberOfLessons);
 	 * 
 	 * try{ Properties properties = new Properties(); String propertyFileName =
@@ -821,7 +820,7 @@ public class AppCourseServices {
 				+ "question_skill_objective.questionid=question.id and question_skill_objective.learning_objectiveid=skill_objective.id and "
 				+ "skill_objective.parent_skill= :cmsessionSkillObjectiveId";
 
-		// System.out.println(sql);
+		// ViksitLogger.logMSG(this.getClass().getName(),sql);
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
 
@@ -924,7 +923,7 @@ public class AppCourseServices {
 		for (Integer cmsessionId : results) {
 			allCmsessions.add(getCmsession(cmsessionId));
 		}
-		// System.out.println("allCmsessions" + allCmsessions.size());
+		// ViksitLogger.logMSG(this.getClass().getName(),"allCmsessions" + allCmsessions.size());
 		return allCmsessions;
 	}
 
@@ -946,7 +945,7 @@ public class AppCourseServices {
 		for (Integer lessonId : results) {
 			allLessons.add(getLesson(lessonId));
 		}
-		// System.out.println("allLessons" + allLessons.size());
+		// ViksitLogger.logMSG(this.getClass().getName(),"allLessons" + allLessons.size());
 		return allLessons;
 	}
 

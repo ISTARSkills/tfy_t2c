@@ -1,6 +1,5 @@
 package com.istarindia.apps.services;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -10,8 +9,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
-import com.viksitpro.core.dao.entities.IstarUser;
-import com.viksitpro.core.dao.entities.SkillObjective;
 import com.viksitpro.core.dao.entities.UserGamification;
 import com.viksitpro.core.dao.entities.UserGamificationDAO;
 

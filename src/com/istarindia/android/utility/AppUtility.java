@@ -11,7 +11,6 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.SecureRandom;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -46,7 +45,7 @@ public class AppUtility {
 
 		File rootUploadFolder = new File(imageUploadPath + subDirectory);
 		if (!rootUploadFolder.exists()) {
-			// System.out.println("RootUploadFolder does not exists, creating new one");
+			// ViksitLogger.logMSG(this.getClass().getName(),"RootUploadFolder does not exists, creating new one");
 			rootUploadFolder.mkdir();
 
 			if (serverType.equalsIgnoreCase("linux"))
@@ -56,12 +55,12 @@ public class AppUtility {
 		if (context != null) {
 			subDirectory = subDirectory + context + "/";
 		}
-		// System.out.println("subDirectory"+subDirectory);
+		// ViksitLogger.logMSG(this.getClass().getName(),"subDirectory"+subDirectory);
 		imageUploadPath = imageUploadPath + subDirectory;
 		File uploadFolder = new File(imageUploadPath);
-		// System.out.println(uploadFolder.getAbsolutePath());
+		// ViksitLogger.logMSG(this.getClass().getName(),uploadFolder.getAbsolutePath());
 		if (!uploadFolder.exists()) {
-			// System.out.println("Folder does not exists");
+			// ViksitLogger.logMSG(this.getClass().getName(),"Folder does not exists");
 			uploadFolder.mkdir();
 			if (serverType.equalsIgnoreCase("linux"))
 				Files.setPosixFilePermissions(Paths.get(uploadFolder.getAbsolutePath()), perms);
@@ -75,8 +74,8 @@ public class AppUtility {
 		file.write(imgByteArray);
 		file.close();
 		File f = new File(filePath);
-		// System.out.println("absouolte file path ->"+f.getAbsolutePath());
-		// System.out.println("fileURL ->"+fileURL);
+		// ViksitLogger.logMSG(this.getClass().getName(),"absouolte file path ->"+f.getAbsolutePath());
+		// ViksitLogger.logMSG(this.getClass().getName(),"fileURL ->"+fileURL);
 		if (serverType.equalsIgnoreCase("linux"))
 			Files.setPosixFilePermissions(Paths.get(f.getAbsolutePath()), perms);
 

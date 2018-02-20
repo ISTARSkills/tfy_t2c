@@ -108,14 +108,14 @@ public class AppJobServices {
 		
 		
 		List<String> actions = new ArrayList<String>();
-		//System.out.println(stageLog.getStageType()+"--->"+stageLog.getStageName());
+		//ViksitLogger.logMSG(this.getClass().getName(),stageLog.getStageType()+"--->"+stageLog.getStageName());
 		for(PMStage pmStage: pmWorkflow.getStages()){
-			//System.out.println(pmStage.getName()+" are equal -->"+ pmStage.getType());
+			//ViksitLogger.logMSG(this.getClass().getName(),pmStage.getName()+" are equal -->"+ pmStage.getType());
 			if(pmStage.getName().equals(stageLog.getStageName()) && pmStage.getType().equals(stageLog.getStageType())){
-				//System.out.println("are equal");
+				//ViksitLogger.logMSG(this.getClass().getName(),"are equal");
 				List<PmStageAction> allStageActions = pmStage.getStageActions();				
 				for(PmStageAction stageAction : allStageActions){
-					//System.out.println(stageAction.getActionDetail());
+					//ViksitLogger.logMSG(this.getClass().getName(),stageAction.getActionDetail());
 					if(stageLog.getStageType().equals("test")){
 						actions.add(stageAction.getActionDetail());
 					}	
@@ -196,7 +196,7 @@ public class AppJobServices {
 		if(task!=null){
 		String sql = "select stage_log.id from task inner join stage_log on stage_log.task=task.id and stage_log.istar_user=task.actor and stage_log.stage_name=task.state where stage_log.task="+task.getId()+" and task.item_id="+task.getItemId()+" and task.item_type='JOB STUDENT' and stage_log.istar_user="+task.getIstarUserByActor().getId();
 	
-		//System.out.println(sql);
+		//ViksitLogger.logMSG(this.getClass().getName(),sql);
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
@@ -221,7 +221,7 @@ public class AppJobServices {
 		
 		String sql = "select id from istar_notification where task_id="+taskId;
 		
-		//System.out.println(sql);
+		//ViksitLogger.logMSG(this.getClass().getName(),sql);
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
@@ -325,12 +325,12 @@ public class AppJobServices {
 						type= "Offered";
 						break;
 					case "WAITING FOR ACCEPTANCE":
-						//System.out.println("WAITING FOR ACCEPTANCE");
+						//ViksitLogger.logMSG(this.getClass().getName(),"WAITING FOR ACCEPTANCE");
 						tag = "Pending";
 						type= "Offered";
 						break;
 					case "ACCPETED":
-						//System.out.println("ACCPETED");
+						//ViksitLogger.logMSG(this.getClass().getName(),"ACCPETED");
 						tag = "Job Offered";
 						type= "Offered";
 						break;
@@ -426,7 +426,7 @@ public class AppJobServices {
 		
 		String sql = "select id from stage_log where task="+taskId+" and istar_user="+istarUserId+" order by created_at desc";
 		
-		//System.out.println(sql);
+		//ViksitLogger.logMSG(this.getClass().getName(),sql);
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
@@ -442,7 +442,7 @@ public class AppJobServices {
 	public List<Integer> getAllJobTasksOfUser(int istarUserId){
 		
 		String sql = "select id from task where actor="+istarUserId+" and item_type='JOB STUDENT'";
-		//System.out.println(sql);
+		//ViksitLogger.logMSG(this.getClass().getName(),sql);
 		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();
@@ -465,7 +465,7 @@ public class AppJobServices {
 				arrayList.add(item);
 			}
 		} else {
-			//System.out.println("The specified itemSeparator does not exists in the input string"
+			//ViksitLogger.logMSG(this.getClass().getName(),"The specified itemSeparator does not exists in the input string"
 					//+ "\n The input will be converted to ArrayList of size 0");
 		}
 		return arrayList;

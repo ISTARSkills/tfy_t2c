@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import com.istarindia.android.pojo.AssessmentPOJO;
 import com.istarindia.android.pojo.TaskSummaryPOJO;
@@ -14,7 +15,6 @@ import com.istarindia.apps.services.AppAssessmentServices;
 import com.istarindia.apps.services.AppCourseServices;
 import com.viksitpro.core.dao.entities.Assessment;
 import com.viksitpro.core.dao.entities.BaseHibernateDAO;
-import com.viksitpro.core.dao.entities.Course;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.Task;
 
@@ -70,7 +70,7 @@ public class AppDashboardUtility {
 		AssessmentPOJO assessmentPOJO=null;
 		AppPOJOUtility appPOJOUtility = new AppPOJOUtility();
 			if(assessment!=null && assessment.getAssessmentQuestions().size() > 0){
-				//System.out.println("Assessment not null");
+				//ViksitLogger.logMSG(this.getClass().getName(),"Assessment not null");
 				assessmentPOJO = appPOJOUtility.getAssessmentPOJO(assessment);
 		}
 		return assessmentPOJO;
@@ -99,18 +99,22 @@ public class AppDashboardUtility {
 	public void updateStudentPlaylistStatus(int lessonId, int istarUserId, String status){		
 		BaseHibernateDAO baseHibernateDAO = new BaseHibernateDAO();
 		Session session = baseHibernateDAO.getSession();			
-		String sql = "update student_playlist set status='"+status+"' where student_id="+istarUserId+" and lesson_id="+lessonId +" returning course_id";
-		//System.out.println(sql);
+		String sql = "update student_playlist set status='"+status+"' where student_id="+istarUserId+" and lesson_id="+lessonId +"";
+		//ViksitLogger.logMSG(this.getClass().getName(),sql);
 		SQLQuery query = session.createSQLQuery(sql);
-		List<Integer> result = query.list();
-		session.close();
-		//System.out.println("Updating Student Playlist status");
-		
-		//System.out.println("Update User Gamification");
-		
-		if(result.size()>0){
-		
+		Transaction tx = session.beginTransaction();
+		try {
+			query.executeUpdate();
+			tx.commit();
 		}
+		catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			tx.rollback();
+		}finally {
+			session.close();
+		}
+		
 	}
 
 /*	public Object getDashboardCardForLessonTest(Task task) {
@@ -123,7 +127,7 @@ public class AppDashboardUtility {
 		if (lesson != null) {
 			
 			if(lesson.getType().equals("VIDEO")){
-				//System.out.println("LEsson is of type VIDEO");
+				//ViksitLogger.logMSG(this.getClass().getName(),"LEsson is of type VIDEO");
 				String thumbnailURL = lesson.getVideoLesson().getVideo_thumb_url();
 				String videoURL = lesson.getVideoLesson().getVideo_url();
 				

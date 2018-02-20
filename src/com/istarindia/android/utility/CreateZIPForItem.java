@@ -32,6 +32,7 @@ import com.viksitpro.core.cms.oldcontent.services.ZipFiles;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Task;
+import com.viksitpro.core.logger.ViksitLogger;
 import com.viksitpro.core.utilities.TaskItemCategory;
 
 public class CreateZIPForItem {
@@ -76,7 +77,7 @@ public class CreateZIPForItem {
 
 		switch (itemType) {
 		case TaskItemCategory.LESSON:
-			// System.out.println("Lesson ID" + task.getItemId());
+			// ViksitLogger.logMSG(this.getClass().getName(),"Lesson ID" + task.getItemId());
 			Lesson l = new LessonDAO().findById(task.getItemId());
 			object = generateXMLForLesson(l);
 			break;
@@ -216,9 +217,9 @@ public class CreateZIPForItem {
 		filesListInDir.clear();
 		filesListInDir.addAll(hs);
 
-		//System.out.println("Zip path for Lesson:" + lesson.getId());
+		//ViksitLogger.logMSG(this.getClass().getName(),"Zip path for Lesson:" + lesson.getId());
 		/*for (String key : filesListInDir) {
-			System.out.println(key);
+			ViksitLogger.logMSG(this.getClass().getName(),key);
 		}*/
 
 		zipFiles.zipLessonDirectory(filesListInDir, sourceFile, zipName);
@@ -237,7 +238,7 @@ public class CreateZIPForItem {
 	}
 
 	public VideoLesson createZIPForVideoLesson(Lesson lesson) throws Exception {
-		// System.out.println("Lesson Type is VIDEO");
+		// ViksitLogger.logMSG(this.getClass().getName(),"Lesson Type is VIDEO");
 		VideoLesson videoLesson = null;
 		Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
 		// add owners permission
@@ -348,7 +349,7 @@ public class CreateZIPForItem {
 
 	public static void writeToZipFile(String mediaPath, String pathOffileToInclude, ZipOutputStream zipOutputStream)
 			throws FileNotFoundException, IOException {
-		// System.out.println("Writing file : '" + pathOffileToInclude + "' to
+		// ViksitLogger.logMSG(this.getClass().getName(),"Writing file : '" + pathOffileToInclude + "' to
 		// zip file");
 
 		File file = new File(pathOffileToInclude);
@@ -370,7 +371,7 @@ public class CreateZIPForItem {
 	public static void main(String[] args) {
 		CreateZIPForItem kk = new CreateZIPForItem();
 
-		System.out.println("start");
+		
 		 for (int i = 163; i < 6953; i++) {
 		try {
 
@@ -380,7 +381,7 @@ public class CreateZIPForItem {
 			e.printStackTrace();
 		}
 		 }
-		System.out.println("end");
+		
 		System.exit(0);
 	}
 

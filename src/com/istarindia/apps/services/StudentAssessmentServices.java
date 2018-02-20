@@ -47,7 +47,7 @@ public class StudentAssessmentServices {
 			Boolean option1, Boolean option2, Boolean option3, Boolean option4, Boolean option5, Integer countryId, 
 			Integer organizationId, Integer batchGroupId, Integer timeTaken){
 		
-		//System.out.println("Updating to DAO");
+		//ViksitLogger.logMSG(this.getClass().getName(),"Updating to DAO");
 		
 		studentAssessment.setCorrect(correct);
 		studentAssessment.setOption1(option1);

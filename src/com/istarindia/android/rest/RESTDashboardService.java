@@ -1,5 +1,6 @@
 package com.istarindia.android.rest;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,12 +22,14 @@ import com.istarindia.apps.factories.TaskFactory;
 import com.istarindia.apps.services.AppComplexObjectServices;
 import com.istarindia.apps.services.GamificationServices;
 import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.dao.entities.IstarUserDAO;
 import com.viksitpro.core.dao.entities.Lesson;
 import com.viksitpro.core.dao.entities.LessonDAO;
 import com.viksitpro.core.dao.entities.Task;
 import com.viksitpro.core.dao.entities.TaskDAO;
 import com.viksitpro.core.dao.utils.task.TaskServices;
 import com.viksitpro.core.dao.utils.user.IstarUserServices;
+import com.viksitpro.core.logger.ViksitLogger;
 import com.viksitpro.core.utilities.TaskItemCategory;
 
 @Path("tasks/user/{userId}")
@@ -144,7 +147,9 @@ public class RESTDashboardService {
 
 			return Response.ok(result).build();
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			ViksitLogger.logMSGERROR(this.getClass().getName(), "Invalid Task found with task id "+ taskId+ " for User -> "+ userId);
+			
 			String result = e.getMessage() != null ? gson.toJson(e.getMessage())
 					: gson.toJson("istarViksitProComplexKeyBad Request or Internal Server Error");
 			return Response.status(Response.Status.OK).entity(result).build();
@@ -189,9 +194,10 @@ public class RESTDashboardService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response completeTask(@PathParam("userId") int userId, @PathParam("taskId") int taskId) {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		long starttime = System.currentTimeMillis();
 		try {
-			IstarUserServices istarUserServices = new IstarUserServices();
-			IstarUser istarUser = istarUserServices.getIstarUser(userId);
+			
+			IstarUser istarUser = new IstarUserDAO().findById(userId);
 
 			String role = "";
 
@@ -200,30 +206,37 @@ public class RESTDashboardService {
 						&& istarUser.getUserRoles().iterator().next().getRole().getRoleName() != null
 								? istarUser.getUserRoles().iterator().next().getRole().getRoleName() : "";
 			} catch (Exception e) {
-
+				e.printStackTrace();	
 			}
-
+			System.out.println(" to get role "+(System.currentTimeMillis()-starttime));
+			starttime = System.currentTimeMillis();
 			if (!role.equalsIgnoreCase("CONTENT_CREATOR")) {
 				TaskServices taskServices = new TaskServices();
 				taskServices.completeTask("COMPLETED", false, taskId, istarUser.getAuthToken());
-
-				Task task = taskServices.getTask(taskId);
-
+				Task task = new TaskDAO().findById(taskId);
+				System.out.println(" to get task "+(System.currentTimeMillis()-starttime));
+				starttime = System.currentTimeMillis();
+				
 				if (task.getItemType().equals(TaskItemCategory.LESSON)) {
 					AppDashboardUtility appDashboardUtility = new AppDashboardUtility();
 					appDashboardUtility.updateStudentPlaylistStatus(task.getItemId(), userId, "COMPLETED");
+					System.out.println(" to get update student play list "+(System.currentTimeMillis()-starttime));
+					starttime = System.currentTimeMillis();
 					GamificationServices gmService = new GamificationServices();
 					Lesson lesson = new LessonDAO().findById(task.getItemId());
 					gmService.updatePointsAndCoinsOnLessonComplete(istarUser, lesson);
+					System.out.println(" to update points and coins "+(System.currentTimeMillis()-starttime));
+					starttime = System.currentTimeMillis();
 				}
 
 			}else{
-				System.err.println("Task Doesn't marked as Completed due to user("+userId+") role is "+role);
+				ViksitLogger.logMSG(this.getClass().getName(),"Task Doesn't marked as Completed due to user("+userId+") role is "+role);
 			}
 			
 			AppComplexObjectServices appComplexObjectServices = new AppComplexObjectServices();
 			ComplexObject complexObject = appComplexObjectServices.getComplexObjectForUser(userId);
-
+			System.out.println(" to get complex object "+(System.currentTimeMillis()-starttime));
+			starttime = System.currentTimeMillis();
 			if (complexObject == null) {
 				throw new Exception();
 			}
