@@ -3,8 +3,18 @@ package com.istarindia.android.rest;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
+import java.sql.Timestamp;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -14,8 +24,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import com.viksitpro.core.dao.entities.IstarUser;
+import com.viksitpro.core.logger.UserJourney;
 import com.viksitpro.core.logger.ViksitLogger;
+import com.viksitpro.core.utilities.DBUTILS;
 
 /**
  * Servlet Filter implementation class SecurityFilter
@@ -55,31 +69,32 @@ public class SecurityFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		HttpServletResponse res=(HttpServletResponse)response;
+		HttpServletResponse res = (HttpServletResponse) response;
 		if (security_token_check.equalsIgnoreCase("true")) {
-			//ViksitLogger.logMSG(this.getClass().getName(),"security_token_check true");
+			// ViksitLogger.logMSG(this.getClass().getName(),"security_token_check true");
 			if (checkAuth((HttpServletRequest) request)) {
-				
+
 				ViksitLogger.logMSG(this.getClass().getName(), "Access Approved");
 				chain.doFilter(request, res);
 			} else {
-				ViksitLogger.logMSG(this.getClass().getName(),"Access Denied");
+				ViksitLogger.logMSG(this.getClass().getName(), "Access Denied");
 				res.setStatus(500);
 				res.getWriter().print("\"istarViksitProComplexKeySecurity Access Denied.\"");
 			}
 
 		} else {
-
+			long start = System.currentTimeMillis();
+			HttpSession session = ((HttpServletRequest) request).getSession(true);
 			chain.doFilter(request, res);
-			//ViksitLogger.logMSG(this.getClass().getName(),"security_token_check false");
+			long end = System.currentTimeMillis();
+			// ViksitLogger.logMSG(this.getClass().getName(),"security_token_check false");
+			new UserJourney().createUserJourneyEntry(request, end - start, session);
 		}
 
 	}
 
-	
-
 	private boolean checkAuth(HttpServletRequest request) {
-		ViksitLogger.logMSG(this.getClass().getName(),"Accessed via filter ");
+		ViksitLogger.logMSG(this.getClass().getName(), "Accessed via filter ");
 		return SecurityService.checkAuth(request);
 
 	}
